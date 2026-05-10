@@ -60,7 +60,7 @@ body{background:#F5F5F0;font-family:'DM Sans',sans-serif;color:#1a1a2e;-webkit-f
   </div>
   <div class="header-right">
     <div class="sync-label">Last sync</div>
-    <div class="sync-date">May 8 · 2026</div>
+    <div class="sync-date">May 10 · 2026</div>
   </div>
 </div>
 <div class="stats" id="stats"></div>
@@ -69,7 +69,33 @@ body{background:#F5F5F0;font-family:'DM Sans',sans-serif;color:#1a1a2e;-webkit-f
 <div class="tabs" id="tabs"></div>
 <div class="tasks" id="tasks"></div>
 <script>
-const TASKS=[{task:"Schedule training days — Florida Fire",project:"Soccer",status:"In Progress",priority:"High",notes:"Verbal deal reached. NFDA = Official Technical Training Partner"},{task:"Formalize written contract — Florida Fire",project:"Soccer",status:"To Do",priority:"High",notes:"10% referral fee agreed verbally"},{task:"Research + outreach to future club prospects",project:"Soccer",status:"To Do",priority:"Medium",notes:""},{task:"Secure field space — identify + negotiate terms",project:"Soccer",status:"To Do",priority:"High",notes:""},{task:"Schedule meeting — Vice Mayor Colburn (Miramar Grant)",project:"Soccer",status:"Waiting",priority:"Medium",notes:"Waiting on them to confirm"},{task:"Follow up — Pines Charter West Campus (Sean Chance)",project:"Soccer",status:"Waiting",priority:"High",notes:"Email sent, confirmed receipt"},{task:"Follow up — Somerset Academy",project:"Soccer",status:"Waiting",priority:"Medium",notes:"Email sent"},{task:"Reach out — Camp Embark / Lydia",project:"Soccer",status:"To Do",priority:"Medium",notes:""},{task:"Check in — Tony March (bereavement)",project:"Soccer",status:"Waiting",priority:"Low",notes:"Wait until appropriate time"},{task:"Research local summer camps + initiate outreach",project:"Soccer",status:"To Do",priority:"Medium",notes:""},{task:"Visit Miramar Sunset Lakes Park in person (D1)",project:"Soccer",status:"To Do",priority:"Medium",notes:"Need to identify contact on site"},{task:"Find Miramar banner contact (D2)",project:"Soccer",status:"To Do",priority:"Low",notes:""},{task:"Finalize Lauderhill Summer schedule + pitch",project:"Soccer",status:"To Do",priority:"Medium",notes:"Team has June off. Exploring May Wed/Fri sessions"},{task:"Check Broward County vendor registration status",project:"Soccer",status:"Waiting",priority:"High",notes:"Last checked Mon 4/13"},{task:"Follow up with Tania — Pembroke Pines PaymentWorks",project:"Soccer",status:"Waiting",priority:"High",notes:"Awaiting PaymentWorks invite"}];
+const TASKS=[
+  {task:"Schedule training days — Florida Fire",project:"Soccer",status:"In Progress",priority:"High",notes:"Verbal deal reached. NFDA = Official Technical Training Partner"},
+  {task:"Formalize written contract — Florida Fire",project:"Soccer",status:"To Do",priority:"High",notes:"10% referral fee agreed verbally"},
+  {task:"Research + outreach to future club prospects",project:"Soccer",status:"To Do",priority:"Medium",notes:""},
+  {task:"Secure field space — identify + negotiate terms",project:"Soccer",status:"To Do",priority:"High",notes:""},
+  {task:"Schedule meeting — Vice Mayor Colburn (Miramar Grant)",project:"Soccer",status:"Waiting",priority:"Medium",notes:"Waiting on them to confirm"},
+  {task:"Follow up — Pines Charter West Campus (Sean Chance)",project:"Soccer",status:"Waiting",priority:"High",notes:"Email sent, confirmed receipt"},
+  {task:"Follow up — Somerset Academy",project:"Soccer",status:"Waiting",priority:"Medium",notes:"Email sent"},
+  {task:"Reach out — Camp Embark / Lydia",project:"Soccer",status:"To Do",priority:"Medium",notes:""},
+  {task:"Check in — Tony March (bereavement)",project:"Soccer",status:"Waiting",priority:"Low",notes:"Wait until appropriate time"},
+  {task:"Research local summer camps + initiate outreach",project:"Soccer",status:"To Do",priority:"Medium",notes:""},
+  {task:"Visit Miramar Sunset Lakes Park in person (D1)",project:"Soccer",status:"To Do",priority:"Medium",notes:"Need to identify contact on site"},
+  {task:"Find Miramar banner contact (D2)",project:"Soccer",status:"To Do",priority:"Low",notes:""},
+  {task:"Finalize Lauderhill Summer schedule + pitch",project:"Soccer",status:"To Do",priority:"Medium",notes:"Team has June off. Exploring May Wed/Fri sessions"},
+  {task:"Check Broward County vendor registration status",project:"Soccer",status:"Waiting",priority:"High",notes:"Last checked Mon 4/13"},
+  {task:"Follow up with Tania — Pembroke Pines PaymentWorks",project:"Soccer",status:"Waiting",priority:"High",notes:"Awaiting PaymentWorks invite"},
+  {task:"Needs Follow Up — 4457 NW 185th St/ Zeisel",project:"Real Estate",status:"To Do",priority:"High",notes:"Property lead from Leads, CRM & A.I. Management chat"},
+  {task:"Needs Follow Up — 3055 Newell Blvd/ Henderson",project:"Real Estate",status:"To Do",priority:"High",notes:"Property lead from Leads, CRM & A.I. Management chat"},
+  {task:"Update Owner Disbursement — 3715 NW 194th St",project:"Real Estate",status:"To Do",priority:"High",notes:"Miami Gardens. Rent Period: May - Jun 2026. Rent Collected: $1,300"},
+  {task:"Update Owner Disbursement — 1606 SW 3rd Ct",project:"Real Estate",status:"To Do",priority:"High",notes:"Homestead. Rent Period: May 01–31, 2026. Collections: $2,666 [Rent: $2,540]"},
+  {task:"UPCOMING PROJECTS",project:"Real Estate",status:"To Do",priority:"Medium",notes:"Review upcoming project list with Jessie Adolfo"},
+  {task:"YouTube videos — Get transcripts & URLs",project:"Real Estate",status:"To Do",priority:"Low",notes:"Compile videos/articles about training a Gem. Get transcripts and URLs"},
+  {task:"Print yellow flyers for new SMRE",project:"Real Estate",status:"To Do",priority:"Low",notes:""},
+  {task:"Better Business Bureau Accreditation",project:"Real Estate",status:"To Do",priority:"Low",notes:"Apply for BBB accreditation. Annual dues $510-660 depending on employee count"},
+  {task:"SEO Weekly for Jessie",project:"Real Estate",status:"To Do",priority:"Medium",notes:"DOW/PND content (Argil AI), mass emails to CRM, blog→podcast via Google LM"},
+  {task:"DOW Schedule — Deal of the Week email",project:"Real Estate",status:"To Do",priority:"Medium",notes:"Draft PND email, schedule via FUB, send to Deal of the Week list"},
+];
 const PROJECTS={Soccer:{emoji:"⚽",color:"#059669",light:"#ECFDF5",border:"#A7F3D0",text:"#065F46"},"Real Estate":{emoji:"🏠",color:"#D97706",light:"#FFFBEB",border:"#FDE68A",text:"#92400E"},"Passive Income":{emoji:"💡",color:"#7C3AED",light:"#F5F3FF",border:"#DDD6FE",text:"#4C1D95"},Career:{emoji:"💼",color:"#2563EB",light:"#EFF6FF",border:"#BFDBFE",text:"#1E3A8A"},"Home Family":{emoji:"🏡",color:"#DB2777",light:"#FDF2F8",border:"#FBCFE8",text:"#831843"}};
 const STATUS_ORDER=["To Do","In Progress","Waiting","Done"];
 const STATUS_META={"To Do":{dot:"#EF4444",bg:"#FEF2F2",text:"#B91C1C"},"In Progress":{dot:"#F59E0B",bg:"#FFFBEB",text:"#B45309"},Waiting:{dot:"#9CA3AF",bg:"#F9FAFB",text:"#6B7280"},Done:{dot:"#10B981",bg:"#ECFDF5",text:"#065F46"}};
