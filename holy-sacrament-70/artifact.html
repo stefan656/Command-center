@@ -159,11 +159,15 @@ img{ max-width:100%; display:block; }
    if WebGL is unavailable, refused, or the context is lost. */
 .sky-paint{
   position:fixed; inset:0; z-index:-3; pointer-events:none;
+  /* A lit backdrop drape rather than a galaxy. The light comes from above
+     and falls off evenly toward the floor, the way an uplit blue curtain
+     behind a banquet table does. No bright core in the middle of the page:
+     that centre bloom is what made it read as deep space. */
   background:
-    radial-gradient(120% 80% at 50% 42%, rgba(74,76,255,.66) 0%, rgba(40,44,205,.54) 32%, rgba(20,26,120,.46) 62%, rgba(10,16,80,0) 88%),
-    radial-gradient(70% 50% at 8% 4%,  rgba(227,197,138,.2) 0%, rgba(227,197,138,0) 60%),
-    radial-gradient(70% 50% at 94% 6%, rgba(227,197,138,.18) 0%, rgba(227,197,138,0) 60%),
-    linear-gradient(178deg, #0c1358 0%, #171e9c 32%, #2a2ee0 55%, #171d9a 78%, #0b1152 100%);
+    radial-gradient(150% 105% at 50% -12%, rgba(118,126,255,.5) 0%, rgba(64,72,225,.36) 26%, rgba(30,38,150,.22) 56%, rgba(14,20,92,0) 84%),
+    radial-gradient(64% 44% at 6% 1%,  rgba(232,205,152,.26) 0%, rgba(232,205,152,0) 62%),
+    radial-gradient(64% 44% at 95% 3%, rgba(232,205,152,.23) 0%, rgba(232,205,152,0) 62%),
+    linear-gradient(177deg, #1a2296 0%, #222ac2 24%, #1e26b0 48%, #161d8a 72%, #101663 100%);
 }
 .sky-paint::after{
   content:"";
@@ -194,6 +198,49 @@ body.webgl .sky-paint::after{ opacity:.18; }
      without draining the colour out of the page edges. */
   background:
     radial-gradient(126% 84% at 50% 50%, rgba(9,14,74,0) 42%, rgba(9,14,74,.34) 84%, rgba(8,12,66,.58) 100%);
+}
+
+/* ---------- bokeh ---------------------------------------------------- */
+
+/* Out-of-focus warm lights, the single strongest cue that this is a room
+   dressed for a party rather than a starfield. Fixed layer, so the blur is
+   composited once instead of being repainted on every scroll frame. */
+.bokeh{
+  position:fixed; inset:0; z-index:-2;
+  pointer-events:none;
+  overflow:hidden;
+}
+.bokeh b{
+  position:absolute;
+  display:block;
+  border-radius:50%;
+  background:radial-gradient(circle,
+    rgba(255,241,208,.34) 0%,
+    rgba(243,214,155,.19) 38%,
+    rgba(226,196,140,.07) 64%,
+    rgba(226,196,140,0) 78%);
+  filter:blur(15px);
+  animation:bokeh-float 26s var(--ease-in-out) infinite;
+  will-change:transform;
+}
+/* A couple of cool ones so the warm lights have something to sit against. */
+.bokeh b.cool{
+  background:radial-gradient(circle,
+    rgba(196,208,255,.24) 0%,
+    rgba(150,168,255,.12) 40%,
+    rgba(130,150,255,0) 76%);
+}
+
+@keyframes bokeh-float{
+  0%,100%{ transform:translate3d(0,0,0)      scale(1);    opacity:.55; }
+  50%    { transform:translate3d(0,-26px,0)  scale(1.11); opacity:.82; }
+}
+
+/* The blur radius here is the expensive part, and phones get the least out
+   of it. Fewer, smaller, cheaper. */
+@media (max-width:760px){
+  .bokeh b{ filter:blur(11px); }
+  .bokeh b:nth-child(n+6){ display:none; }
 }
 
 /* ---------- the north star ------------------------------------------ */
@@ -557,45 +604,6 @@ section{
   }
 }
 
-/* ---------- about --------------------------------------------------- */
-
-.about-grid{
-  display:grid;
-  gap:clamp(1.8rem,5vw,3.5rem);
-  align-items:start;
-}
-@media (min-width:900px){
-  .about-grid{ grid-template-columns:1.15fr .85fr; gap:clamp(2.5rem,5vw,4.5rem); }
-}
-
-.placeholder-note{
-  display:inline-flex; align-items:center; gap:.5rem;
-  margin-bottom:1rem;
-  padding:.36rem .85rem;
-  border-radius:999px;
-  border:1px dashed rgba(227,197,138,.55);
-  background:rgba(227,197,138,.08);
-  font-family:'Cinzel',Georgia,serif;
-  font-size:.65rem; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--gold-bright);
-}
-.placeholder-body{ color:var(--paper-dim); }
-
-.at-a-glance{ display:grid; gap:1px; background:var(--hair); border-radius:var(--r-card); overflow:hidden; border:1px solid var(--hair); }
-.at-a-glance > div{
-  background:rgba(8,11,60,.72);
-  padding:1.15rem clamp(1.1rem,3vw,1.6rem);
-}
-.at-a-glance dt{
-  font-family:'Cinzel',Georgia,serif;
-  font-size:.6rem; letter-spacing:.22em; text-transform:uppercase;
-  color:var(--paper-dim);
-  margin-bottom:.35rem;
-}
-.at-a-glance dd{ margin:0; font-size:1.02rem; color:var(--paper); line-height:1.5; }
-.at-a-glance dd a{ color:var(--paper); text-decoration-color:rgba(227,197,138,.6); text-underline-offset:4px; }
-@media (hover:hover) and (pointer:fine){ .at-a-glance dd a:hover{ color:var(--gold-bright); } }
-
 /* ---------- calendar ------------------------------------------------ */
 
 .cal{
@@ -757,13 +765,12 @@ footer{
    not worth it on a phone, so touch devices get the flat surfaces above. */
 @media (pointer: fine){
   .card, .frame, .btn-ghost,
-  .needs li, .at-a-glance > div{
+  .needs li{
     -webkit-backdrop-filter:blur(9px);
     backdrop-filter:blur(9px);
   }
   :root{ --card-bg:rgba(10,14,66,.42); }
   .btn-ghost{ background:rgba(10,14,66,.35); }
-  .at-a-glance > div{ background:rgba(8,11,60,.55); }
   .needs li{ background:rgba(8,11,60,.5); }
   .frame{ background:linear-gradient(160deg, rgba(28,32,132,.55) 0%, rgba(7,10,52,.62) 100%); }
 }
@@ -788,6 +795,7 @@ footer{
   html{ scroll-behavior:auto; }
   .reveal{ opacity:1; transform:none; transition:opacity 300ms ease; }
   .sky-paint::after,
+  .bokeh b,
   .northstar .ns-halo,
   .northstar .ns-beam-v,
   .northstar .ns-beam-h,
@@ -801,7 +809,7 @@ footer{
   *{ scroll-behavior:auto !important; }
 }
 @media (prefers-reduced-transparency:reduce){
-  .card,.needs li,.at-a-glance > div,.frame,.btn-ghost{
+  .card,.needs li,.frame,.btn-ghost{
     -webkit-backdrop-filter:none; backdrop-filter:none;
     background:rgba(7,10,52,.92);
   }
@@ -809,6 +817,16 @@ footer{
 </style>
 <div class="sky-paint" aria-hidden="true"></div>
 <canvas id="sky" aria-hidden="true"></canvas>
+<div class="bokeh" aria-hidden="true">
+  <b style="left:7%;  top:16%; width:170px; height:170px; animation-delay:-2s;"></b>
+  <b style="left:78%; top:9%;  width:230px; height:230px; animation-delay:-9s;"></b>
+  <b style="left:26%; top:63%; width:135px; height:135px; animation-delay:-15s;"></b>
+  <b class="cool" style="left:63%; top:48%; width:265px; height:265px; animation-delay:-5s;"></b>
+  <b style="left:90%; top:74%; width:150px; height:150px; animation-delay:-19s;"></b>
+  <b style="left:44%; top:28%; width:105px; height:105px; animation-delay:-12s;"></b>
+  <b class="cool" style="left:14%; top:88%; width:195px; height:195px; animation-delay:-22s;"></b>
+  <b style="left:56%; top:81%; width:125px; height:125px; animation-delay:-7s;"></b>
+</div>
 <div class="veil" aria-hidden="true"></div>
 <div class="northstar" id="northstar" aria-hidden="true">
   <b class="ns-halo"></b>
@@ -843,68 +861,11 @@ footer{
           Register <span class="arrow" aria-hidden="true">&rarr;</span>
         </a>
         <a class="btn btn-ghost" href="#weekend">See the weekend</a>
+        <a class="btn btn-ghost" href="https://www.signupgenius.com/go/60B094FADA928ABFB6-64808560-hsec#/" target="_blank" rel="noopener">Donate</a>
       </div>
 
       <div class="scroll-hint reveal" style="--d:420ms" aria-hidden="true">
         <span>Scroll</span><i></i>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ ABOUT ============================ -->
-  <section id="about">
-    <div class="glow" data-depth="0.16" style="left:-14%;top:6%;width:min(60vw,620px);height:min(60vw,620px);background:radial-gradient(circle, rgba(43,44,230,.5) 0%, rgba(43,44,230,0) 70%);"></div>
-
-    <div class="wrap about-grid">
-      <div>
-        <h2 class="reveal">Seventy years of <span class="gold">Holy Sacrament</span></h2>
-        <svg class="swash reveal" style="--d:60ms" viewBox="0 0 150 11" fill="none" aria-hidden="true">
-          <path d="M0 5.5C22 5.5 30 1 45 1s20 9 34 9 22-9 36-9 27 4.5 35 4.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-          <circle cx="75" cy="5.5" r="2.6" fill="currentColor"/>
-        </svg>
-
-        <div class="reveal" style="--d:120ms">
-          <span class="placeholder-note">Placeholder text</span>
-          <!-- PLACEHOLDER: replace the two paragraphs below with the real
-               parish history before publishing. Everything else on this
-               page is final copy. -->
-          <div class="placeholder-body">
-            <p class="lede">
-              This is placeholder copy standing in for the real parish history.
-              Holy Sacrament Episcopal Church has gathered in Pembroke Pines for
-              seventy years, and this is where that story belongs: the founding
-              families, the first service, the building of the sanctuary, and the
-              rectors who carried the parish through each decade.
-            </p>
-            <p>
-              A few sentences on what the parish has meant to the neighborhood
-              would sit well here too, along with a line about the ministries and
-              the people who kept them going. Replace all of this with the real
-              history when it is ready.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="reveal" style="--d:180ms">
-        <dl class="at-a-glance">
-          <div>
-            <dt>Weekend</dt>
-            <dd>Saturday, September 19 and Sunday, September 20</dd>
-          </div>
-          <div>
-            <dt>Where</dt>
-            <dd>
-              <a href="https://www.google.com/maps/search/?api=1&query=2801+N+University+Dr+Pembroke+Pines+FL+33024" target="_blank" rel="noopener">
-                2801 N University Dr<br />Pembroke Pines, FL 33024
-              </a>
-            </dd>
-          </div>
-          <div>
-            <dt>Who</dt>
-            <dd>Every member, past and present, and everyone they bring with them</dd>
-          </div>
-        </dl>
       </div>
     </div>
   </section>
@@ -1185,7 +1146,7 @@ footer{
     // Fade the far plane out so new stars ease in instead of popping,
     // and fade the very near ones so they do not smear across the screen.
     '  float dist = -mv.z;',
-    '  float far  = 1.0 - smoothstep(900.0, 1750.0, dist);',
+    '  float far  = 1.0 - smoothstep(470.0, 980.0, dist);',
     '  float near = smoothstep(6.0, 60.0, dist);',
     '  vBright = tw * far * near;',
     '  vColor  = aColor;',
@@ -1257,17 +1218,24 @@ footer{
   // Star budget scaled to the device. Phones get well under half the desktop
   // count, which is the difference between 60fps and a warm battery.
   var COUNT  = (coarse || smallish) ? 1400 : 3200;
-  var DEPTH  = 1600;   // z extent of the volume
-  var TRAVEL = 620;    // how far the camera flies over the full page scroll
+  // Shallow volume and a short camera push. The old numbers flew the camera
+  // through a deep field, which is the motion that read as space flight;
+  // this drifts instead, so the stars behave like hung decorations catching
+  // the light rather than like something being flown past.
+  var DEPTH  = 820;    // z extent of the volume
+  var TRAVEL = 140;    // how far the camera moves over the full page scroll
 
   var pos   = new Float32Array(COUNT * 3);
   var col   = new Float32Array(COUNT * 3);
   var size  = new Float32Array(COUNT);
   var phase = new Float32Array(COUNT);
 
-  var WHITE = [1.00, 1.00, 1.00];
-  var GOLD  = [0.98, 0.83, 0.58];
-  var BLUE  = [0.72, 0.79, 1.00];
+  // Champagne rather than pure white, and gold carries the majority. A field
+  // of white and blue-white points is what stars look like; a field of warm
+  // gold ones is what fairy lights and glitter look like.
+  var CHAMP = [1.00, 0.96, 0.88];
+  var GOLD  = [1.00, 0.85, 0.58];
+  var ICE   = [0.86, 0.90, 1.00];
 
   // ~10% of the stars are pulled into two arcs in the upper corners,
   // echoing the gold dust flourishes on the printed invitation.
@@ -1294,8 +1262,9 @@ footer{
 
     pos[i3] = x; pos[i3 + 1] = y; pos[i3 + 2] = z;
 
+    // ~46% gold, ~42% champagne, ~12% ice.
     var roll = Math.random();
-    var c = (i < ARC) ? GOLD : (roll > 0.90 ? GOLD : (roll > 0.78 ? BLUE : WHITE));
+    var c = (i < ARC) ? GOLD : (roll > 0.54 ? GOLD : (roll > 0.12 ? CHAMP : ICE));
     col[i3] = c[0]; col[i3 + 1] = c[1]; col[i3 + 2] = c[2];
 
     // Sizes run large on purpose: at the old scale the field read as noise
@@ -1446,7 +1415,9 @@ footer{
     var cy = -easeY * 22;
     var cz = 90 - scrollE * TRAVEL;
 
-    setView(view, cx, cy, cz, -easeY * 0.05, easeX * 0.06, easeX * 0.014 + tSec * 0.004);
+    // No time-driven roll term: a sky that slowly rotates is a sky you are
+    // tumbling through. Roll now only answers the pointer.
+    setView(view, cx, cy, cz, -easeY * 0.05, easeX * 0.06, easeX * 0.014);
     draw();
   }
 
