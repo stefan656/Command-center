@@ -644,17 +644,12 @@ section{
 .cal-note{ color:var(--paper-dim); font-size:.96rem; }
 .cal-rule{ height:1px; background:linear-gradient(90deg, rgba(227,197,138,.5), rgba(227,197,138,0)); }
 
-/* ---------- registration (centered invitation moment) --------------- */
-
-.invite{
-  text-align:center;
-  max-width:660px;
-  margin-inline:auto;
-  padding:clamp(2.2rem,6vw,3.6rem) clamp(1.4rem,5vw,3.2rem);
-  perspective:1100px;
+/* Register sits directly under the three cards, centred on the grid. */
+.cal-cta{
+  display:flex;
+  justify-content:center;
+  margin-top:clamp(2.2rem,5vw,3.4rem);
 }
-.invite .btn{ margin-top:1.8rem; }
-.invite p{ margin-inline:auto; }
 
 /* ---------- donation (asymmetric split) ------------------------------ */
 
@@ -908,24 +903,8 @@ footer{
           <p class="cal-note">Twenty six dishes from the countries our parish calls home, served right after the service.</p>
         </article>
       </div>
-    </div>
-  </section>
 
-  <!-- ======================== REGISTRATION ========================= -->
-  <section id="register">
-    <div class="glow" data-depth="0.2" style="left:50%;top:0;transform:translateX(-50%);width:min(80vw,820px);height:min(50vw,520px);background:radial-gradient(circle, rgba(43,44,230,.42) 0%, rgba(43,44,230,0) 70%);"></div>
-
-    <div class="wrap">
-      <div class="card invite reveal" data-tilt>
-        <svg class="swash is-centered" viewBox="0 0 150 11" fill="none" aria-hidden="true">
-          <path d="M0 5.5C22 5.5 30 1 45 1s20 9 34 9 22-9 36-9 27 4.5 35 4.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
-          <circle cx="75" cy="5.5" r="2.6" fill="currentColor"/>
-        </svg>
-        <h2>You are cordially invited</h2>
-        <p class="lede" style="margin-top:1rem">
-          Let us know you are coming so we can set a place for you and yours.
-          Registration takes about a minute.
-        </p>
+      <div class="cal-cta reveal" id="register" style="--d:220ms">
         <a class="btn btn-primary" href="https://forms.gle/Wv25acTJ7sGoKymTA" target="_blank" rel="noopener">
           Register <span class="arrow" aria-hidden="true">&rarr;</span>
         </a>
