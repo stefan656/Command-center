@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>70th Anniversary Family Reunion Weekend | Holy Sacrament Episcopal Church</title>
+<meta name="description" content="Holy Sacrament Episcopal Church celebrates 70 years with a Family Reunion Weekend on September 19 and 20 in Pembroke Pines, Florida. Picnic, festive service, and fellowship around the world in 26 bites." />
+<meta name="theme-color" content="#05071f" />
+<meta property="og:title" content="70th Anniversary Family Reunion Weekend" />
+<meta property="og:description" content="Holy Sacrament Episcopal Church, September 19 and 20. Come home and celebrate seventy years with us." />
+<meta property="og:type" content="website" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&family=Lora:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   Holy Sacrament Episcopal Church, 70th Anniversary
+   Palette and type lifted from the printed invitation:
+   royal blue night sky, gold dust, warm white inscriptional serif.
+   One theme (dark). One accent (gold). One radius rule:
+   cards 18px, pressable things are pills.
+   ============================================================ */
+
+:root{
+  --void:        #03041a;
+  --blue-deep:   #070b38;
+  --blue-mid:    #14169e;
+  --blue-bright: #2b2ce6;
+
+  --gold:        #e3c58a;
+  --gold-bright: #f8e7bd;
+  --gold-deep:   #a8823f;
+
+  --paper:       #f2f3ff;
+  --paper-dim:   rgba(233,236,255,.74);
+  --paper-faint: rgba(226,230,255,.5);
+
+  --hair:        rgba(226,214,178,.22);
+  --card-bg:     rgba(10,14,66,.62);
+
+  --r-card: 18px;
+
+  /* Emil's stronger curves. The built in ones are too limp. */
+  --ease-out:    cubic-bezier(.23,1,.32,1);
+  --ease-in-out: cubic-bezier(.77,0,.175,1);
+
+  --pad: clamp(1.25rem, 5vw, 4rem);
+  --measure: 62ch;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  background:var(--void);
+  color:var(--paper);
+  font-family:'Lora', Georgia, serif;
+  font-size:clamp(1rem, .96rem + .25vw, 1.075rem);
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+
+img{ max-width:100%; display:block; }
+
+::selection{ background:var(--gold); color:#0a0c33; }
+
+:focus-visible{
+  outline:2px solid var(--gold-bright);
+  outline-offset:3px;
+  border-radius:4px;
+}
+
+/* ---------- the sky ------------------------------------------------ */
+
+/* Layer 0: painted CSS sky. Always present, so the page is never empty
+   if WebGL is unavailable, refused, or the context is lost. */
+.sky-paint{
+  position:fixed; inset:0; z-index:-3; pointer-events:none;
+  background:
+    radial-gradient(120% 80% at 50% 42%, rgba(48,49,224,.62) 0%, rgba(23,24,150,.5) 32%, rgba(9,12,64,.5) 62%, rgba(3,4,26,0) 88%),
+    radial-gradient(70% 50% at 8% 4%,  rgba(227,197,138,.16) 0%, rgba(227,197,138,0) 60%),
+    radial-gradient(70% 50% at 94% 6%, rgba(227,197,138,.14) 0%, rgba(227,197,138,0) 60%),
+    linear-gradient(178deg, #05061f 0%, #0a0d48 34%, #131593 55%, #090c46 78%, #03041a 100%);
+}
+.sky-paint::after{
+  content:"";
+  position:absolute; inset:-10%;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='19' cy='37' r='1'/%3E%3Ccircle cx='88' cy='14' r='.7'/%3E%3Ccircle cx='142' cy='63' r='1.1'/%3E%3Ccircle cx='205' cy='27' r='.7'/%3E%3Ccircle cx='268' cy='52' r='1'/%3E%3Ccircle cx='305' cy='113' r='.7'/%3E%3Ccircle cx='36' cy='121' r='.8'/%3E%3Ccircle cx='97' cy='168' r='1'/%3E%3Ccircle cx='161' cy='139' r='.7'/%3E%3Ccircle cx='233' cy='176' r='1.1'/%3E%3Ccircle cx='287' cy='209' r='.7'/%3E%3Ccircle cx='24' cy='223' r='1'/%3E%3Ccircle cx='72' cy='265' r='.8'/%3E%3Ccircle cx='129' cy='241' r='.7'/%3E%3Ccircle cx='186' cy='292' r='1'/%3E%3Ccircle cx='249' cy='268' r='.7'/%3E%3Ccircle cx='299' cy='301' r='.9'/%3E%3Ccircle cx='55' cy='84' r='.6'/%3E%3Ccircle cx='176' cy='97' r='.6'/%3E%3Ccircle cx='118' cy='198' r='.6'/%3E%3C/g%3E%3C/svg%3E");
+  opacity:.5;
+  animation:drift 140s linear infinite;
+}
+@keyframes drift{ to{ transform:translate3d(-320px,-320px,0); } }
+
+/* Layer 1: the real thing. */
+#sky{
+  position:fixed; inset:0; z-index:-2;
+  width:100%; height:100%;
+  display:block; pointer-events:none;
+  opacity:0;
+  transition:opacity 1200ms var(--ease-out);
+}
+#sky.is-live{ opacity:1; }
+/* When the canvas is live the painted dots would double up. */
+body.webgl .sky-paint::after{ opacity:.18; }
+
+/* Layer 2: vignette, keeps type legible over the brightest part of the sky. */
+.veil{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(115% 75% at 50% 50%, rgba(3,4,26,0) 38%, rgba(3,4,26,.55) 82%, rgba(3,4,26,.86) 100%);
+}
+
+/* ---------- type --------------------------------------------------- */
+
+.caps{
+  font-family:'Cinzel', Georgia, serif;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+  font-weight:500;
+}
+
+h1,h2,h3{ margin:0; font-weight:400; }
+
+h2{
+  font-family:'Cinzel', Georgia, serif;
+  font-size:clamp(1.85rem, 1.1rem + 3vw, 3.1rem);
+  line-height:1.16;
+  letter-spacing:.01em;
+  color:var(--paper);
+}
+
+h3{
+  font-family:'Cinzel', Georgia, serif;
+  font-size:clamp(1.15rem, .95rem + .8vw, 1.5rem);
+  line-height:1.3;
+  letter-spacing:.05em;
+}
+
+p{ margin:0 0 1.1em; max-width:var(--measure); }
+p:last-child{ margin-bottom:0; }
+
+.lede{
+  font-size:clamp(1.05rem, .98rem + .45vw, 1.28rem);
+  color:var(--paper-dim);
+}
+
+.gold{
+  background:linear-gradient(168deg, var(--gold-bright) 0%, var(--gold) 45%, var(--gold-deep) 100%);
+  -webkit-background-clip:text; background-clip:text;
+  color:var(--gold);
+  -webkit-text-fill-color:transparent;
+}
+@supports not (background-clip:text){ .gold{ color:var(--gold); -webkit-text-fill-color:var(--gold); } }
+
+/* Hairline flourish, the little swash from the invitation. */
+.swash{
+  width:clamp(90px,18vw,150px); height:11px;
+  display:block; margin:1.1rem 0;
+  color:var(--gold);
+  opacity:.75;
+}
+.swash.is-centered{ margin-left:auto; margin-right:auto; }
+
+/* ---------- layout ------------------------------------------------- */
+
+main{
+  position:relative; z-index:1;
+  /* The section glows deliberately bleed past the page edges. Clip the
+     horizontal overflow so they never create a sideways scrollbar, while
+     leaving vertical bleed alone so glows still carry between sections.
+     `clip` (unlike `hidden`) does not make this a scroll container. */
+  overflow-x:clip;
+}
+
+.wrap{
+  width:min(1140px, 100%);
+  margin-inline:auto;
+  padding-inline:var(--pad);
+}
+
+section{
+  position:relative;
+  padding-block:clamp(4.5rem, 11vh, 8.5rem);
+}
+
+/* Each section carries its own faint glow that parallaxes at a
+   different rate than the copy. That is where the depth comes from. */
+.glow{
+  position:absolute; z-index:-1; pointer-events:none;
+  border-radius:50%;
+  filter:blur(60px);
+  opacity:.5;
+  will-change:transform;
+}
+
+/* ---------- hero ---------------------------------------------------- */
+
+.hero{
+  min-height:100svh;
+  display:flex; flex-direction:column; justify-content:center;
+  padding-block:clamp(3.5rem,9vh,6rem) clamp(3rem,8vh,5rem);
+  text-align:center;
+}
+
+.hero-brand{
+  font-size:clamp(.66rem, .58rem + .42vw, .9rem);
+  letter-spacing:.3em;
+  color:var(--paper-dim);
+  margin-bottom:clamp(1rem,3vh,2rem);
+}
+.hero-brand span{ display:inline-block; }
+
+/* The 70 / Anniversary lockup */
+.lockup{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  line-height:1;
+}
+@media (min-width:760px){
+  .lockup{ flex-direction:row; justify-content:center; align-items:flex-start; }
+}
+
+.numeral{
+  font-family:'Playfair Display', Georgia, serif;
+  font-weight:700;
+  font-size:clamp(5.4rem, 20vw, 12.5rem);
+  line-height:.82;
+  letter-spacing:-.02em;
+  display:inline-block;
+  /* Light bloom, not a neon rim. Warm white at low opacity, matching the way
+     the display type blooms against the sky on the printed invitation, and
+     doing double duty as a legibility scrim over the bright centre. */
+  text-shadow:0 0 54px rgba(255,251,240,.26);
+}
+.numeral sup{
+  font-family:'Cinzel', Georgia, serif;
+  font-size:.2em;
+  font-weight:600;
+  letter-spacing:.06em;
+  /* Sits just under the numeral's cap height, as on the invitation. */
+  vertical-align:baseline;
+  position:relative;
+  bottom:2.6em;
+  margin-left:.1em;
+  -webkit-text-fill-color:currentColor;
+  color:var(--paper);
+}
+
+.script{
+  font-family:'Pinyon Script', 'Playfair Display', cursive;
+  font-size:clamp(3.2rem, 13.5vw, 8rem);
+  /* Pinyon has a deep y descender. Never let it clip. */
+  line-height:1.12;
+  padding-bottom:.12em;
+  margin-top:-.28em;
+  color:var(--paper);
+  text-shadow:0 0 44px rgba(255,251,240,.24);
+}
+@media (min-width:760px){
+  .script{ margin-top:.34em; margin-left:-.1em; }
+}
+
+.hero-title{
+  font-family:'Cinzel', Georgia, serif;
+  font-size:clamp(1.05rem, .7rem + 1.9vw, 2.05rem);
+  letter-spacing:.19em;
+  text-transform:uppercase;
+  margin-top:clamp(.5rem,2vh,1.4rem);
+  color:var(--paper);
+}
+
+.hero-sub{
+  margin:clamp(1.1rem,3vh,1.9rem) auto 0;
+  max-width:44ch;
+  color:var(--paper-dim);
+  font-size:clamp(1rem,.94rem + .38vw,1.2rem);
+}
+
+.hero-cta{
+  display:flex; flex-wrap:wrap; gap:.85rem;
+  justify-content:center;
+  margin-top:clamp(1.6rem,4vh,2.6rem);
+}
+
+.scroll-hint{
+  margin-top:clamp(1.8rem,5vh,3rem);
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.62rem; letter-spacing:.34em; text-transform:uppercase;
+  color:var(--paper-faint);
+  display:flex; flex-direction:column; align-items:center; gap:.6rem;
+}
+.scroll-hint i{
+  display:block; width:1px; height:38px;
+  background:linear-gradient(180deg, var(--gold) 0%, rgba(227,197,138,0) 100%);
+  animation:hint 2.6s var(--ease-in-out) infinite;
+  transform-origin:top;
+}
+@keyframes hint{
+  0%,100%{ transform:scaleY(.35); opacity:.35; }
+  45%    { transform:scaleY(1);   opacity:1; }
+}
+
+/* On very short screens the scroll cue is what pushes the hero past the
+   fold. It is decorative, so it is the first thing to go. */
+@media (max-height: 700px){
+  .scroll-hint{ display:none; }
+  .hero{ padding-block:clamp(2.5rem,7vh,4rem) clamp(2rem,6vh,3.5rem); }
+}
+
+/* ---------- buttons ------------------------------------------------- */
+
+.btn{
+  --btn-bg:transparent;
+  --btn-fg:var(--paper);
+  --btn-edge:var(--hair);
+  position:relative;
+  display:inline-flex; align-items:center; justify-content:center; gap:.6rem;
+  padding:.95rem 1.9rem;
+  border-radius:999px;
+  border:1px solid var(--btn-edge);
+  background:var(--btn-bg);
+  color:var(--btn-fg);
+  font-family:'Cinzel', Georgia, serif;
+  font-size:clamp(.72rem,.68rem+.18vw,.83rem);
+  font-weight:600;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+  text-decoration:none;
+  white-space:nowrap;
+  cursor:pointer;
+  transform-style:preserve-3d;
+  transition:
+    transform 200ms var(--ease-out),
+    border-color 200ms ease,
+    box-shadow 260ms var(--ease-out),
+    background-color 200ms ease;
+}
+.btn:active{ transform:scale(.975); }
+
+.btn-primary{
+  background:linear-gradient(168deg, var(--gold-bright) 0%, var(--gold) 55%, var(--gold-deep) 100%);
+  --btn-fg:#0a0c33;
+  --btn-edge:rgba(248,231,189,.9);
+  box-shadow:0 12px 28px -16px rgba(1,2,20,.95);
+}
+.btn-ghost{
+  background:rgba(12,16,74,.58);
+}
+
+@media (hover:hover) and (pointer:fine){
+  /* Lift and brighten the surface. The feedback comes from the button
+     moving toward you, not from a halo blooming behind it. */
+  .btn-primary:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(168deg, #fff3d8 0%, var(--gold-bright) 55%, var(--gold) 100%);
+    box-shadow:0 18px 36px -18px rgba(1,2,20,.98);
+  }
+  .btn-primary:active{ transform:translateY(-1px) scale(.975); }
+  .btn-ghost:hover{ border-color:rgba(227,197,138,.6); background:rgba(24,28,110,.5); }
+}
+
+.btn .arrow{
+  transition:transform 220ms var(--ease-out);
+  font-family:'Lora',serif;
+  letter-spacing:0;
+}
+@media (hover:hover) and (pointer:fine){
+  .btn:hover .arrow{ transform:translateX(4px); }
+}
+
+/* ---------- cards --------------------------------------------------- */
+
+.card{
+  position:relative;
+  border-radius:var(--r-card);
+  border:1px solid var(--hair);
+  background:var(--card-bg);
+  padding:clamp(1.4rem,3.4vw,2.2rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 22px 60px -34px rgba(2,4,32,.95);
+  transform-style:preserve-3d;
+  transition:
+    transform 420ms var(--ease-out),
+    border-color 300ms ease,
+    box-shadow 420ms var(--ease-out);
+}
+.card > *{ transform:translateZ(0.01px); }
+
+@media (hover:hover) and (pointer:fine){
+  .card.is-tilting{ transition:border-color 300ms ease, box-shadow 420ms var(--ease-out); }
+  .card:hover{
+    border-color:rgba(227,197,138,.42);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.11),
+      0 34px 74px -34px rgba(1,2,20,.98);
+  }
+}
+
+/* ---------- about --------------------------------------------------- */
+
+.about-grid{
+  display:grid;
+  gap:clamp(1.8rem,5vw,3.5rem);
+  align-items:start;
+}
+@media (min-width:900px){
+  .about-grid{ grid-template-columns:1.15fr .85fr; gap:clamp(2.5rem,5vw,4.5rem); }
+}
+
+.placeholder-note{
+  display:inline-flex; align-items:center; gap:.5rem;
+  margin-bottom:1rem;
+  padding:.36rem .85rem;
+  border-radius:999px;
+  border:1px dashed rgba(227,197,138,.55);
+  background:rgba(227,197,138,.08);
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.65rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold-bright);
+}
+.placeholder-body{ color:var(--paper-dim); }
+
+.at-a-glance{ display:grid; gap:1px; background:var(--hair); border-radius:var(--r-card); overflow:hidden; border:1px solid var(--hair); }
+.at-a-glance > div{
+  background:rgba(8,11,60,.72);
+  padding:1.15rem clamp(1.1rem,3vw,1.6rem);
+}
+.at-a-glance dt{
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.6rem; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--paper-dim);
+  margin-bottom:.35rem;
+}
+.at-a-glance dd{ margin:0; font-size:1.02rem; color:var(--paper); line-height:1.5; }
+.at-a-glance dd a{ color:var(--paper); text-decoration-color:rgba(227,197,138,.6); text-underline-offset:4px; }
+@media (hover:hover) and (pointer:fine){ .at-a-glance dd a:hover{ color:var(--gold-bright); } }
+
+/* ---------- calendar ------------------------------------------------ */
+
+.cal{
+  display:grid;
+  gap:clamp(1rem,2.4vw,1.5rem);
+  margin-top:clamp(2rem,5vh,3rem);
+  perspective:1100px;
+}
+@media (min-width:880px){ .cal{ grid-template-columns:repeat(3,1fr); } }
+
+.cal-card{ display:flex; flex-direction:column; gap:.9rem; }
+.cal-card p{ margin:0; max-width:none; }
+
+.cal-day{
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.62rem; letter-spacing:.26em; text-transform:uppercase;
+  color:var(--gold);
+}
+.cal-date{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(2.4rem,7vw,3.4rem);
+  line-height:.92;
+  font-weight:700;
+  display:flex; align-items:baseline; gap:.45rem;
+}
+.cal-date small{
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.24em; font-weight:500; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--paper-dim);
+  -webkit-text-fill-color:var(--paper-dim);
+}
+.cal-time{
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.78rem; letter-spacing:.13em;
+  color:var(--paper);
+  padding-top:.15rem;
+}
+.cal-note{ color:var(--paper-dim); font-size:.96rem; }
+.cal-rule{ height:1px; background:linear-gradient(90deg, rgba(227,197,138,.5), rgba(227,197,138,0)); }
+
+/* ---------- registration (centered invitation moment) --------------- */
+
+.invite{
+  text-align:center;
+  max-width:660px;
+  margin-inline:auto;
+  padding:clamp(2.2rem,6vw,3.6rem) clamp(1.4rem,5vw,3.2rem);
+  perspective:1100px;
+}
+.invite .btn{ margin-top:1.8rem; }
+.invite p{ margin-inline:auto; }
+
+/* ---------- donation (asymmetric split) ------------------------------ */
+
+.donate-grid{
+  display:grid; gap:clamp(1.8rem,4.5vw,3.2rem);
+  align-items:center;
+}
+@media (min-width:900px){ .donate-grid{ grid-template-columns:.95fr 1.05fr; } }
+
+.needs{
+  list-style:none; margin:0; padding:0;
+  display:grid; gap:1px;
+  background:var(--hair);
+  border:1px solid var(--hair);
+  border-radius:var(--r-card);
+  overflow:hidden;
+}
+.needs li{
+  background:rgba(8,11,60,.68);
+  padding:1rem clamp(1.1rem,3vw,1.5rem);
+  display:flex; align-items:baseline; gap:.9rem;
+  font-size:.98rem;
+  color:var(--paper-dim);
+  transition:background-color 260ms ease, color 260ms ease;
+}
+.needs li b{
+  font-family:'Cinzel',Georgia,serif;
+  font-weight:600; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold);
+  min-width:1.4rem;
+}
+@media (hover:hover) and (pointer:fine){
+  .needs li:hover{ background:rgba(20,24,104,.6); color:var(--paper); }
+}
+
+/* ---------- photo album (memory band) -------------------------------- */
+
+.photos{ text-align:center; }
+.frames{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:clamp(.7rem,2vw,1.1rem);
+  margin:clamp(2rem,5vh,3rem) 0 clamp(1.8rem,4vh,2.6rem);
+  perspective:1200px;
+}
+@media (min-width:760px){ .frames{ grid-template-columns:repeat(4,1fr); } }
+
+.frame{
+  aspect-ratio:4/5;
+  border-radius:var(--r-card);
+  border:1px solid var(--hair);
+  background:
+    linear-gradient(160deg, rgba(28,32,132,.7) 0%, rgba(7,10,52,.78) 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:.5rem;
+  padding:1rem;
+  color:var(--paper-dim);
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.55rem; letter-spacing:.2em; text-transform:uppercase;
+  text-align:center;
+  transform-style:preserve-3d;
+  transition:transform 420ms var(--ease-out), border-color 300ms ease;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 20px 48px -30px rgba(2,4,32,.95);
+}
+.frame svg{ width:26px; height:26px; color:var(--gold); opacity:.8; }
+@media (hover:hover) and (pointer:fine){
+  .frame:hover{ border-color:rgba(227,197,138,.4); }
+}
+.frame:nth-child(2){ transform:translateY(-10px); }
+.frame:nth-child(4){ transform:translateY(-10px); }
+@media (max-width:759px){ .frame:nth-child(2),.frame:nth-child(4){ transform:none; } }
+
+/* ---------- footer --------------------------------------------------- */
+
+footer p{ max-width:none; }
+
+footer{
+  position:relative; z-index:1;
+  border-top:1px solid var(--hair);
+  padding-block:clamp(2.6rem,7vh,4rem);
+  text-align:center;
+  background:linear-gradient(180deg, rgba(3,4,26,0) 0%, rgba(3,4,26,.72) 100%);
+}
+.foot-name{
+  font-family:'Cinzel',Georgia,serif;
+  font-size:clamp(.72rem,.66rem+.3vw,.92rem);
+  letter-spacing:.24em; text-transform:uppercase;
+  color:var(--paper);
+}
+.foot-addr{
+  margin-top:.9rem;
+  color:var(--paper-dim);
+  font-size:.95rem;
+}
+.foot-addr a{ color:var(--paper-dim); text-decoration-color:rgba(227,197,138,.5); text-underline-offset:4px; }
+@media (hover:hover) and (pointer:fine){ .foot-addr a:hover{ color:var(--gold-bright); } }
+.foot-links{
+  margin-top:1.4rem;
+  display:flex; flex-wrap:wrap; gap:.5rem 1.6rem; justify-content:center;
+  font-family:'Cinzel',Georgia,serif;
+  font-size:.63rem; letter-spacing:.2em; text-transform:uppercase;
+}
+.foot-links a{ color:var(--paper-dim); text-decoration:none; transition:color 200ms ease; }
+@media (hover:hover) and (pointer:fine){ .foot-links a:hover{ color:var(--gold); } }
+
+/* Frosted panels are re-blurred by the compositor on every scroll frame,
+   and this page scrolls over a live canvas. Worth it on a desktop GPU,
+   not worth it on a phone, so touch devices get the flat surfaces above. */
+@media (pointer: fine){
+  .card, .frame, .btn-ghost,
+  .needs li, .at-a-glance > div{
+    -webkit-backdrop-filter:blur(9px);
+    backdrop-filter:blur(9px);
+  }
+  :root{ --card-bg:rgba(10,14,66,.42); }
+  .btn-ghost{ background:rgba(10,14,66,.35); }
+  .at-a-glance > div{ background:rgba(8,11,60,.55); }
+  .needs li{ background:rgba(8,11,60,.5); }
+  .frame{ background:linear-gradient(160deg, rgba(28,32,132,.55) 0%, rgba(7,10,52,.62) 100%); }
+}
+
+/* ---------- scroll reveal -------------------------------------------- */
+
+.reveal{
+  opacity:0;
+  transform:translate3d(0,22px,0);
+  transition:
+    opacity 780ms var(--ease-out),
+    transform 780ms var(--ease-out);
+  transition-delay:var(--d, 0ms);
+  will-change:transform,opacity;
+}
+.reveal.is-in{ opacity:1; transform:none; }
+.reveal.is-in{ will-change:auto; }
+
+/* ---------- reduced motion -------------------------------------------- */
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  .reveal{ opacity:1; transform:none; transition:opacity 300ms ease; }
+  .sky-paint::after,
+  .scroll-hint i{ animation:none; }
+  .scroll-hint i{ opacity:.6; transform:none; }
+  .card,.frame,.btn{ transition:border-color 200ms ease, box-shadow 200ms ease; }
+  .frame:nth-child(2),.frame:nth-child(4){ transform:none; }
+  *{ scroll-behavior:auto !important; }
+}
+@media (prefers-reduced-transparency:reduce){
+  .card,.needs li,.at-a-glance > div,.frame,.btn-ghost{
+    -webkit-backdrop-filter:none; backdrop-filter:none;
+    background:rgba(7,10,52,.92);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sky-paint" aria-hidden="true"></div>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+
+<main>
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <p class="caps hero-brand reveal">Holy Sacrament Episcopal Church</p>
+
+      <div class="lockup reveal" style="--d:90ms">
+        <span class="numeral gold">70<sup>th</sup></span>
+        <span class="script">Anniversary</span>
+      </div>
+
+      <h1 class="hero-title reveal" style="--d:180ms">Family Reunion Weekend</h1>
+
+      <p class="hero-sub reveal" style="--d:250ms">
+        Two days of picnic, praise, and food from around the world.
+        September 19 and 20 in Pembroke Pines.
+      </p>
+
+      <div class="hero-cta reveal" style="--d:320ms">
+        <a class="btn btn-primary" href="https://forms.gle/Wv25acTJ7sGoKymTA" target="_blank" rel="noopener">
+          Register <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="btn btn-ghost" href="#weekend">See the weekend</a>
+      </div>
+
+      <div class="scroll-hint reveal" style="--d:420ms" aria-hidden="true">
+        <span>Scroll</span><i></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ ABOUT ============================ -->
+  <section id="about">
+    <div class="glow" data-depth="0.16" style="left:-14%;top:6%;width:min(60vw,620px);height:min(60vw,620px);background:radial-gradient(circle, rgba(43,44,230,.5) 0%, rgba(43,44,230,0) 70%);"></div>
+
+    <div class="wrap about-grid">
+      <div>
+        <h2 class="reveal">Seventy years of <span class="gold">Holy Sacrament</span></h2>
+        <svg class="swash reveal" style="--d:60ms" viewBox="0 0 150 11" fill="none" aria-hidden="true">
+          <path d="M0 5.5C22 5.5 30 1 45 1s20 9 34 9 22-9 36-9 27 4.5 35 4.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          <circle cx="75" cy="5.5" r="2.6" fill="currentColor"/>
+        </svg>
+
+        <div class="reveal" style="--d:120ms">
+          <span class="placeholder-note">Placeholder text</span>
+          <!-- PLACEHOLDER: replace the two paragraphs below with the real
+               parish history before publishing. Everything else on this
+               page is final copy. -->
+          <div class="placeholder-body">
+            <p class="lede">
+              This is placeholder copy standing in for the real parish history.
+              Holy Sacrament Episcopal Church has gathered in Pembroke Pines for
+              seventy years, and this is where that story belongs: the founding
+              families, the first service, the building of the sanctuary, and the
+              rectors who carried the parish through each decade.
+            </p>
+            <p>
+              A few sentences on what the parish has meant to the neighborhood
+              would sit well here too, along with a line about the ministries and
+              the people who kept them going. Replace all of this with the real
+              history when it is ready.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal" style="--d:180ms">
+        <dl class="at-a-glance">
+          <div>
+            <dt>Weekend</dt>
+            <dd>Saturday, September 19 and Sunday, September 20</dd>
+          </div>
+          <div>
+            <dt>Where</dt>
+            <dd>
+              <a href="https://www.google.com/maps/search/?api=1&query=2801+N+University+Dr+Pembroke+Pines+FL+33024" target="_blank" rel="noopener">
+                2801 N University Dr<br />Pembroke Pines, FL 33024
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt>Who</dt>
+            <dd>Every member, past and present, and everyone they bring with them</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== CALENDAR =========================== -->
+  <section id="weekend">
+    <div class="glow" data-depth="0.24" style="right:-18%;top:12%;width:min(66vw,700px);height:min(66vw,700px);background:radial-gradient(circle, rgba(227,197,138,.2) 0%, rgba(227,197,138,0) 70%);"></div>
+
+    <div class="wrap">
+      <h2 class="reveal">The weekend</h2>
+      <p class="lede reveal" style="--d:60ms; margin-top:1rem">
+        Three gatherings across two days. Come for one, come for all of them.
+      </p>
+
+      <div class="cal">
+        <article class="card cal-card reveal" data-tilt style="--d:0ms">
+          <p class="cal-day">Saturday</p>
+          <p class="cal-date gold">19 <small>Sept</small></p>
+          <div class="cal-rule"></div>
+          <h3>Family Picnic</h3>
+          <p class="cal-time">12:00 PM to 6:00 PM</p>
+          <p class="cal-note">An afternoon on the grounds with food, games, and room for the children to run.</p>
+        </article>
+
+        <article class="card cal-card reveal" data-tilt style="--d:80ms">
+          <p class="cal-day">Sunday</p>
+          <p class="cal-date gold">20 <small>Sept</small></p>
+          <div class="cal-rule"></div>
+          <h3>Festive Service</h3>
+          <p class="cal-time">9:30 AM</p>
+          <p class="cal-note">Our anniversary celebration of the Eucharist, with the choir and the whole parish family together.</p>
+        </article>
+
+        <article class="card cal-card reveal" data-tilt style="--d:160ms">
+          <p class="cal-day">Sunday</p>
+          <p class="cal-date gold">20 <small>Sept</small></p>
+          <div class="cal-rule"></div>
+          <h3>Fellowship Around the World in 26 Bites</h3>
+          <p class="cal-time">11:30 AM</p>
+          <p class="cal-note">Twenty six dishes from the countries our parish calls home, served right after the service.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== REGISTRATION ========================= -->
+  <section id="register">
+    <div class="glow" data-depth="0.2" style="left:50%;top:0;transform:translateX(-50%);width:min(80vw,820px);height:min(50vw,520px);background:radial-gradient(circle, rgba(43,44,230,.42) 0%, rgba(43,44,230,0) 70%);"></div>
+
+    <div class="wrap">
+      <div class="card invite reveal" data-tilt>
+        <svg class="swash is-centered" viewBox="0 0 150 11" fill="none" aria-hidden="true">
+          <path d="M0 5.5C22 5.5 30 1 45 1s20 9 34 9 22-9 36-9 27 4.5 35 4.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          <circle cx="75" cy="5.5" r="2.6" fill="currentColor"/>
+        </svg>
+        <h2>You are cordially invited</h2>
+        <p class="lede" style="margin-top:1rem">
+          Let us know you are coming so we can set a place for you and yours.
+          Registration takes about a minute.
+        </p>
+        <a class="btn btn-primary" href="https://forms.gle/Wv25acTJ7sGoKymTA" target="_blank" rel="noopener">
+          Register <span class="arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================== DONATIONS =========================== -->
+  <section id="donate">
+    <div class="glow" data-depth="0.18" style="left:-12%;bottom:4%;width:min(58vw,600px);height:min(58vw,600px);background:radial-gradient(circle, rgba(227,197,138,.17) 0%, rgba(227,197,138,0) 70%);"></div>
+
+    <div class="wrap donate-grid">
+      <div>
+        <h2 class="reveal">Bring something to the table</h2>
+        <p class="lede reveal" style="--d:60ms; margin-top:1rem">
+          A weekend this size runs on what the parish carries in. The sign up
+          sheet shows what is still needed and who has claimed what.
+        </p>
+        <div class="reveal" style="--d:120ms; margin-top:1.7rem">
+          <a class="btn btn-primary" href="https://www.signupgenius.com/go/60B094FADA928ABFB6-64808560-hsec#/" target="_blank" rel="noopener">
+            Donate items <span class="arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <ol class="needs reveal" style="--d:180ms">
+        <li><b>01</b> Open the sign up sheet and see what is still uncovered</li>
+        <li><b>02</b> Claim an item, or a few, and add your name</li>
+        <li><b>03</b> Bring it with you on the day of the event</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ========================= PHOTO ALBUM ========================== -->
+  <section id="photos">
+    <div class="glow" data-depth="0.22" style="right:-16%;top:8%;width:min(62vw,660px);height:min(62vw,660px);background:radial-gradient(circle, rgba(43,44,230,.4) 0%, rgba(43,44,230,0) 70%);"></div>
+
+    <div class="wrap photos">
+      <h2 class="reveal">Seventy years of photographs</h2>
+      <p class="lede reveal" style="--d:60ms; margin:1rem auto 0">
+        Baptisms, choir robes, church suppers, and every Sunday in between.
+        Add yours to the shared album so the whole parish can see them.
+      </p>
+
+      <!-- TODO: swap these four placeholder frames for real parish photos
+           (roughly 800x1000 each) once the album has images to feature. -->
+      <div class="frames reveal" style="--d:120ms">
+        <div class="frame" data-tilt>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.4"/><path d="M8.5 6l1.3-2h4.4l1.3 2"/></svg>
+          <span>Your photo here</span>
+        </div>
+        <div class="frame" data-tilt>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.4"/><path d="M8.5 6l1.3-2h4.4l1.3 2"/></svg>
+          <span>Your photo here</span>
+        </div>
+        <div class="frame" data-tilt>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.4"/><path d="M8.5 6l1.3-2h4.4l1.3 2"/></svg>
+          <span>Your photo here</span>
+        </div>
+        <div class="frame" data-tilt>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.4"/><path d="M8.5 6l1.3-2h4.4l1.3 2"/></svg>
+          <span>Your photo here</span>
+        </div>
+      </div>
+
+      <a class="btn btn-primary reveal" style="--d:180ms" href="https://photos.app.goo.gl/yv1YRmU7grUxKZZ8A" target="_blank" rel="noopener">
+        Add your photos <span class="arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="foot-name">Holy Sacrament Episcopal Church</p>
+    <p class="foot-addr">
+      <a href="https://www.google.com/maps/search/?api=1&query=2801+N+University+Dr+Pembroke+Pines+FL+33024" target="_blank" rel="noopener">
+        2801 N University Dr, Pembroke Pines, FL 33024
+      </a>
+    </p>
+    <nav class="foot-links" aria-label="Anniversary links">
+      <a href="https://forms.gle/Wv25acTJ7sGoKymTA" target="_blank" rel="noopener">Register</a>
+      <a href="https://www.signupgenius.com/go/60B094FADA928ABFB6-64808560-hsec#/" target="_blank" rel="noopener">Donate items</a>
+      <a href="https://photos.app.goo.gl/yv1YRmU7grUxKZZ8A" target="_blank" rel="noopener">Add your photos</a>
+      <a href="#top">Back to top</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- =====================================================================
+     3D starfield.
+
+     Hand-rolled WebGL rather than a library. This is one draw call of one
+     point cloud with two custom shaders, which is the entire job; pulling in
+     three.js would cost ~163KB gzipped for code we would never touch, on a
+     page whose visitors are mostly on phones. The sprite is drawn
+     procedurally in the fragment shader, so there is no texture request
+     either. Total cost here is a few KB inline and zero network round trips.
+
+     Camera flies forward on scroll and drifts with the pointer. Everything
+     is damped so nothing snaps. If WebGL is missing, fails, or the context
+     is lost, the painted CSS sky underneath is already doing the job.
+     ===================================================================== -->
+<script>
+(function(){
+  'use strict';
+
+  var canvas  = document.getElementById('sky');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var coarse  = window.matchMedia('(pointer: coarse)').matches;
+
+  var gl = null;
+  try{
+    var opts = {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,          // points do not need MSAA and it is not free
+      depth: false,              // additive point cloud, nothing to depth test
+      stencil: false,
+      powerPreference: 'high-performance',
+      failIfMajorPerformanceCaveat: false
+    };
+    gl = canvas.getContext('webgl', opts) || canvas.getContext('experimental-webgl', opts);
+  }catch(e){ gl = null; }
+
+  if (!gl) return;   // CSS sky stays, nothing else to do
+
+  /* ---------- shaders ------------------------------------------------ */
+
+  var VERT = [
+    'attribute vec3  aPos;',
+    'attribute vec3  aColor;',
+    'attribute float aSize;',
+    'attribute float aPhase;',
+    'uniform mat4  uProj;',
+    'uniform mat4  uView;',
+    'uniform float uTime;',
+    'uniform float uDpr;',
+    'uniform float uTwinkle;',
+    'uniform float uMaxPoint;',
+    'varying vec3  vColor;',
+    'varying float vBright;',
+    'void main(){',
+    '  vec4 mv = uView * vec4(aPos, 1.0);',
+    '  gl_Position = uProj * mv;',
+    '  float tw = 1.0 - uTwinkle * 0.42',
+    '           + uTwinkle * 0.42 * sin(uTime * 1.35 + aPhase * 6.2831853);',
+    // Fade the far plane out so new stars ease in instead of popping,
+    // and fade the very near ones so they do not smear across the screen.
+    '  float dist = -mv.z;',
+    '  float far  = 1.0 - smoothstep(900.0, 1750.0, dist);',
+    '  float near = smoothstep(6.0, 60.0, dist);',
+    '  vBright = tw * far * near;',
+    '  vColor  = aColor;',
+    '  gl_PointSize = min(aSize * uDpr * (320.0 / max(dist, 1.0)), uMaxPoint);',
+    '}'
+  ].join('\n');
+
+  var FRAG = [
+    'precision mediump float;',
+    'varying vec3  vColor;',
+    'varying float vBright;',
+    'void main(){',
+    '  vec2 uv = gl_PointCoord - 0.5;',
+    '  float d = length(uv);',
+    '  if (d > 0.5) discard;',
+    '  float core = smoothstep(0.5, 0.0, d);',
+    '  float glow = pow(core, 2.6);',
+    '  float a = glow * vBright;',
+    '  if (a < 0.006) discard;',
+    // Premultiplied output, additive accumulation.
+    '  gl_FragColor = vec4(vColor * (0.55 + 0.85 * glow) * a, a);',
+    '}'
+  ].join('\n');
+
+  function compile(type, src){
+    var s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { gl.deleteShader(s); return null; }
+    return s;
+  }
+
+  var vs = compile(gl.VERTEX_SHADER, VERT);
+  var fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) return;
+
+  var prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+  gl.useProgram(prog);
+
+  var A = {
+    pos:   gl.getAttribLocation(prog, 'aPos'),
+    color: gl.getAttribLocation(prog, 'aColor'),
+    size:  gl.getAttribLocation(prog, 'aSize'),
+    phase: gl.getAttribLocation(prog, 'aPhase')
+  };
+  var U = {
+    proj:     gl.getUniformLocation(prog, 'uProj'),
+    view:     gl.getUniformLocation(prog, 'uView'),
+    time:     gl.getUniformLocation(prog, 'uTime'),
+    dpr:      gl.getUniformLocation(prog, 'uDpr'),
+    twinkle:  gl.getUniformLocation(prog, 'uTwinkle'),
+    maxPoint: gl.getUniformLocation(prog, 'uMaxPoint')
+  };
+
+  // Some mobile GPUs cap gl_PointSize far lower than desktop. Respect it.
+  var sizeRange = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE);
+  gl.uniform1f(U.maxPoint, Math.min(sizeRange && sizeRange[1] ? sizeRange[1] : 64, 128));
+  gl.uniform1f(U.twinkle, reduced ? 0.0 : 1.0);
+
+  /* ---------- the star volume ---------------------------------------- */
+
+  var smallish = Math.min(window.innerWidth, window.innerHeight) < 720;
+  // Star budget scaled to the device. Phones get well under half the desktop
+  // count, which is the difference between 60fps and a warm battery.
+  var COUNT  = (coarse || smallish) ? 1400 : 3200;
+  var DEPTH  = 1600;   // z extent of the volume
+  var TRAVEL = 620;    // how far the camera flies over the full page scroll
+
+  var pos   = new Float32Array(COUNT * 3);
+  var col   = new Float32Array(COUNT * 3);
+  var size  = new Float32Array(COUNT);
+  var phase = new Float32Array(COUNT);
+
+  var WHITE = [1.00, 1.00, 1.00];
+  var GOLD  = [0.98, 0.83, 0.58];
+  var BLUE  = [0.72, 0.79, 1.00];
+
+  // ~10% of the stars are pulled into two arcs in the upper corners,
+  // echoing the gold dust flourishes on the printed invitation.
+  var ARC = Math.floor(COUNT * 0.10);
+
+  for (var i = 0; i < COUNT; i++){
+    var i3 = i * 3, x, y, z;
+
+    if (i < ARC){
+      var left = (i % 2 === 0);
+      var t = Math.random();
+      var ang = (left ? Math.PI * 0.95 : Math.PI * 0.05) + (left ? 1 : -1) * t * 1.25;
+      var r = 380 + Math.random() * 190;
+      var jitter = (Math.random() - 0.5) * 130;
+      x = Math.cos(ang) * (r + jitter) * 1.25;
+      y = Math.abs(Math.sin(ang)) * (r + jitter) * 0.72 + 180;
+      z = -120 - Math.random() * 380;
+    } else {
+      var spread = 620;
+      x = (Math.random() - 0.5) * spread * 3.1;
+      y = (Math.random() - 0.5) * spread * 2.3;
+      z = 80 - Math.random() * DEPTH;
+    }
+
+    pos[i3] = x; pos[i3 + 1] = y; pos[i3 + 2] = z;
+
+    var roll = Math.random();
+    var c = (i < ARC) ? GOLD : (roll > 0.90 ? GOLD : (roll > 0.78 ? BLUE : WHITE));
+    col[i3] = c[0]; col[i3 + 1] = c[1]; col[i3 + 2] = c[2];
+
+    // A handful of noticeably larger stars carry the sparkle read.
+    size[i] = (i < ARC)
+      ? 1.6 + Math.random() * 2.2
+      : (Math.random() > 0.965 ? 6.5 + Math.random() * 5.5 : 1.3 + Math.random() * 3.2);
+    phase[i] = Math.random();
+  }
+
+  function buffer(data, loc, n){
+    var b = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, b);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, n, gl.FLOAT, false, 0, 0);
+    return b;
+  }
+  buffer(pos, A.pos, 3);
+  buffer(col, A.color, 3);
+  buffer(size, A.size, 1);
+  buffer(phase, A.phase, 1);
+
+  gl.disable(gl.DEPTH_TEST);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.ONE, gl.ONE);          // additive, premultiplied
+  gl.clearColor(0, 0, 0, 0);
+
+  /* ---------- matrices ------------------------------------------------ */
+  /* Column-major, same convention as WebGL expects. Only what we use:
+     a perspective projection and a camera that translates and rotates
+     by small angles. No general-purpose matrix library needed. */
+
+  var proj = new Float32Array(16);
+  var view = new Float32Array(16);
+
+  function perspective(out, fovyDeg, aspect, near, far){
+    var f = 1 / Math.tan((fovyDeg * Math.PI / 180) / 2);
+    var nf = 1 / (near - far);
+    out[0] = f / aspect; out[1] = 0; out[2] = 0;  out[3] = 0;
+    out[4] = 0; out[5] = f; out[6] = 0;  out[7] = 0;
+    out[8] = 0; out[9] = 0; out[10] = (far + near) * nf; out[11] = -1;
+    out[12] = 0; out[13] = 0; out[14] = (2 * far * near) * nf; out[15] = 0;
+  }
+
+  // view = Rx(-pitch) * Ry(-yaw) * Rz(-roll) * T(-cam), expanded inline.
+  function setView(out, cx, cy, cz, pitch, yaw, roll){
+    var sp = Math.sin(-pitch), cp = Math.cos(-pitch);
+    var sy = Math.sin(-yaw),   cy2 = Math.cos(-yaw);
+    var sr = Math.sin(-roll),  cr = Math.cos(-roll);
+
+    // R = Rx * Ry * Rz  (row-major rotation, written into column-major slots)
+    var r00 = cy2 * cr,                  r01 = -cy2 * sr,                 r02 = sy;
+    var r10 = sp * sy * cr + cp * sr,    r11 = -sp * sy * sr + cp * cr,   r12 = -sp * cy2;
+    var r20 = -cp * sy * cr + sp * sr,   r21 = cp * sy * sr + sp * cr,    r22 = cp * cy2;
+
+    out[0] = r00; out[1] = r10; out[2]  = r20; out[3]  = 0;
+    out[4] = r01; out[5] = r11; out[6]  = r21; out[7]  = 0;
+    out[8] = r02; out[9] = r12; out[10] = r22; out[11] = 0;
+    // translation = -R * cam
+    out[12] = -(r00 * cx + r01 * cy + r02 * cz);
+    out[13] = -(r10 * cx + r11 * cy + r12 * cz);
+    out[14] = -(r20 * cx + r21 * cy + r22 * cz);
+    out[15] = 1;
+  }
+
+  /* ---------- sizing --------------------------------------------------- */
+
+  // Cap DPR hard. Retina phones will happily hand you 3.0 and melt.
+  var maxDPR = coarse ? 1.5 : 2;
+  var dpr = 1, vw = 0, vh = 0;
+
+  function applySize(){
+    vw = window.innerWidth;
+    vh = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, maxDPR);
+    canvas.width  = Math.round(vw * dpr);
+    canvas.height = Math.round(vh * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    perspective(proj, 62, vw / vh, 1, 2600);
+    gl.uniformMatrix4fv(U.proj, false, proj);
+    gl.uniform1f(U.dpr, dpr);
+  }
+  applySize();
+
+  /* ---------- input ---------------------------------------------------- */
+
+  var ptrX = 0, ptrY = 0, easeX = 0, easeY = 0;
+  var scrollT = 0, scrollE = 0;
+
+  function readScroll(){
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    scrollT = max > 0 ? Math.min(window.pageYOffset / max, 1) : 0;
+  }
+  readScroll();
+  addEventListener('scroll', readScroll, { passive: true });
+
+  if (!coarse && !reduced){
+    addEventListener('pointermove', function(e){
+      ptrX = (e.clientX / window.innerWidth  - 0.5) * 2;
+      ptrY = (e.clientY / window.innerHeight - 0.5) * 2;
+    }, { passive: true });
+  }
+
+  var resizeTimer;
+  addEventListener('resize', function(){
+    // Mobile browsers fire resize every time the address bar slides.
+    // Ignore height-only nudges; only a real width change needs work.
+    if (window.innerWidth === vw && Math.abs(window.innerHeight - vh) < 120){
+      readScroll();
+      return;
+    }
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){ applySize(); readScroll(); }, 150);
+  }, { passive: true });
+
+  /* ---------- loop ------------------------------------------------------ */
+
+  var running = true, raf = 0, last = performance.now(), tSec = 0;
+
+  function draw(){
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniformMatrix4fv(U.view, false, view);
+    gl.uniform1f(U.time, tSec);
+    gl.drawArrays(gl.POINTS, 0, COUNT);
+  }
+
+  function frame(now){
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+
+    // Clamp dt so a backgrounded tab does not lurch on return.
+    var dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    tSec += dt;
+
+    // Frame-rate independent damping.
+    var k = 1 - Math.pow(0.001, dt);
+    scrollE += (scrollT - scrollE) * k;
+    easeX   += (ptrX - easeX) * k;
+    easeY   += (ptrY - easeY) * k;
+
+    // Pointer drift, plus a slow autonomous drift so touch devices still
+    // feel like they are moving through something.
+    var auto = coarse ? Math.sin(tSec * 0.11) * 0.34 : 0;
+    var cx = (easeX + auto) * 34;
+    var cy = -easeY * 22;
+    var cz = 90 - scrollE * TRAVEL;
+
+    setView(view, cx, cy, cz, -easeY * 0.05, easeX * 0.06, easeX * 0.014 + tSec * 0.004);
+    draw();
+  }
+
+  document.addEventListener('visibilitychange', function(){
+    running = !document.hidden;
+    if (running){ last = performance.now(); raf = requestAnimationFrame(frame); }
+    else { cancelAnimationFrame(raf); }
+  });
+
+  canvas.addEventListener('webglcontextlost', function(e){
+    e.preventDefault();
+    running = false;
+    cancelAnimationFrame(raf);
+    // Hand the sky back to CSS rather than leaving a dead black rectangle.
+    canvas.classList.remove('is-live');
+    document.body.classList.remove('webgl');
+  });
+
+  if (reduced){
+    // One static frame. No motion, but the sky is still there.
+    setView(view, 0, 0, 90, 0, 0, 0);
+    draw();
+  } else {
+    setView(view, 0, 0, 90, 0, 0, 0);
+    raf = requestAnimationFrame(frame);
+  }
+
+  document.body.classList.add('webgl');
+  canvas.classList.add('is-live');
+})();
+</script>
+
+<!-- =====================================================================
+     Page motion: scroll reveals, section parallax, card tilt.
+     All transform/opacity only, all on one rAF, all off on reduced motion.
+     ===================================================================== -->
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine    = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  /* ---- reveal on enter --------------------------------------------- */
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+
+  if (reduced || !('IntersectionObserver' in window)){
+    reveals.forEach(function(el){ el.classList.add('is-in'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.06 });
+
+    reveals.forEach(function(el){ io.observe(el); });
+
+    // Anything already on screen at load reveals immediately, staggered.
+    requestAnimationFrame(function(){
+      reveals.forEach(function(el){
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.92){
+          el.classList.add('is-in');
+          io.unobserve(el);
+        }
+      });
+    });
+  }
+
+  /* ---- section glow parallax ---------------------------------------- */
+  /* One rAF, transforms only, and only for glows currently in view.
+     Scroll listener writes a number; the loop does the work. */
+  if (!reduced){
+    var glows = Array.prototype.slice.call(document.querySelectorAll('.glow[data-depth]'));
+
+    if (glows.length){
+      var layers = glows.map(function(el){
+        return {
+          el: el,
+          depth: parseFloat(el.getAttribute('data-depth')) || 0.15,
+          // Preserve any centring transform authored in the style attribute.
+          base: (el.style.transform || '').trim(),
+          top: 0,
+          h: 0,
+          y: 0,
+          on: false
+        };
+      });
+
+      var measure = function(){
+        var sy = window.pageYOffset;
+        layers.forEach(function(l){
+          var r = l.el.getBoundingClientRect();
+          l.top = r.top + sy;
+          l.h = r.height;
+        });
+      };
+      measure();
+      addEventListener('resize', function(){ clearTimeout(window.__glowT); window.__glowT = setTimeout(measure, 150); }, { passive: true });
+      addEventListener('load', measure);
+
+      var ticking = false;
+      var runParallax = function(){
+        ticking = false;
+        var sy = window.pageYOffset;
+        var vh = window.innerHeight;
+
+        for (var i = 0; i < layers.length; i++){
+          var l = layers[i];
+          var visible = (l.top < sy + vh + 200) && (l.top + l.h > sy - 200);
+          if (!visible){
+            if (l.on){ l.el.style.willChange = 'auto'; l.on = false; }
+            continue;
+          }
+          if (!l.on){ l.el.style.willChange = 'transform'; l.on = true; }
+
+          // Distance of the layer's centre from the viewport centre.
+          var delta = (sy + vh / 2) - (l.top + l.h / 2);
+          var y = delta * l.depth;
+          if (Math.abs(y - l.y) < 0.4) continue;
+          l.y = y;
+          l.el.style.transform = l.base + ' translate3d(0,' + y.toFixed(1) + 'px,0)';
+        }
+      };
+
+      addEventListener('scroll', function(){
+        if (!ticking){ ticking = true; requestAnimationFrame(runParallax); }
+      }, { passive: true });
+
+      requestAnimationFrame(runParallax);
+    }
+  }
+
+  /* ---- 3D tilt on cards and frames ----------------------------------- */
+  /* Desktop pointers only. Touch never runs this, so phones pay nothing. */
+  if (fine && !reduced){
+    var MAX = 6;      // degrees
+    var LIFT = 10;    // px toward the viewer
+
+    Array.prototype.forEach.call(document.querySelectorAll('[data-tilt]'), function(el){
+      var frameReq = 0, rx = 0, ry = 0;
+      var resting = el.style.transform || '';
+
+      function write(){
+        frameReq = 0;
+        el.style.transform = resting +
+          ' perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translate3d(0,0,' + LIFT + 'px)';
+      }
+
+      el.addEventListener('pointerenter', function(){
+        el.classList.add('is-tilting');
+        el.style.willChange = 'transform';
+      });
+
+      el.addEventListener('pointermove', function(e){
+        var r = el.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width  - 0.5;
+        var py = (e.clientY - r.top)  / r.height - 0.5;
+        ry =  px * MAX * 2;
+        rx = -py * MAX * 2;
+        if (!frameReq) frameReq = requestAnimationFrame(write);
+      }, { passive: true });
+
+      function reset(){
+        if (frameReq){ cancelAnimationFrame(frameReq); frameReq = 0; }
+        el.classList.remove('is-tilting');   // brings the 420ms ease back for the return
+        el.style.transform = resting;
+        el.style.willChange = 'auto';
+      }
+      el.addEventListener('pointerleave', reset);
+      el.addEventListener('pointercancel', reset);
+    });
+  }
+
+  /* ---- smooth in-page jumps respect reduced motion ------------------- */
+  if (reduced){
+    document.documentElement.style.scrollBehavior = 'auto';
+  }
+})();
+</script>
+
+</body>
+</html>
