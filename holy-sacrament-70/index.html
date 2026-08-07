@@ -589,6 +589,10 @@ section{
 }
 @media (min-width:900px){ .donate-grid{ grid-template-columns:.95fr 1.05fr; } }
 
+/* The heading and copy above stay left-aligned; only the button centers,
+   within its own column. */
+.donate-cta{ text-align:center; }
+
 .needs{
   list-style:none; margin:0; padding:0;
   display:grid; gap:1px;
@@ -860,7 +864,7 @@ footer{
           A weekend this size runs on what the parish carries in. The sign up
           sheet shows what is still needed and who has claimed what.
         </p>
-        <div class="reveal" style="--d:120ms; margin-top:1.7rem">
+        <div class="donate-cta reveal" style="--d:120ms; margin-top:1.7rem">
           <a class="btn btn-primary" href="https://www.signupgenius.com/go/60B094FADA928ABFB6-64808560-hsec#/" target="_blank" rel="noopener">
             Donate &amp; Volunteer <span class="arrow" aria-hidden="true">&rarr;</span>
           </a>
