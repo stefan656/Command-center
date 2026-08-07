@@ -8,6 +8,8 @@ page cannot be published as-is. This produces the variant that can:
 
   * unwraps the document (the host provides the shell)
   * inlines the four webfonts as base64 woff2 (no fonts.googleapis.com)
+  * inlines every local photo (photos/*.jpg) as a base64 data: URI, since
+    the published artifact cannot fetch same-origin files either
   * re-asserts the viewport meta, which is otherwise lost with the <head>
 
 Regenerate with:  python3 build-artifact.py
@@ -81,6 +83,27 @@ def inline_fonts():
     return "\n".join(blocks)
 
 
+def inline_photos(body):
+    """<img src="photos/foo.jpg"> -> <img src="data:image/jpeg;base64,...">"""
+    total = 0
+
+    def replace(m):
+        nonlocal total
+        rel = m.group(1)
+        path = HERE / rel
+        if not path.is_file():
+            sys.exit(f"referenced photo missing on disk: {rel}")
+        data = path.read_bytes()
+        total += len(data)
+        b64 = base64.b64encode(data).decode()
+        return f'src="data:image/jpeg;base64,{b64}"'
+
+    body, n = re.subn(r'src="(photos/[^"]+\.jpg)"', replace, body)
+    if n:
+        print(f"  inlined {n} photos, {total // 1024} KB of jpeg")
+    return body
+
+
 def main():
     src = SRC.read_text()
 
@@ -101,6 +124,8 @@ def main():
         + "\n",
         1,
     )
+
+    body = inline_photos(body)
 
     OUT.write_text(
         "\n".join([title, VIEWPORT_SHIM, style, body.strip(), ""])
