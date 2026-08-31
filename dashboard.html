@@ -166,10 +166,11 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .bar-value{color:var(--cyan-0);font-weight:700}
 .bar-track{height:5px;background:rgba(120,235,255,.08);border-radius:3px;overflow:hidden;position:relative}
 .bar-fill{
-  height:100%;border-radius:3px;width:0%;
+  height:100%;border-radius:3px;width:100%;
+  transform-origin:left center;transform:scaleX(0);
   background:linear-gradient(90deg,var(--cyan-3),var(--cyan-1));
   box-shadow:0 0 8px rgba(90,220,255,.7);
-  transition:width 1.4s cubic-bezier(.2,.8,.2,1);
+  transition:transform 1.4s cubic-bezier(.2,.8,.2,1);
 }
 
 .hud-sponsors{top:560px;right:24px;width:min(340px,30vw)}
@@ -378,9 +379,14 @@ $('bars').innerHTML = funnel.map(function(f){
   return '<div class="bar-row"><div class="bar-label"><span>'+f.stage+'</span><span class="bar-value">'+f.value+'</span></div>'+
          '<div class="bar-track"><div class="bar-fill" data-pct="'+f.pct+'"></div></div></div>';
 }).join('');
+document.querySelectorAll('.bar-fill').forEach(function(el){
+  el.style.width = Math.min(100, parseFloat(el.dataset.pct)) + '%';
+});
 requestAnimationFrame(function(){
-  document.querySelectorAll('.bar-fill').forEach(function(el){
-    el.style.width = Math.min(100, parseFloat(el.dataset.pct)) + '%';
+  requestAnimationFrame(function(){
+    document.querySelectorAll('.bar-fill').forEach(function(el){
+      el.style.transform = 'scaleX(1)';
+    });
   });
 });
 
