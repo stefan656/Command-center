@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>J.A.R.V.I.S. — Command Center</title>
+<title>V.I.K.I. — Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -12,19 +12,18 @@
   --navy-0:#020408;
   --navy-1:#040a14;
   --navy-2:#07121f;
-  --cyan-0:#eafeff;
-  --cyan-1:#7ffcff;
-  --cyan-2:#3fd4ec;
-  --cyan-3:#1a8fa8;
-  --cyan-dim:#0d3a45;
-  --amber:#ffb545;
-  --amber-dim:#7a5220;
-  --green:#3ef0a8;
+  --blue-0:#eef4fb;   /* silver-white: primary text / voxel highlights */
+  --blue-1:#4fa6ff;   /* electric blue: primary accent */
+  --blue-2:#6f93c2;   /* steel blue: secondary accent / labels */
+  --blue-3:#3c5776;   /* dim steel blue: tertiary labels */
+  --blue-dim:#0f2438;
+  --celebrate:#ffd25c;      /* reserved: closed deals / wins / milestones only */
+  --celebrate-soft:#ffe6a3;
   --red:#ff5f6d;
-  --glow:0 0 6px rgba(120,250,255,.85),0 0 18px rgba(90,220,255,.45),0 0 40px rgba(60,180,255,.2);
-  --glow-soft:0 0 10px rgba(90,220,255,.35);
-  --panel-bg:linear-gradient(160deg,rgba(14,34,48,.52),rgba(4,10,18,.38));
-  --panel-border:rgba(120,235,255,.22);
+  --glow:0 0 6px rgba(130,190,255,.85),0 0 18px rgba(90,160,255,.45),0 0 40px rgba(70,140,240,.2);
+  --glow-soft:0 0 10px rgba(90,160,255,.35);
+  --panel-bg:linear-gradient(160deg,rgba(18,32,52,.52),rgba(4,9,18,.38));
+  --panel-border:rgba(140,180,230,.22);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{
@@ -32,11 +31,11 @@ html,body{
   background:var(--navy-0);
   overflow:hidden;
   font-family:'Share Tech Mono',monospace;
-  color:var(--cyan-1);
+  color:var(--blue-1);
   -webkit-font-smoothing:antialiased;
 }
 h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
-::selection{background:rgba(90,220,255,.3)}
+::selection{background:rgba(90,160,255,.3)}
 
 #scene{position:fixed;inset:0;z-index:0;display:block}
 
@@ -52,7 +51,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .scan-sweep{
   position:fixed;left:0;right:0;height:26vh;z-index:7;pointer-events:none;
   top:-26vh;
-  background:linear-gradient(to bottom, transparent, rgba(120,240,255,.05) 45%, rgba(120,240,255,.09) 50%, rgba(120,240,255,.05) 55%, transparent);
+  background:linear-gradient(to bottom, transparent, rgba(130,190,255,.05) 45%, rgba(130,190,255,.09) 50%, rgba(130,190,255,.05) 55%, transparent);
   animation:sweep 9s linear infinite;
   mix-blend-mode:screen;
 }
@@ -62,7 +61,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 }
 .noise-vig{
   position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.5;
-  background:radial-gradient(ellipse at 50% 50%, rgba(10,30,45,0) 0%, rgba(2,5,10,0) 55%, rgba(2,4,8,.55) 100%);
+  background:radial-gradient(ellipse at 50% 50%, rgba(12,26,42,0) 0%, rgba(2,5,10,0) 55%, rgba(2,4,8,.55) 100%);
 }
 
 .hud{position:fixed;z-index:10}
@@ -73,11 +72,11 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   padding:14px 16px;
   backdrop-filter:blur(7px) saturate(140%);
   -webkit-backdrop-filter:blur(7px) saturate(140%);
-  box-shadow:0 0 0 1px rgba(0,0,0,.25), 0 10px 30px rgba(0,0,0,.35), inset 0 0 22px rgba(80,200,255,.04);
+  box-shadow:0 0 0 1px rgba(0,0,0,.25), 0 10px 30px rgba(0,0,0,.35), inset 0 0 22px rgba(90,150,255,.04);
 }
 .panel::before,.panel::after{
   content:"";position:absolute;width:10px;height:10px;pointer-events:none;
-  border-color:var(--cyan-2);opacity:.75;
+  border-color:var(--blue-2);opacity:.75;
 }
 .panel::before{top:-1px;left:-1px;border-top:2px solid;border-left:2px solid}
 .panel::after{bottom:-1px;right:-1px;border-bottom:2px solid;border-right:2px solid}
@@ -86,52 +85,53 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   font-family:'Orbitron',sans-serif;
   font-size:10.5px;
   letter-spacing:3px;
-  color:var(--cyan-1);
-  text-shadow:0 0 8px rgba(90,220,255,.6);
+  color:var(--blue-1);
+  text-shadow:0 0 8px rgba(90,160,255,.6);
   margin-bottom:10px;
   padding-bottom:7px;
-  border-bottom:1px solid rgba(120,235,255,.18);
+  border-bottom:1px solid rgba(140,180,230,.18);
   display:flex;align-items:center;gap:8px;
 }
-.panel-title::before{content:"";width:6px;height:6px;background:var(--cyan-1);box-shadow:var(--glow);border-radius:1px;flex:none}
+.panel-title::before{content:"";width:6px;height:6px;background:var(--blue-1);box-shadow:var(--glow);border-radius:1px;flex:none}
 
 /* ---------- Top Left ---------- */
 .hud-top-left{top:24px;left:24px;width:min(420px,38vw);padding:16px 20px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand-mark{
-  font-size:20px;color:var(--cyan-1);text-shadow:var(--glow);
+  font-size:20px;color:var(--blue-1);text-shadow:var(--glow);
   animation:corepulse 3.2s ease-in-out infinite;
 }
+@keyframes corepulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
 .brand h1{
   font-size:clamp(22px,2.6vw,32px);
   letter-spacing:6px;
-  color:var(--cyan-0);
-  text-shadow:0 0 10px rgba(120,240,255,.85),0 0 30px rgba(80,200,255,.4);
+  color:var(--blue-0);
+  text-shadow:0 0 10px rgba(130,190,255,.85),0 0 30px rgba(90,160,255,.4);
   font-weight:800;
 }
 .subtitle{
-  margin-top:8px;font-size:13px;letter-spacing:1px;color:var(--cyan-2);opacity:.9;
+  margin-top:8px;font-size:13px;letter-spacing:1px;color:var(--blue-2);opacity:.9;
 }
 .datestamp{
-  margin-top:5px;font-size:10.5px;letter-spacing:1.5px;color:var(--cyan-3);text-transform:uppercase;
+  margin-top:5px;font-size:10.5px;letter-spacing:1.5px;color:var(--blue-3);text-transform:uppercase;
 }
 
 /* ---------- Top Right ---------- */
 .hud-top-right{top:24px;right:24px;width:min(300px,32vw);text-align:right}
 .clock{
   font-family:'Orbitron',sans-serif;font-size:clamp(24px,2.6vw,32px);font-weight:700;
-  letter-spacing:3px;color:var(--cyan-0);text-shadow:var(--glow);
+  letter-spacing:3px;color:var(--blue-0);text-shadow:var(--glow);
 }
-.clock-date{font-size:10.5px;letter-spacing:2px;color:var(--cyan-3);text-transform:uppercase;margin-top:2px}
-.connectors{list-style:none;margin-top:12px;padding-top:10px;border-top:1px solid rgba(120,235,255,.18)}
+.clock-date{font-size:10.5px;letter-spacing:2px;color:var(--blue-3);text-transform:uppercase;margin-top:2px}
+.connectors{list-style:none;margin-top:12px;padding-top:10px;border-top:1px solid rgba(140,180,230,.18)}
 .conn{
   display:flex;align-items:center;justify-content:flex-end;gap:8px;
-  font-size:11.5px;letter-spacing:1px;color:var(--cyan-2);padding:3px 0;text-transform:uppercase;
+  font-size:11.5px;letter-spacing:1px;color:var(--blue-2);padding:3px 0;text-transform:uppercase;
 }
 .conn .dot{width:7px;height:7px;border-radius:50%;flex:none}
-.conn.online .dot{background:var(--green);box-shadow:0 0 6px var(--green),0 0 14px rgba(62,240,168,.7)}
-.conn.offline .dot{background:var(--amber);box-shadow:0 0 6px var(--amber);animation:blink 1.1s steps(1) infinite}
-.conn.offline{color:rgba(255,181,69,.75)}
+.conn.online .dot{background:var(--blue-1);box-shadow:0 0 6px var(--blue-1),0 0 14px rgba(79,166,255,.7)}
+.conn.offline .dot{background:var(--blue-3);box-shadow:0 0 5px var(--blue-3);animation:blink 1.1s steps(1) infinite}
+.conn.offline{color:rgba(140,170,210,.65)}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.15}}
 
 /* ---------- Left column: log + priorities ---------- */
@@ -140,21 +140,23 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .log-line{
   font-size:11px;line-height:1.4;display:flex;gap:8px;
   opacity:0;transform:translateX(-6px);transition:opacity .5s ease, transform .5s ease;
-  border-left:2px solid rgba(120,235,255,.35);padding-left:8px;
+  border-left:2px solid rgba(140,180,230,.35);padding-left:8px;
 }
 .log-line.show{opacity:1;transform:translateX(0)}
-.log-time{color:var(--cyan-3);flex:none}
-.log-text{color:var(--cyan-1);opacity:.92}
+.log-line.celebrate{border-left-color:rgba(255,210,92,.7)}
+.log-time{color:var(--blue-3);flex:none}
+.log-text{color:var(--blue-1);opacity:.92}
+.log-line.celebrate .log-text{color:var(--celebrate);opacity:1;text-shadow:0 0 8px rgba(255,210,92,.4)}
 
 .hud-priorities{top:calc(150px + 34vh + 16px);left:24px;width:min(340px,30vw)}
 .priority-list{list-style:none;display:flex;flex-direction:column;gap:8px}
 .priority-item{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;line-height:1.35}
 .priority-item .tag{
   flex:none;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;
-  border:1px solid rgba(120,235,255,.4);color:var(--cyan-1);opacity:.85;white-space:nowrap;margin-top:1px;
+  border:1px solid rgba(140,180,230,.4);color:var(--blue-1);opacity:.85;white-space:nowrap;margin-top:1px;
 }
 .priority-item.urgency-high .tag{border-color:rgba(255,95,109,.55);color:#ff9aa3}
-.priority-item .ptext{color:var(--cyan-0);opacity:.9}
+.priority-item .ptext{color:var(--blue-0);opacity:.9}
 .priority-item::marker{content:""}
 .priority-item .pdot{width:5px;height:5px;border-radius:50%;background:var(--red);margin-top:5px;box-shadow:0 0 6px var(--red);flex:none}
 
@@ -162,14 +164,14 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .hud-stats{top:300px;right:24px;width:min(340px,30vw)}
 .bars{display:flex;flex-direction:column;gap:11px}
 .bar-row{}
-.bar-label{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.5px;color:var(--cyan-2);margin-bottom:4px;text-transform:uppercase}
-.bar-value{color:var(--cyan-0);font-weight:700}
-.bar-track{height:5px;background:rgba(120,235,255,.08);border-radius:3px;overflow:hidden;position:relative}
+.bar-label{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.5px;color:var(--blue-2);margin-bottom:4px;text-transform:uppercase}
+.bar-value{color:var(--blue-0);font-weight:700}
+.bar-track{height:5px;background:rgba(140,180,230,.08);border-radius:3px;overflow:hidden;position:relative}
 .bar-fill{
   height:100%;border-radius:3px;width:100%;
   transform-origin:left center;transform:scaleX(0);
-  background:linear-gradient(90deg,var(--cyan-3),var(--cyan-1));
-  box-shadow:0 0 8px rgba(90,220,255,.7);
+  background:linear-gradient(90deg,var(--blue-3),var(--blue-1));
+  box-shadow:0 0 8px rgba(90,160,255,.7);
   transition:transform 1.4s cubic-bezier(.2,.8,.2,1);
 }
 
@@ -177,12 +179,13 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .sponsor-list{list-style:none;display:flex;flex-direction:column;gap:10px}
 .sponsor-item{font-size:11px}
 .sponsor-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.sname{color:var(--cyan-0);letter-spacing:.5px}
+.sname{color:var(--blue-0);letter-spacing:.5px}
 .sstatus{font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid}
-.status-verbaldeal{color:var(--green);border-color:rgba(62,240,168,.5)}
-.status-pending{color:var(--amber);border-color:rgba(255,181,69,.5)}
-.status-waiting{color:var(--cyan-2);border-color:rgba(120,235,255,.4)}
-.sdetail{color:var(--cyan-3);font-size:10px;margin-top:2px;opacity:.85}
+.status-verbaldeal{color:var(--blue-2);border-color:rgba(111,147,194,.5)}
+.status-pending{color:var(--blue-2);border-color:rgba(111,147,194,.5)}
+.status-waiting{color:var(--blue-1);border-color:rgba(140,180,230,.4)}
+.sstatus.celebrate{color:var(--celebrate);border-color:rgba(255,210,92,.6);box-shadow:0 0 10px rgba(255,210,92,.3);text-shadow:0 0 6px rgba(255,210,92,.4)}
+.sdetail{color:var(--blue-3);font-size:10px;margin-top:2px;opacity:.85}
 
 /* ---------- Bottom headline / metrics / payment chip ---------- */
 .hud-headline{
@@ -191,37 +194,39 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 }
 .headline-text{
   font-family:'Orbitron',sans-serif;font-size:clamp(12px,1.5vw,16px);letter-spacing:3px;
-  color:var(--cyan-0);text-shadow:0 0 12px rgba(120,240,255,.55);margin-bottom:16px;
+  color:var(--blue-0);text-shadow:0 0 12px rgba(130,190,255,.55);margin-bottom:16px;
 }
 .metrics{display:flex;justify-content:center;gap:clamp(18px,4vw,52px);flex-wrap:wrap}
 .metric-value{
-  font-family:'Orbitron',sans-serif;font-size:clamp(22px,3vw,38px);font-weight:800;color:var(--cyan-0);
+  font-family:'Orbitron',sans-serif;font-size:clamp(22px,3vw,38px);font-weight:800;color:var(--blue-0);
   text-shadow:var(--glow);line-height:1;
 }
-.metric-label{font-size:9.5px;letter-spacing:1.5px;color:var(--cyan-3);text-transform:uppercase;margin-top:6px}
+.metric-value.celebrate{color:var(--celebrate);text-shadow:0 0 8px rgba(255,210,92,.85),0 0 24px rgba(255,210,92,.4)}
+.metric-label{font-size:9.5px;letter-spacing:1.5px;color:var(--blue-3);text-transform:uppercase;margin-top:6px}
+.metric-label.celebrate{color:var(--celebrate-soft);opacity:.85}
 
 .payment-chip{
   pointer-events:auto;
   margin:18px auto 0;display:inline-flex;align-items:center;gap:10px;
   padding:7px 16px;border-radius:20px;
-  border:1px solid rgba(255,181,69,.55);
-  background:linear-gradient(160deg,rgba(60,40,10,.55),rgba(20,14,4,.4));
-  box-shadow:0 0 16px rgba(255,181,69,.18), inset 0 0 10px rgba(255,181,69,.08);
-  font-size:11px;letter-spacing:.5px;color:var(--amber);
+  border:1px solid rgba(140,180,230,.45);
+  background:linear-gradient(160deg,rgba(18,32,52,.55),rgba(6,10,20,.4));
+  box-shadow:0 0 16px rgba(90,160,255,.15), inset 0 0 10px rgba(90,160,255,.07);
+  font-size:11px;letter-spacing:.5px;color:var(--blue-2);
 }
-.chip-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber);animation:blink 1.4s steps(1) infinite}
-.chip-amount{color:#ffd9a0;font-weight:700}
-.chip-date{color:rgba(255,181,69,.75)}
+.chip-dot{width:7px;height:7px;border-radius:50%;background:var(--blue-1);box-shadow:0 0 8px var(--blue-1);animation:blink 1.6s steps(1) infinite}
+.chip-amount{color:var(--blue-0);font-weight:700}
+.chip-date{color:var(--blue-3)}
 
 /* ---------- Toast ---------- */
 .toast{
   position:fixed;left:50%;bottom:340px;transform:translateX(-50%) translateY(10px);
   z-index:20;pointer-events:none;
-  background:linear-gradient(160deg,rgba(10,28,40,.85),rgba(4,10,18,.8));
-  border:1px solid var(--cyan-2);border-radius:4px;
+  background:linear-gradient(160deg,rgba(12,24,40,.85),rgba(4,9,18,.8));
+  border:1px solid var(--blue-2);border-radius:4px;
   padding:12px 22px;max-width:min(640px,80vw);text-align:center;
-  font-size:12.5px;letter-spacing:.5px;color:var(--cyan-0);
-  box-shadow:0 0 24px rgba(90,220,255,.25);
+  font-size:12.5px;letter-spacing:.5px;color:var(--blue-0);
+  box-shadow:0 0 24px rgba(90,160,255,.25);
   opacity:0;transition:opacity .4s ease, transform .4s ease;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -231,27 +236,27 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   position:fixed;left:0;right:0;bottom:0;height:78px;z-index:11;
   display:flex;align-items:center;gap:22px;padding:0 26px;
   background:linear-gradient(to top, rgba(2,5,10,.92), rgba(2,5,10,.55));
-  border-top:1px solid rgba(120,235,255,.25);
+  border-top:1px solid rgba(140,180,230,.25);
   box-shadow:0 -10px 30px rgba(0,0,0,.4);
 }
 .brief-btn{
   flex:none;position:relative;cursor:pointer;
   font-family:'Orbitron',sans-serif;font-size:12.5px;letter-spacing:2.5px;font-weight:700;
-  color:var(--navy-0);background:linear-gradient(160deg,var(--cyan-1),var(--cyan-2));
+  color:var(--navy-0);background:linear-gradient(160deg,var(--blue-1),var(--blue-2));
   border:none;border-radius:24px;padding:13px 26px;
-  box-shadow:0 0 18px rgba(90,220,255,.55), 0 0 40px rgba(90,220,255,.25);
+  box-shadow:0 0 18px rgba(90,160,255,.55), 0 0 40px rgba(90,160,255,.25);
   transition:transform .15s ease, box-shadow .3s ease, background .3s ease;
 }
-.brief-btn:hover{transform:translateY(-1px);box-shadow:0 0 24px rgba(90,220,255,.75), 0 0 54px rgba(90,220,255,.35)}
+.brief-btn:hover{transform:translateY(-1px);box-shadow:0 0 24px rgba(90,160,255,.75), 0 0 54px rgba(90,160,255,.35)}
 .brief-btn:active{transform:translateY(0)}
 .brief-btn.speaking{
-  background:linear-gradient(160deg,#ffd27a,var(--amber));
-  box-shadow:0 0 18px rgba(255,181,69,.6), 0 0 44px rgba(255,181,69,.3);
+  background:linear-gradient(160deg,var(--blue-0),var(--blue-1));
+  box-shadow:0 0 22px rgba(130,190,255,.75), 0 0 50px rgba(90,160,255,.4);
   animation:briefpulse 1.1s ease-in-out infinite;
 }
 @keyframes briefpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
 .btn-ring{
-  position:absolute;inset:-6px;border-radius:30px;border:1px solid rgba(120,235,255,.35);
+  position:absolute;inset:-6px;border-radius:30px;border:1px solid rgba(140,180,230,.35);
   opacity:0;pointer-events:none;
 }
 .brief-btn.speaking .btn-ring{opacity:1;animation:ringpulse 1.1s ease-out infinite}
@@ -260,20 +265,21 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .ticker-wrap{flex:1;overflow:hidden;position:relative;height:20px;mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent)}
 .ticker{
   position:absolute;white-space:nowrap;display:flex;gap:0;
-  font-size:11.5px;letter-spacing:1px;color:var(--cyan-2);
+  font-size:11.5px;letter-spacing:1px;color:var(--blue-2);
   animation:tickerscroll 42s linear infinite;
 }
 .ticker span{padding-right:60px}
+.ticker .celebrate-tick{color:var(--celebrate)}
 @keyframes tickerscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 .handle-btn{
   flex:none;cursor:pointer;background:transparent;
-  border:1px solid rgba(120,235,255,.4);border-radius:20px;padding:12px 20px;
-  font-family:'Orbitron',sans-serif;font-size:10.5px;letter-spacing:2px;color:var(--cyan-1);
-  text-shadow:0 0 8px rgba(90,220,255,.5);
+  border:1px solid rgba(140,180,230,.4);border-radius:20px;padding:12px 20px;
+  font-family:'Orbitron',sans-serif;font-size:10.5px;letter-spacing:2px;color:var(--blue-1);
+  text-shadow:0 0 8px rgba(90,160,255,.5);
   transition:background .2s ease, box-shadow .2s ease, transform .15s ease;
 }
-.handle-btn:hover{background:rgba(120,235,255,.08);box-shadow:0 0 16px rgba(90,220,255,.3);transform:translateY(-1px)}
+.handle-btn:hover{background:rgba(140,180,230,.08);box-shadow:0 0 16px rgba(90,160,255,.3);transform:translateY(-1px)}
 .handle-btn:active{transform:translateY(0)}
 
 /* ---------- Responsive ---------- */
@@ -301,7 +307,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 <div class="vignette"></div>
 
 <header class="hud hud-top-left panel">
-  <div class="brand"><span class="brand-mark">◈</span><h1>J.A.R.V.I.S.</h1></div>
+  <div class="brand"><span class="brand-mark">◉</span><h1>V.I.K.I.</h1></div>
   <div class="subtitle" id="subtitle"></div>
   <div class="datestamp" id="datestamp"></div>
 </header>
@@ -346,13 +352,13 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   <button class="handle-btn" id="handleBtn">WHAT SHOULD I HANDLE FIRST</button>
 </div>
 
-<audio id="briefAudio" src="jarvis_brief.mp3" preload="auto" hidden></audio>
+<audio id="briefAudio" src="viki_brief.mp3" preload="auto" hidden></audio>
 
-<script src="jarvis_data.js"></script>
+<script src="viki_data.js"></script>
 <script>
 (function(){
 "use strict";
-var DATA = window.JARVIS_DATA || {};
+var DATA = window.VIKI_DATA || {};
 
 function $(id){ return document.getElementById(id); }
 function slug(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,""); }
@@ -396,14 +402,15 @@ $('priorityList').innerHTML = (DATA.priorities||[]).map(function(p){
 
 $('sponsorList').innerHTML = (DATA.sponsors||[]).map(function(s){
   return '<li class="sponsor-item"><div class="sponsor-top"><span class="sname">'+s.name+'</span>'+
-         '<span class="sstatus status-'+slug(s.status)+'">'+s.status+'</span></div>'+
+         '<span class="sstatus status-'+slug(s.status)+(s.celebrate?' celebrate':'')+'">'+s.status+'</span></div>'+
          '<div class="sdetail">'+s.detail+'</div></li>';
 }).join('');
 
 $('headlineText').textContent = DATA.headline || "";
 var metrics = (DATA.content && DATA.content.metrics) || [];
 $('metrics').innerHTML = metrics.map(function(m){
-  return '<div class="metric"><div class="metric-value">'+m.value+'</div><div class="metric-label">'+m.label+'</div></div>';
+  var cls = m.celebrate ? ' celebrate' : '';
+  return '<div class="metric"><div class="metric-value'+cls+'">'+m.value+'</div><div class="metric-label'+cls+'">'+m.label+'</div></div>';
 }).join('');
 
 if(DATA.paymentDue){
@@ -418,7 +425,10 @@ if(DATA.paymentDue){
 /* ticker: headline + partner status + priorities + closer, looped twice for seamless scroll */
 var tickerParts = [];
 if(DATA.headline) tickerParts.push(DATA.headline);
-(DATA.sponsors||[]).forEach(function(s){ tickerParts.push(s.name.toUpperCase()+': '+s.status); });
+(DATA.sponsors||[]).forEach(function(s){
+  var t = s.name.toUpperCase()+': '+s.status;
+  tickerParts.push(s.celebrate ? '<span class="celebrate-tick">★ '+t+'</span>' : t);
+});
 (DATA.priorities||[]).forEach(function(p){ tickerParts.push(p.label); });
 if(DATA.closer) tickerParts.push(DATA.closer);
 var tickerText = tickerParts.join('   •   ');
@@ -431,10 +441,11 @@ $('ticker').innerHTML = '<span>'+tickerText+'</span><span aria-hidden="true">'+t
   var list = $('logList');
   var i = 0;
   function pushLine(){
+    var entry = lines[i % lines.length];
     var li = document.createElement('li');
-    li.className = 'log-line';
+    li.className = 'log-line' + (entry.celebrate ? ' celebrate' : '');
     var time = new Date().toLocaleTimeString('en-US',{hour12:false});
-    li.innerHTML = '<span class="log-time">'+time+'</span><span class="log-text">'+lines[i % lines.length]+'</span>';
+    li.innerHTML = '<span class="log-time">'+time+'</span><span class="log-text">'+(entry.celebrate?'★ ':'')+entry.text+'</span>';
     list.appendChild(li);
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ li.classList.add('show'); }); });
     while(list.children.length > 7){ list.removeChild(list.firstChild); }
@@ -459,11 +470,34 @@ $('handleBtn').addEventListener('click', function(){
   if(top){ showToast('▲ HANDLE FIRST — '+top.label, 7000); }
 });
 
-/* ================= BRIEF ME + SPEECH ENVELOPE ================= */
+/* ================= BRIEF ME + WEB AUDIO ANALYSIS ================= */
 var briefBtn = $('briefBtn');
 var audioEl = $('briefAudio');
 var speaking = false;
 var speakEndTimer = null;
+var usedRealAudio = false;
+
+/* -- Web Audio graph: analyses the actual playing audio in real time -- */
+var audioCtx = null, analyser = null, freqData = null, audioGraphReady = false;
+function ensureAudioGraph(){
+  if(audioGraphReady) return true;
+  try{
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return false;
+    audioCtx = new AC();
+    var sourceNode = audioCtx.createMediaElementSource(audioEl);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.75;
+    sourceNode.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+    audioGraphReady = true;
+  }catch(e){
+    audioGraphReady = false;
+  }
+  return audioGraphReady;
+}
 
 function setSpeaking(v){
   speaking = v;
@@ -475,13 +509,16 @@ briefBtn.addEventListener('click', function(){
   if(speaking){
     try{ audioEl.pause(); audioEl.currentTime = 0; }catch(e){}
     clearTimeout(speakEndTimer);
+    usedRealAudio = false;
     setSpeaking(false);
     return;
   }
   setSpeaking(true);
   showToast(DATA.closer || '', 6500);
+  usedRealAudio = false;
 
-  var usedRealAudio = false;
+  ensureAudioGraph();
+  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume().catch(function(){}); }
   try{ audioEl.currentTime = 0; }catch(e){}
 
   function fallback(){
@@ -493,17 +530,56 @@ briefBtn.addEventListener('click', function(){
 
   var p = audioEl.play();
   if(p && typeof p.then === 'function'){
-    p.then(function(){ usedRealAudio = true; }).catch(fallback);
+    p.then(function(){ usedRealAudio = audioGraphReady; if(!usedRealAudio) fallback(); }).catch(fallback);
   } else {
     fallback();
   }
   audioEl.onended = function(){ setSpeaking(false); };
   audioEl.onerror = fallback;
-  // if metadata never resolves within a beat, don't leave the sphere silent forever
+  // if playback never actually starts producing audio, don't leave the head silent forever
   setTimeout(function(){ if(speaking && !usedRealAudio && audioEl.paused) fallback(); }, 600);
 });
 
-/* ================= CANVAS SCENE: J.A.R.V.I.S. SPHERE ================= */
+/* -- synthetic speech-envelope fallback (keeps BRIEF ME demonstrable offline) -- */
+var synthAmpCur = 0, synthAmpTgt = 0, synthTimer = 0;
+function stepSynthEnvelope(dtMs){
+  synthTimer -= dtMs;
+  if(synthTimer <= 0){
+    var roll = Math.random();
+    if(roll < 0.16) synthAmpTgt = 0.05 + Math.random()*0.15;
+    else if(roll < 0.82) synthAmpTgt = 0.45 + Math.random()*0.4;
+    else synthAmpTgt = 0.9 + Math.random()*0.1;
+    synthTimer = 70 + Math.random()*110;
+  }
+  var rate = synthAmpTgt > synthAmpCur ? 0.4 : 0.16;
+  synthAmpCur += (synthAmpTgt - synthAmpCur) * Math.min(1, rate * (dtMs/16.67));
+}
+
+/* returns {bass, treble, amp} each 0..1, from real analysis when available, else synthetic */
+function getAudioBands(t, dtMs){
+  if(!speaking) return {bass:0, treble:0, amp:0};
+  if(usedRealAudio && analyser){
+    analyser.getByteFrequencyData(freqData);
+    var n = freqData.length;
+    var bassEnd = Math.max(1, Math.floor(n*0.14));
+    var trebleStart = Math.floor(n*0.42);
+    var bassSum=0, trebleSum=0, totalSum=0, i;
+    for(i=0;i<bassEnd;i++) bassSum += freqData[i];
+    for(i=trebleStart;i<n;i++) trebleSum += freqData[i];
+    for(i=0;i<n;i++) totalSum += freqData[i];
+    return {
+      bass: bassSum/bassEnd/255,
+      treble: trebleSum/(n-trebleStart)/255,
+      amp: totalSum/n/255
+    };
+  }
+  stepSynthEnvelope(dtMs);
+  var bass = (0.35 + 0.5*Math.abs(Math.sin(t*1.3))) * synthAmpCur;
+  var treble = (0.3 + 0.6*Math.abs(Math.sin(t*4.7+0.6))*Math.abs(Math.sin(t*1.9))) * synthAmpCur;
+  return { bass: bass, treble: treble, amp: synthAmpCur };
+}
+
+/* ================= CANVAS SCENE: V.I.K.I. VOXEL HEAD ================= */
 var canvas = $('scene');
 var ctx = canvas.getContext('2d');
 var W = 0, H = 0, DPR = 1;
@@ -520,26 +596,6 @@ function resize(){
 window.addEventListener('resize', resize);
 resize();
 
-/* ---- Fibonacci sphere point cloud ---- */
-var N = 680;
-var points = (function(){
-  var pts = [];
-  var GA = Math.PI * (3 - Math.sqrt(5)); // golden angle
-  for(var i=0;i<N;i++){
-    var y = 1 - (i/(N-1))*2;
-    var r = Math.sqrt(Math.max(0,1 - y*y));
-    var theta = GA * i;
-    pts.push({
-      x: Math.cos(theta)*r,
-      y: y,
-      z: Math.sin(theta)*r,
-      tw: Math.random()*Math.PI*2, // per-point twinkle phase
-      ts: 0.6 + Math.random()*0.9  // twinkle speed
-    });
-  }
-  return pts;
-})();
-
 /* ---- rotation helpers ---- */
 function rotY(p, a){
   var c = Math.cos(a), s = Math.sin(a);
@@ -549,115 +605,148 @@ function rotX(p, a){
   var c = Math.cos(a), s = Math.sin(a);
   return { x: p.x, y: p.y*c - p.z*s, z: p.y*s + p.z*c };
 }
-function rotZ(p, a){
-  var c = Math.cos(a), s = Math.sin(a);
-  return { x: p.x*c - p.y*s, y: p.x*s + p.y*c, z: p.z };
+
+/* ---- build a voxelated humanoid head silhouette (front-facing bust) ---- */
+var COLS = 48, ROWS = 58;
+// [v, halfWidth] profile keyframes from crown (v=-1) to shoulders (v=1)
+var PROFILE = [
+  [-1.00, 0.02], [-0.94, 0.22], [-0.82, 0.42], [-0.68, 0.55],
+  [-0.52, 0.615],[-0.34, 0.62], [-0.16, 0.60], [ 0.00, 0.565],
+  [ 0.14, 0.50], [ 0.28, 0.40], [ 0.40, 0.30], [ 0.50, 0.20],
+  [ 0.58, 0.13], [ 0.64, 0.10], [ 0.68, 0.12], [ 0.72, 0.135],
+  [ 0.86, 0.145],[ 1.00, 0.16]
+];
+function smoothstep(t){ return t*t*(3-2*t); }
+function halfWidthAt(v){
+  v = Math.max(-1, Math.min(1, v));
+  for(var i=0;i<PROFILE.length-1;i++){
+    var a = PROFILE[i], b = PROFILE[i+1];
+    if(v >= a[0] && v <= b[0]){
+      var t = (b[0]===a[0]) ? 0 : (v-a[0])/(b[0]-a[0]);
+      return a[1] + (b[1]-a[1])*smoothstep(t);
+    }
+  }
+  return PROFILE[PROFILE.length-1][1];
+}
+function inVoid(u, v){
+  // eyes
+  if(v > -0.09 && v < 0.05){
+    if(u > 0.13 && u < 0.31) return true;
+    if(u < -0.13 && u > -0.31) return true;
+  }
+  // mouth
+  if(v > 0.27 && v < 0.34 && u > -0.13 && u < 0.13) return true;
+  return false;
 }
 
-/* ---- pointer parallax ---- */
+var CLUSTER_SPAN = 4;
+var REGION_BANDS = 6;
+var clusterPhaseMap = {};
+function clusterPhase(cid){
+  if(!(cid in clusterPhaseMap)) clusterPhaseMap[cid] = Math.random()*Math.PI*2;
+  return clusterPhaseMap[cid];
+}
+
+var voxels = (function(){
+  var list = [];
+  for(var row=0; row<ROWS; row++){
+    var v = (row/(ROWS-1))*2 - 1;
+    var hw = halfWidthAt(v);
+    for(var col=0; col<COLS; col++){
+      var u = (col/(COLS-1))*2 - 1;
+      if(Math.abs(u) > hw) continue;
+      if(inVoid(u,v)) continue;
+
+      var zBase = Math.sqrt(Math.max(0, 1 - (u/Math.max(hw,0.001))*(u/Math.max(hw,0.001))));
+      zBase *= 0.55;
+      // small nose bump for sculptural relief
+      if(v > 0.08 && v < 0.22 && Math.abs(u) < 0.05){
+        zBase += 0.14 * (1 - Math.abs(u)/0.05) * smoothstep(1 - Math.abs(v-0.15)/0.07);
+      }
+      zBase += (Math.random()-0.5) * 0.05; // chunky voxel irregularity
+
+      var clusterId = Math.floor(row/CLUSTER_SPAN)*1000 + Math.floor(col/CLUSTER_SPAN);
+      var regionBand = Math.max(0, Math.min(REGION_BANDS-1, Math.floor(((v+1)/2)*REGION_BANDS)));
+
+      list.push({
+        u:u, v:v, z:zBase,
+        clusterId: clusterId,
+        clusterPh: clusterPhase(clusterId),
+        regionBand: regionBand,
+        twPhase: Math.random()*Math.PI*2,
+        twSpeed: 0.5 + Math.random()*0.8
+      });
+    }
+  }
+  return list;
+})();
+
+/* ---- pointer parallax (subtle) ---- */
 var mouseT = {x:0,y:0}, mouse = {x:0,y:0};
 window.addEventListener('pointermove', function(e){
   mouseT.x = (e.clientX / W - 0.5);
   mouseT.y = (e.clientY / H - 0.5);
 });
 
-/* ---- speaking / breathing envelope ---- */
-var envCurrent = 0, envTarget = 0, envTimer = 0;
 var idleT = 0;
+var lastTime = performance.now();
 
-function updateEnvelope(dtMs){
-  var dt = dtMs/1000;
-  idleT += dt;
-  if(speaking){
-    envTimer -= dtMs;
-    if(envTimer <= 0){
-      var roll = Math.random();
-      if(roll < 0.16) envTarget = 0.05 + Math.random()*0.15;      // brief pause
-      else if(roll < 0.82) envTarget = 0.45 + Math.random()*0.4;  // normal syllable
-      else envTarget = 0.9 + Math.random()*0.1;                  // emphatic peak
-      envTimer = 70 + Math.random()*110;
-    }
-    var rate = envTarget > envCurrent ? 0.4 : 0.16; // fast attack, slower release
-    envCurrent += (envTarget - envCurrent) * Math.min(1, rate * (dtMs/16.67));
-  } else {
-    envTarget = 0;
-    envCurrent += (0 - envCurrent) * Math.min(1, 0.08 * (dtMs/16.67));
-  }
-}
-
-function currentPulse(){
-  if(speaking){
-    return 1 + envCurrent * 0.85; // 1.0 .. ~1.85
-  }
-  var breathe = Math.sin(idleT * 0.62) * 0.5 + 0.5; // 0..1 slow breathing
-  return 1 + breathe * 0.11; // gentle idle swell
-}
-
-/* ---- angles for rings/arcs/orbit ---- */
+/* ---- ring / arc framing angles (reused around the head) ---- */
 var spin = 0;
-var orbitAngle = 0;
 var arcAngles = [0, 0.6, 1.9];
 var arcSpeeds = [0.00034, -0.00021, 0.00047];
 var rayAngle = 0;
 
-var lastTime = performance.now();
-
 function draw(now){
   var dtMs = Math.min(48, now - lastTime);
   lastTime = now;
+  idleT += dtMs/1000;
 
-  updateEnvelope(dtMs);
-  var pulse = currentPulse();
-  var speakBoost = speaking ? envCurrent : 0;
+  var bands = getAudioBands(idleT, dtMs);
+  var breathe = Math.sin(idleT * 0.5) * 0.5 + 0.5;
+  var ampGlobal = speaking ? (0.22 + bands.amp*0.85) : (0.08 + breathe*0.10);
 
   mouse.x += (mouseT.x - mouse.x) * 0.03;
   mouse.y += (mouseT.y - mouse.y) * 0.03;
 
-  spin += dtMs * (0.00016 + (speaking ? speakBoost*0.00012 : 0));
-  orbitAngle += dtMs * 0.00055;
+  spin += dtMs * (0.00016 + (speaking ? bands.amp*0.00012 : 0));
   rayAngle += dtMs * 0.00009;
-  for(var a=0;a<3;a++) arcAngles[a] += dtMs * arcSpeeds[a] * (1 + (speaking? speakBoost*0.6:0));
+  for(var a=0;a<3;a++) arcAngles[a] += dtMs * arcSpeeds[a] * (1 + (speaking ? bands.amp*0.6 : 0));
 
-  var cx = W/2, cy = H/2 + H*0.015;
-  var R = Math.min(W,H) * 0.145;
+  var cx = W/2, cy = H*0.46;
+  var worldScale = Math.min(W,H) * 0.155;
+  var R = worldScale * 1.05; // radius unit for the surrounding HUD framing
 
   /* background */
   var bg = ctx.createRadialGradient(cx, cy - H*0.05, 0, cx, cy, Math.max(W,H)*0.75);
-  bg.addColorStop(0, '#071827');
-  bg.addColorStop(0.35, '#040d18');
+  bg.addColorStop(0, '#0a1728');
+  bg.addColorStop(0.35, '#050d1a');
   bg.addColorStop(1, '#010305');
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.fillStyle = bg;
   ctx.fillRect(0,0,W,H);
 
-  /* ambient glow */
-  var glowR = R * (2.6 + pulse*0.5);
+  /* ambient breathing glow behind the head */
+  var glowR = worldScale * (1.9 + ampGlobal*0.9);
   var amb = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
-  amb.addColorStop(0, 'rgba(110,235,255,'+(0.16 + speakBoost*0.12)+')');
-  amb.addColorStop(0.4, 'rgba(70,190,255,0.07)');
+  amb.addColorStop(0, 'rgba(120,175,255,'+(0.14 + ampGlobal*0.16)+')');
+  amb.addColorStop(0.4, 'rgba(80,140,230,0.06)');
   amb.addColorStop(1, 'rgba(10,20,30,0)');
   ctx.fillStyle = amb;
   ctx.beginPath(); ctx.arc(cx,cy,glowR,0,Math.PI*2); ctx.fill();
 
-  /* outer tick ring */
-  drawTickRing(cx, cy, R*2.5, spin*0.15);
+  /* HUD framing */
+  drawTickRing(cx, cy, R*2.6, spin*0.15);
+  drawRays(cx, cy, R*1.5, R*2.42, rayAngle);
+  drawArc(cx, cy, R*1.75, arcAngles[0], [14,10], 0.28, 0.4);
+  drawArc(cx, cy, R*1.98, arcAngles[1], [3,9], 0.9, 0.2);
+  drawArc(cx, cy, R*2.2, arcAngles[2], [22,6], 0.55, 0.14);
 
-  /* faint radial rays */
-  drawRays(cx, cy, R*1.35, R*2.35, rayAngle);
+  /* voxel head */
+  drawHead(cx, cy, worldScale, bands, ampGlobal);
 
-  /* dashed HUD arcs */
-  drawArc(cx, cy, R*1.62, arcAngles[0], [14,10], 0.28, 0.42);
-  drawArc(cx, cy, R*1.86, arcAngles[1], [3,9], 0.9, 0.22);
-  drawArc(cx, cy, R*2.08, arcAngles[2], [22,6], 0.55, 0.16);
-
-  /* elliptical orbital ring + marker */
-  drawOrbit(cx, cy, R*1.42, R*0.42, -0.42, orbitAngle);
-
-  /* sphere point cloud */
-  drawSphere(cx, cy, R, pulse, speakBoost);
-
-  /* bright pulsing core */
-  drawCore(cx, cy, R, pulse, speakBoost);
+  /* scanlines drifting down across the head */
+  drawHeadScanlines(cx, cy, worldScale);
 
   requestAnimationFrame(draw);
 }
@@ -672,7 +761,7 @@ function drawTickRing(cx, cy, R, rot){
     var len = major ? 10 : 5;
     var x1 = Math.cos(ang)*R, y1 = Math.sin(ang)*R;
     var x2 = Math.cos(ang)*(R+len), y2 = Math.sin(ang)*(R+len);
-    ctx.strokeStyle = 'rgba(120,225,255,'+(major?0.32:0.14)+')';
+    ctx.strokeStyle = 'rgba(140,190,255,'+(major?0.3:0.13)+')';
     ctx.lineWidth = major?1.3:1;
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
   }
@@ -683,7 +772,7 @@ function drawRays(cx, cy, r1, r2, rot){
   ctx.save();
   ctx.translate(cx,cy); ctx.rotate(rot);
   var count = 16;
-  ctx.strokeStyle = 'rgba(110,220,255,0.07)';
+  ctx.strokeStyle = 'rgba(110,170,255,0.06)';
   ctx.lineWidth = 1;
   for(var i=0;i<count;i++){
     var ang = (i/count)*Math.PI*2;
@@ -699,9 +788,9 @@ function drawArc(cx, cy, R, rot, dash, sweep, alpha){
   ctx.save();
   ctx.translate(cx,cy); ctx.rotate(rot);
   ctx.setLineDash(dash);
-  ctx.strokeStyle = 'rgba(130,235,255,'+alpha+')';
+  ctx.strokeStyle = 'rgba(140,190,255,'+alpha+')';
   ctx.lineWidth = 1.4;
-  ctx.shadowColor = 'rgba(110,220,255,0.6)';
+  ctx.shadowColor = 'rgba(110,170,255,0.55)';
   ctx.shadowBlur = 6;
   ctx.beginPath();
   ctx.arc(0,0,R, 0, Math.PI*2*sweep);
@@ -709,84 +798,110 @@ function drawArc(cx, cy, R, rot, dash, sweep, alpha){
   ctx.restore();
 }
 
-function drawOrbit(cx, cy, rx, ry, rot, ang){
-  ctx.save();
-  ctx.translate(cx,cy); ctx.rotate(rot);
-  ctx.strokeStyle = 'rgba(120,230,255,0.28)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
-  ctx.stroke();
+var STEEL = {r:70,g:110,b:158};
+var SILVER = {r:230,g:240,b:251};
+var CELEBRATE_RGB = {r:255,g:210,b:92};
 
-  var mx = Math.cos(ang)*rx, my = Math.sin(ang)*ry;
-  var depth = Math.sin(ang); // -1 back .. 1 front
-  var scale = 0.7 + (depth*0.5+0.5)*0.7;
-  ctx.globalCompositeOperation = 'lighter';
-  var g = ctx.createRadialGradient(mx,my,0,mx,my,10*scale);
-  g.addColorStop(0,'rgba(220,255,255,0.95)');
-  g.addColorStop(0.4,'rgba(120,235,255,0.55)');
-  g.addColorStop(1,'rgba(120,235,255,0)');
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(mx,my,10*scale,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = 'rgba(230,255,255,0.95)';
-  ctx.beginPath(); ctx.arc(mx,my,2.2*scale,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
+var swayY = 0, swayX = 0;
+var headScreenBox = {top:0,bottom:0,left:0,right:0};
 
-var tiltX = 0.5;
-function drawSphere(cx, cy, R, pulse, speakBoost){
-  var focal = R*3.4;
-  var mx = mouse.y * 0.35; // vertical mouse -> extra tilt
-  var mz = mouse.x * 0.35;
+function drawHead(cx, cy, worldScale, bands, ampGlobal){
+  var t = idleT;
+  var speakFactor = speaking ? (1 + bands.amp*0.3) : 1;
+  swayY = 0.09 * speakFactor * Math.sin(t * 0.25);
+  swayX = 0.13 + 0.05 * Math.sin(t * 0.19 + 1.3) + mouse.y*0.08;
+  var swayZ = mouse.x * 0.06;
 
-  var proj = new Array(N);
-  for(var i=0;i<N;i++){
-    var p = points[i];
-    var q = rotZ(p, mz*0.2);
-    q = rotX(q, tiltX + mx);
-    q = rotY(q, spin);
-    proj[i] = q;
+  var focal = worldScale * 3.2;
+  var cellPitch = worldScale * 2 / (COLS-1);
+  var renderSize = cellPitch * 0.82;
+
+  var bassRegionPhase = [0,0.9,1.8,2.7,3.6,4.5];
+
+  var proj = new Array(voxels.length);
+  var i, vx;
+  for(i=0;i<voxels.length;i++){
+    vx = voxels[i];
+
+    var bassWave = Math.sin(t*0.8 + bassRegionPhase[vx.regionBand]) * bands.bass * 0.11;
+    var trebleWave = Math.sin(t*(5 + bands.treble*6) + vx.clusterPh) * bands.treble;
+
+    var xw = vx.u * worldScale + trebleWave * worldScale * 0.028;
+    var yw = vx.v * worldScale + Math.cos(t*(5+bands.treble*6)+vx.clusterPh*1.3) * bands.treble * worldScale * 0.02;
+    var zw = (vx.z + bassWave) * worldScale;
+
+    var p = { x:xw, y:yw, z:zw };
+    p = rotY(p, swayZ*0.3);
+    p = rotX(p, swayX);
+    p = rotY(p, swayY);
+
+    var twinkle = 0.82 + 0.18*Math.sin(t*vx.twSpeed*2 + vx.twPhase);
+    var brightness = 0.42*((p.z/worldScale)+0.6) + 0.28*twinkle
+                    + bands.treble*0.22 + bands.bass*0.12 + ampGlobal*0.22;
+    brightness = Math.max(0, Math.min(1, brightness));
+
+    proj[i] = { x:p.x, y:p.y, z:p.z, b:brightness };
   }
   proj.sort(function(a,b){ return a.z - b.z; });
 
+  var minSX=Infinity, maxSX=-Infinity, minSY=Infinity, maxSY=-Infinity;
+
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
-  for(i=0;i<N;i++){
+  for(i=0;i<proj.length;i++){
     var d = proj[i];
-    var scale = focal / (focal - d.z*R);
-    var sx = cx + d.x*R*scale;
-    var sy = cy + d.y*R*scale*0.98;
-    var depthA = (d.z + 1)/2; // 0 back .. 1 front
-    var twinkle = 0.85 + 0.15*Math.sin(idleT*points[i].ts*2 + points[i].tw);
-    var alpha = (0.12 + depthA*0.62) * twinkle * (0.85 + speakBoost*0.3);
-    var size = (0.55 + depthA*1.15) * (pulse*0.9);
-    ctx.beginPath();
-    ctx.fillStyle = 'rgba(140,238,255,'+Math.min(1,alpha)+')';
-    ctx.arc(sx, sy, size, 0, Math.PI*2);
-    ctx.fill();
+    var scale = focal / (focal - d.z);
+    var sx = cx + d.x*scale;
+    var sy = cy + d.y*scale;
+    if(sx<minSX)minSX=sx; if(sx>maxSX)maxSX=sx;
+    if(sy<minSY)minSY=sy; if(sy>maxSY)maxSY=sy;
+
+    var size = renderSize * scale * (0.62 + d.b*0.6) * (1 + ampGlobal*0.3);
+    var alpha = 0.15 + d.b*0.8;
+
+    var r = STEEL.r + (SILVER.r-STEEL.r)*d.b;
+    var g = STEEL.g + (SILVER.g-STEEL.g)*d.b;
+    var b = STEEL.b + (SILVER.b-STEEL.b)*d.b;
+
+    ctx.fillStyle = 'rgba('+(r|0)+','+(g|0)+','+(b|0)+','+Math.min(1,alpha)+')';
+    ctx.fillRect(sx-size/2, sy-size/2, size, size);
+
+    if(d.b > 0.58){
+      var hs = size*0.42;
+      ctx.fillStyle = 'rgba(235,244,255,'+Math.min(1,(d.b-0.58)*1.6)+')';
+      ctx.fillRect(sx-hs/2, sy-hs/2, hs, hs);
+    }
   }
   ctx.restore();
+
+  if(isFinite(minSX)){
+    var pad = renderSize*3;
+    headScreenBox = { left:minSX-pad, right:maxSX+pad, top:minSY-pad, bottom:maxSY+pad };
+  }
 }
 
-function drawCore(cx, cy, R, pulse, speakBoost){
-  var coreR = R*0.34*pulse;
+var scanOffset = 0;
+function drawHeadScanlines(cx, cy, worldScale){
+  scanOffset += 0.028 * (performance.now() - (drawHeadScanlines._last || performance.now()));
+  drawHeadScanlines._last = performance.now();
+
+  var box = headScreenBox;
+  if(!box || !isFinite(box.top)) return;
+  var spacing = 6;
+  var offset = scanOffset % spacing;
+
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
-
-  var halo = ctx.createRadialGradient(cx,cy,0,cx,cy,coreR*3.2);
-  halo.addColorStop(0, 'rgba(210,255,255,'+(0.5+speakBoost*0.3)+')');
-  halo.addColorStop(0.25, 'rgba(120,235,255,0.28)');
-  halo.addColorStop(1, 'rgba(120,235,255,0)');
-  ctx.fillStyle = halo;
-  ctx.beginPath(); ctx.arc(cx,cy,coreR*3.2,0,Math.PI*2); ctx.fill();
-
-  var core = ctx.createRadialGradient(cx,cy,0,cx,cy,coreR);
-  core.addColorStop(0,'rgba(255,255,255,0.98)');
-  core.addColorStop(0.35,'rgba(190,250,255,0.9)');
-  core.addColorStop(1,'rgba(110,225,255,0)');
-  ctx.fillStyle = core;
-  ctx.beginPath(); ctx.arc(cx,cy,coreR,0,Math.PI*2); ctx.fill();
-
+  ctx.beginPath();
+  ctx.rect(box.left, box.top, box.right-box.left, box.bottom-box.top);
+  ctx.clip();
+  ctx.strokeStyle = 'rgba(200,225,255,0.07)';
+  ctx.lineWidth = 1;
+  for(var y = box.top - spacing + offset; y < box.bottom + spacing; y += spacing){
+    ctx.beginPath();
+    ctx.moveTo(box.left, y);
+    ctx.lineTo(box.right, y);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 

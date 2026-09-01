@@ -1,8 +1,12 @@
-// jarvis_data.js
-// Single source of truth for the J.A.R.V.I.S. command center dashboard.
-// dashboard.html reads everything it renders from window.JARVIS_DATA.
+// viki_data.js
+// Single source of truth for the V.I.K.I. command center dashboard.
+// dashboard.html reads everything it renders from window.VIKI_DATA.
+//
+// Any entry below may carry `celebrate: true`. That flag is the only thing
+// that triggers the dashboard's warm-yellow accent — reserved for closed
+// deals, wins, and milestones — so it should stay rare.
 
-window.JARVIS_DATA = {
+window.VIKI_DATA = {
   greeting: "Good evening, Stefan.",
   generatedLabel: "Brief generated",
   generated: "Aug 31, 2026 · 07:45 AM",
@@ -31,26 +35,28 @@ window.JARVIS_DATA = {
       { value: "18%",    label: "Offer Accept Rate"   },
       { value: "7",      label: "Active Deals"        },
       { value: "3",      label: "Club Partners"       },
-      { value: "29",     label: "Tasks Open"          }
+      { value: "29",     label: "Tasks Open"          },
+      { value: "1",      label: "Deal Closed This Week", celebrate: true }
     ],
     log: [
-      "Skip trace batch complete — 96 owners resolved",
-      "Retell AI closed 14 outbound calls, 3 qualified",
-      "New WhatsApp lead: 4457 NW 185th St, Miami Gardens",
-      "Owner disbursement drafted — 3715 NW 194th St",
-      "FUB stage updated: Zeisel → Needs Follow Up",
-      "Broward County vendor registration still pending",
-      "PaymentWorks invite requested — Pembroke Pines",
-      "SEO content queued for Jessie — DOW draft ready",
-      "iBuyer offer window opens in 2 days — Henderson",
-      "Sentiment analysis flagged 3 warm leads overnight",
-      "Skip trace contact rate holding at 6% this week",
-      "Calendar hold created — Miramar grant meeting"
+      { text: "Skip trace batch complete — 96 owners resolved" },
+      { text: "Retell AI closed 14 outbound calls, 3 qualified" },
+      { text: "New WhatsApp lead: 4457 NW 185th St, Miami Gardens" },
+      { text: "Owner disbursement drafted — 3715 NW 194th St" },
+      { text: "FUB stage updated: Zeisel → Needs Follow Up" },
+      { text: "Deal closed — 1606 SW 3rd Ct funded, commission secured", celebrate: true },
+      { text: "Broward County vendor registration still pending" },
+      { text: "PaymentWorks invite requested — Pembroke Pines" },
+      { text: "SEO content queued for Jessie — DOW draft ready" },
+      { text: "iBuyer offer window opens in 2 days — Henderson" },
+      { text: "Sentiment analysis flagged 3 warm leads overnight" },
+      { text: "Skip trace contact rate holding at 6% this week" },
+      { text: "Calendar hold created — Miramar grant meeting" }
     ]
   },
 
   sponsors: [
-    { name: "Florida Fire Academy",         status: "Verbal Deal", detail: "NFDA Official Technical Training Partner · 10% referral" },
+    { name: "Florida Fire Academy",         status: "Verbal Deal", detail: "NFDA Official Technical Training Partner · 10% referral", celebrate: true },
     { name: "Pembroke Pines Parks & Rec",   status: "Pending",     detail: "Awaiting PaymentWorks vendor invite" },
     { name: "Miramar Parks & Rec",          status: "Waiting",     detail: "Grant meeting · VM Colburn TBD" },
     { name: "Broward County",               status: "Pending",     detail: "Vendor registration under review" }
