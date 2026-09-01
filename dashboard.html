@@ -612,62 +612,107 @@ function rotX(p, a){
    likeness comes entirely from per-tile brightness sampled off a small
    offscreen face texture, never from geometric relief. ---- */
 
-var TEX_W = 132, TEX_H = 148;
+var TEX_W = 176, TEX_H = 198;
 var faceTex = (function(){
-  var c = document.createElement('canvas');
-  c.width = TEX_W; c.height = TEX_H;
-  var tx = c.getContext('2d');
+  var raw = document.createElement('canvas');
+  raw.width = TEX_W; raw.height = TEX_H;
+  var tx = raw.getContext('2d');
   tx.fillStyle = '#000'; tx.fillRect(0,0,TEX_W,TEX_H);
 
-  function glow(cx, cy, r, a){
-    var g = tx.createRadialGradient(cx,cy,0,cx,cy,r);
+  function glow(cx, cy, rx, ry, a){
+    tx.save();
+    tx.translate(cx,cy); tx.scale(1, ry/rx);
+    var g = tx.createRadialGradient(0,0,0,0,0,rx);
     g.addColorStop(0, 'rgba(255,255,255,'+a+')');
     g.addColorStop(1, 'rgba(255,255,255,0)');
-    tx.fillStyle = g; tx.fillRect(0,0,TEX_W,TEX_H);
+    tx.fillStyle = g; tx.beginPath(); tx.arc(0,0,rx,0,Math.PI*2); tx.fill();
+    tx.restore();
   }
   function shadow(cx, cy, rx, ry, a){
     tx.save();
-    tx.beginPath(); tx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-    tx.fillStyle = 'rgba(0,0,0,'+a+')'; tx.fill();
+    tx.translate(cx,cy); tx.scale(1, ry/rx);
+    var g = tx.createRadialGradient(0,0,0,0,0,rx);
+    g.addColorStop(0, 'rgba(0,0,0,'+a+')');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    tx.fillStyle = g; tx.beginPath(); tx.arc(0,0,rx,0,Math.PI*2); tx.fill();
     tx.restore();
   }
 
-  // ambient face glow, brightest center, fading toward the frame edges
-  glow(TEX_W*0.5, TEX_H*0.46, TEX_W*0.62, 0.5);
-  glow(TEX_W*0.5, TEX_H*0.27, TEX_W*0.26, 0.45);   // forehead
-  glow(TEX_W*0.29, TEX_H*0.53, TEX_W*0.15, 0.5);   // left cheek
-  glow(TEX_W*0.71, TEX_H*0.53, TEX_W*0.15, 0.5);   // right cheek
-  glow(TEX_W*0.5, TEX_H*0.44, TEX_W*0.05, 0.6);    // nose bridge
-  glow(TEX_W*0.5, TEX_H*0.52, TEX_W*0.045, 0.55);  // nose tip
-  glow(TEX_W*0.5, TEX_H*0.60, TEX_W*0.10, 0.35);   // philtrum/upper lip
-  glow(TEX_W*0.5, TEX_H*0.78, TEX_W*0.13, 0.4);    // chin
+  // base skin visibility against the black background
+  glow(TEX_W*0.5, TEX_H*0.46, TEX_W*0.40, TEX_H*0.46, 0.62);
 
-  shadow(TEX_W*0.36, TEX_H*0.40, TEX_W*0.095, TEX_H*0.048, 0.75); // eye socket L
-  shadow(TEX_W*0.64, TEX_H*0.40, TEX_W*0.095, TEX_H*0.048, 0.75); // eye socket R
-  shadow(TEX_W*0.36, TEX_H*0.345, TEX_W*0.10, TEX_H*0.015, 0.4);  // brow L
-  shadow(TEX_W*0.64, TEX_H*0.345, TEX_W*0.10, TEX_H*0.015, 0.4);  // brow R
-  shadow(TEX_W*0.435, TEX_H*0.50, TEX_W*0.022, TEX_H*0.06, 0.35); // nose shadow L
-  shadow(TEX_W*0.565, TEX_H*0.50, TEX_W*0.022, TEX_H*0.06, 0.35); // nose shadow R
-  shadow(TEX_W*0.5, TEX_H*0.645, TEX_W*0.15, TEX_H*0.03, 0.7);    // mouth line
-  shadow(TEX_W*0.5, TEX_H*0.90, TEX_W*0.30, TEX_H*0.12, 0.55);    // under-chin
-  shadow(TEX_W*0.08, TEX_H*0.5, TEX_W*0.16, TEX_H*0.46, 0.6);     // left frame edge
-  shadow(TEX_W*0.92, TEX_H*0.5, TEX_W*0.16, TEX_H*0.46, 0.6);     // right frame edge
-  shadow(TEX_W*0.5, TEX_H*0.045, TEX_W*0.55, TEX_H*0.09, 0.65);   // top frame edge
-  shadow(TEX_W*0.5, TEX_H*0.97, TEX_W*0.55, TEX_H*0.09, 0.6);     // bottom frame edge
+  // broad volume (forehead / cheeks / chin), moderate
+  glow(TEX_W*0.5, TEX_H*0.24, TEX_W*0.22, TEX_H*0.15, 0.28);
+  glow(TEX_W*0.29, TEX_H*0.55, TEX_W*0.15, TEX_H*0.17, 0.24);
+  glow(TEX_W*0.71, TEX_H*0.55, TEX_W*0.15, TEX_H*0.17, 0.24);
+  glow(TEX_W*0.5, TEX_H*0.80, TEX_W*0.13, TEX_H*0.09, 0.22);
+
+  // temple / brow-bone shadow
+  shadow(TEX_W*0.22, TEX_H*0.32, TEX_W*0.11, TEX_H*0.15, 0.28);
+  shadow(TEX_W*0.78, TEX_H*0.32, TEX_W*0.11, TEX_H*0.15, 0.28);
+  shadow(TEX_W*0.365, TEX_H*0.355, TEX_W*0.09, TEX_H*0.018, 0.35);
+  shadow(TEX_W*0.635, TEX_H*0.355, TEX_W*0.09, TEX_H*0.018, 0.35);
+  glow(TEX_W*0.365, TEX_H*0.335, TEX_W*0.085, TEX_H*0.015, 0.32);
+  glow(TEX_W*0.635, TEX_H*0.335, TEX_W*0.085, TEX_H*0.015, 0.32);
+
+  // eye sockets — the single most important legibility cue
+  shadow(TEX_W*0.365, TEX_H*0.41, TEX_W*0.068, TEX_H*0.038, 0.72);
+  shadow(TEX_W*0.635, TEX_H*0.41, TEX_W*0.068, TEX_H*0.038, 0.72);
+  shadow(TEX_W*0.365, TEX_H*0.448, TEX_W*0.062, TEX_H*0.02, 0.3);
+  shadow(TEX_W*0.635, TEX_H*0.448, TEX_W*0.062, TEX_H*0.02, 0.3);
+  glow(TEX_W*0.365, TEX_H*0.425, TEX_W*0.016, TEX_H*0.01, 0.45);
+  glow(TEX_W*0.635, TEX_H*0.425, TEX_W*0.016, TEX_H*0.01, 0.45);
+
+  // nose — soft ridge + defined side shadows
+  glow(TEX_W*0.5, TEX_H*0.40, TEX_W*0.024, TEX_H*0.10, 0.45);
+  glow(TEX_W*0.5, TEX_H*0.50, TEX_W*0.028, TEX_H*0.02, 0.42);
+  shadow(TEX_W*0.435, TEX_H*0.465, TEX_W*0.026, TEX_H*0.085, 0.4);
+  shadow(TEX_W*0.565, TEX_H*0.465, TEX_W*0.026, TEX_H*0.085, 0.4);
+  shadow(TEX_W*0.468, TEX_H*0.512, TEX_W*0.011, TEX_H*0.009, 0.4);
+  shadow(TEX_W*0.532, TEX_H*0.512, TEX_W*0.011, TEX_H*0.009, 0.4);
+
+  // mouth — volume, not a flat bar
+  glow(TEX_W*0.5, TEX_H*0.57, TEX_W*0.045, TEX_H*0.016, 0.32);
+  glow(TEX_W*0.5, TEX_H*0.598, TEX_W*0.085, TEX_H*0.018, 0.26);
+  shadow(TEX_W*0.5, TEX_H*0.618, TEX_W*0.092, TEX_H*0.01, 0.5);
+  glow(TEX_W*0.5, TEX_H*0.64, TEX_W*0.09, TEX_H*0.018, 0.36);
+  shadow(TEX_W*0.5, TEX_H*0.662, TEX_W*0.10, TEX_H*0.016, 0.3);
+
+  // jaw / face edge — rounds off into the dark surround
+  shadow(TEX_W*0.5, TEX_H*0.89, TEX_W*0.28, TEX_H*0.12, 0.5);
+  shadow(TEX_W*0.08, TEX_H*0.5, TEX_W*0.16, TEX_H*0.48, 0.62);
+  shadow(TEX_W*0.92, TEX_H*0.5, TEX_W*0.16, TEX_H*0.48, 0.62);
+  shadow(TEX_W*0.5, TEX_H*0.02, TEX_W*0.56, TEX_H*0.08, 0.55);
+  shadow(TEX_W*0.5, TEX_H*0.99, TEX_W*0.56, TEX_H*0.08, 0.5);
 
   // fine grain so the sampled brightness isn't perfectly smooth
-  for(var i=0;i<900;i++){
-    tx.fillStyle = 'rgba(255,255,255,'+(Math.random()*0.06)+')';
+  for(var i=0;i<700;i++){
+    tx.fillStyle = 'rgba(255,255,255,'+(Math.random()*0.05)+')';
     tx.fillRect(Math.random()*TEX_W, Math.random()*TEX_H, 1, 1);
   }
 
-  return tx.getImageData(0,0,TEX_W,TEX_H).data;
+  // a light blur only — enough to feel photographic, not enough to melt
+  // the eyes/nose/mouth structure into a formless glow.
+  var soft = document.createElement('canvas');
+  soft.width = TEX_W; soft.height = TEX_H;
+  var sx = soft.getContext('2d');
+  sx.filter = 'blur(1.6px)';
+  sx.drawImage(raw, 0, 0);
+
+  return sx.getImageData(0,0,TEX_W,TEX_H).data;
 })();
 function sampleFace(u, v){
   var px = Math.min(TEX_W-1, Math.max(0, Math.round((u*0.5+0.5)*(TEX_W-1))));
   var py = Math.min(TEX_H-1, Math.max(0, Math.round((v*0.5+0.5)*(TEX_H-1))));
   var idx = (py*TEX_W + px) * 4;
   return (0.299*faceTex[idx] + 0.587*faceTex[idx+1] + 0.114*faceTex[idx+2]) / 255;
+}
+function gauss2(dx, dy, sx, sy){
+  return Math.exp(-((dx*dx)/(2*sx*sx) + (dy*dy)/(2*sy*sy)));
+}
+// where warm skin-tone highlight is allowed to bloom in (face volume, not background/frame)
+function sampleSkinMask(u, v){
+  return gauss2(u, (v-0.02)*0.92, 0.62, 0.62);
 }
 function hash(n){ var x = Math.sin(n*127.1) * 43758.5453; return x - Math.floor(x); }
 
@@ -681,10 +726,10 @@ function clusterPhase(cid){
 
 // Rectangle proportions: roughly equal width/height (a touch taller — portrait).
 var RECT_W = 0.92, RECT_H = 1.0;
-var ROWS = 52;
+var ROWS = 64;
 var ROW_PITCH = (RECT_H*2) / (ROWS-1);
-var TILE_SIZE = ROW_PITCH * 0.88;      // tiles nearly touch vertically within a column
-var COL_PITCH = TILE_SIZE * 1.34;      // wider gap between columns -> visible curtain strips
+var TILE_SIZE = ROW_PITCH * 0.86;      // tiles nearly touch vertically within a column
+var COL_PITCH = TILE_SIZE * 1.28;      // wider gap between columns -> visible curtain strips
 var COLS = Math.max(2, Math.round((RECT_W*2) / COL_PITCH) + 1);
 
 var voxels = (function(){
@@ -704,6 +749,7 @@ var voxels = (function(){
       list.push({
         u:u, v:v, colYOff:colYOff, z:colZ,
         lum: sampleFace(u, v),
+        skin: sampleSkinMask(u, v),
         clusterId: clusterId,
         clusterPh: clusterPhase(clusterId),
         regionBand: regionBand,
@@ -738,7 +784,7 @@ function draw(now){
 
   var bands = getAudioBands(idleT, dtMs);
   var breathe = Math.sin(idleT * 0.5) * 0.5 + 0.5;
-  var ampGlobal = speaking ? (0.22 + bands.amp*0.85) : (0.08 + breathe*0.10);
+  var ampGlobal = speaking ? (0.22 + bands.amp*0.85) : (0.02 + breathe*0.05);
 
   mouse.x += (mouseT.x - mouse.x) * 0.03;
   mouse.y += (mouseT.y - mouse.y) * 0.03;
@@ -832,9 +878,11 @@ function drawArc(cx, cy, R, rot, dash, sweep, alpha){
   ctx.restore();
 }
 
-var STEEL = {r:70,g:110,b:158};
+var STEEL = {r:16,g:26,b:42};
 var SILVER = {r:230,g:240,b:251};
+var WARM = {r:255,g:214,b:172};
 var CELEBRATE_RGB = {r:255,g:210,b:92};
+function clamp255(v){ return v<0?0:(v>255?255:v); }
 
 var swayY = 0, swayX = 0;
 var headScreenBox = {top:0,bottom:0,left:0,right:0};
@@ -875,14 +923,15 @@ function drawHead(cx, cy, worldScale, bands, ampGlobal){
                     + bands.treble*0.22 + bands.bass*0.12 + ampGlobal*0.22;
     brightness = Math.max(0, Math.min(1, brightness));
 
-    proj[i] = { x:p.x, y:p.y, z:p.z, b:brightness };
+    proj[i] = { x:p.x, y:p.y, z:p.z, b:brightness, k:vx.skin };
   }
   proj.sort(function(a,b){ return a.z - b.z; });
 
   var minSX=Infinity, maxSX=-Infinity, minSY=Infinity, maxSY=-Infinity;
 
+  // extrusion direction for the cube's top/side faces (constant "light from
+  // upper-left" convention: top face lightest, front mid, side darkest).
   ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
   for(i=0;i<proj.length;i++){
     var d = proj[i];
     var scale = focal / (focal - d.z);
@@ -891,18 +940,46 @@ function drawHead(cx, cy, worldScale, bands, ampGlobal){
     if(sx<minSX)minSX=sx; if(sx>maxSX)maxSX=sx;
     if(sy<minSY)minSY=sy; if(sy>maxSY)maxSY=sy;
 
-    // tiles stay small, uniform and square — brightness/alpha carry the
-    // face, not dramatic per-tile size swings.
-    var size = renderSize * scale * (0.82 + d.b*0.22) * (1 + ampGlobal*0.1);
-    var alpha = 0.06 + d.b*0.96;
+    // tiles stay small, uniform and square — brightness carries the face,
+    // not dramatic per-tile size swings.
+    var size = renderSize * scale * (0.9 + d.b*0.14) * (1 + ampGlobal*0.08);
+    var alpha = 0.82 + d.b*0.18;
 
     var mixT = Math.min(1, d.b*1.05);
     var r = STEEL.r + (SILVER.r-STEEL.r)*mixT;
     var g = STEEL.g + (SILVER.g-STEEL.g)*mixT;
     var b = STEEL.b + (SILVER.b-STEEL.b)*mixT;
+    // warm skin-tone bloom only where the face texture is both a skin
+    // region and lit — shadows/background stay on the cool blue palette.
+    var warmT = d.k * mixT * 0.55;
+    r = r + (WARM.r-r)*warmT;
+    g = g + (WARM.g-g)*warmT;
+    b = b + (WARM.b-b)*warmT;
 
-    ctx.fillStyle = 'rgba('+(r|0)+','+(g|0)+','+(b|0)+','+Math.min(1,alpha)+')';
-    ctx.fillRect(sx-size/2, sy-size/2, size, size);
+    var half = size/2;
+    // keep the extrusion inside this tile's own gap allowance so adjacent
+    // tiles' faces never bleed into each other (that's what was smearing
+    // the whole grid into a soft blob instead of crisp little cubes).
+    var depth = size*0.16;
+    var ex = depth*0.8, ey = -depth*0.5;
+    var tl_x=sx-half, tl_y=sy-half, tr_x=sx+half, tr_y=sy-half;
+    var br_x=sx+half, br_y=sy+half, bl_x=sx-half, bl_y=sy+half;
+
+    // side face (right) — darkest
+    ctx.fillStyle = 'rgba('+(clamp255(r*0.5)|0)+','+(clamp255(g*0.5)|0)+','+(clamp255(b*0.55)|0)+','+alpha+')';
+    ctx.beginPath();
+    ctx.moveTo(tr_x,tr_y); ctx.lineTo(br_x,br_y); ctx.lineTo(br_x+ex,br_y+ey); ctx.lineTo(tr_x+ex,tr_y+ey);
+    ctx.closePath(); ctx.fill();
+
+    // top face — lightest
+    ctx.fillStyle = 'rgba('+(clamp255(r*1.28)|0)+','+(clamp255(g*1.24)|0)+','+(clamp255(b*1.18)|0)+','+alpha+')';
+    ctx.beginPath();
+    ctx.moveTo(tl_x,tl_y); ctx.lineTo(tr_x,tr_y); ctx.lineTo(tr_x+ex,tr_y+ey); ctx.lineTo(tl_x+ex,tl_y+ey);
+    ctx.closePath(); ctx.fill();
+
+    // front face — mid-tone, carries the sampled face texture value
+    ctx.fillStyle = 'rgba('+(r|0)+','+(g|0)+','+(b|0)+','+alpha+')';
+    ctx.fillRect(tl_x, tl_y, size, size);
   }
   ctx.restore();
 
