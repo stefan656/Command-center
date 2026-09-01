@@ -648,6 +648,16 @@ var arcAngles = [0, 0.6, 1.9];
 var arcSpeeds = [0.00034, -0.00021, 0.00047];
 var rayAngle = 0;
 
+/* ---- spirit-figure particle trail (energy motes between sphere and figure) ---- */
+var SPIRIT_PARTICLE_COUNT = 20;
+var spiritParticles = (function(){
+  var list = [];
+  for(var i=0;i<SPIRIT_PARTICLE_COUNT;i++){
+    list.push({ t: Math.random(), xJ: (Math.random()-0.5), speed: 0.25 + Math.random()*0.35, sway: Math.random()*Math.PI*2, size: 0.9 + Math.random()*1.3 });
+  }
+  return list;
+})();
+
 function draw(now){
   var dtMs = Math.min(48, now - lastTime);
   lastTime = now;
@@ -708,6 +718,15 @@ function draw(now){
 
   /* bright pulsing core */
   drawCore(cx, cy, R, pulse, speakBoost);
+
+  /* hovering spirit figure above the sphere, and its energy-mote trail */
+  var figH = R*1.3;
+  var bobY = Math.sin(idleT*0.62) * (R*0.045 + speakBoost*R*0.02); // synced to the same breathing phase as the sphere
+  var feetY = cy - R*0.55 + bobY;
+  var headTopY = feetY - figH;
+
+  drawSpiritParticles(cx, feetY, cy - R*0.05, dtMs, speakBoost);
+  drawSpiritFigure(cx, feetY, figH, pulse, speakBoost);
 
   requestAnimationFrame(draw);
 }
@@ -835,6 +854,105 @@ function drawCore(cx, cy, R, pulse, speakBoost){
   core.addColorStop(1,'rgba(120,180,255,0)');
   ctx.fillStyle = core;
   ctx.beginPath(); ctx.arc(cx,cy,coreR,0,Math.PI*2); ctx.fill();
+
+  ctx.restore();
+}
+
+/* ---- energy motes drifting between the sphere and the hovering figure ---- */
+function drawSpiritParticles(cx, zoneTop, zoneBottom, dtMs, speakBoost){
+  var span = zoneBottom - zoneTop;
+  if(span <= 0) return;
+  var activity = 0.35 + speakBoost*1.4; // calmer at idle, livelier while speaking
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for(var i=0;i<spiritParticles.length;i++){
+    var p = spiritParticles[i];
+    p.t += (dtMs/1000) * p.speed * (0.5 + activity*0.5);
+    if(p.t > 1){
+      p.t = 0;
+      p.xJ = (Math.random()-0.5);
+      p.sway = Math.random()*Math.PI*2;
+      p.speed = 0.25 + Math.random()*0.35;
+      p.size = 0.9 + Math.random()*1.3;
+    }
+    var y = zoneTop + p.t*span;
+    var x = cx + p.xJ*14 + Math.sin(idleT*0.8 + p.sway)*5;
+    // fade in near the figure, fade out (dissipate) as it nears the sphere
+    var fade = Math.sin(Math.min(1,p.t)*Math.PI);
+    var alpha = fade * (0.22 + activity*0.26) * p.size;
+    var size = p.size * (1 + speakBoost*0.6);
+
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(150,205,255,'+Math.min(0.55,alpha)+')';
+    ctx.arc(x, y, size, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---- simple translucent glowing humanoid silhouette hovering above the sphere ---- */
+function drawSpiritFigure(cx, feetY, FH, pulse, speakBoost){
+  var glowAlpha = 0.5 + speakBoost*0.5;
+  var bodyAlpha = 0.22 + speakBoost*0.22;
+  var headPulse = 1 + (pulse-1)*0.6 + speakBoost*0.15;
+
+  var headR   = FH*0.078;
+  var headY   = feetY - FH*0.925;
+  var shoulderY = feetY - FH*0.80;
+  var hipY    = feetY - FH*0.44;
+  var shoulderW = FH*0.155;
+  var hipW    = FH*0.075;
+  var handY   = feetY - FH*0.50;
+  var handW   = FH*0.20;
+  var footW   = FH*0.09;
+
+  function limb(x1,y1,x2,y2,w,alpha,blur){
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(150,205,255,'+alpha+')';
+    ctx.lineWidth = w;
+    ctx.shadowColor = 'rgba(120,185,255,0.9)';
+    ctx.shadowBlur = blur;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+
+  // soft outer aura, wider + fainter, behind everything
+  limb(cx, shoulderY, cx, hipY, shoulderW*2.1, bodyAlpha*0.35, 22);
+  limb(cx-shoulderW*0.6, shoulderY, cx-handW*0.6, handY, FH*0.11, bodyAlpha*0.3, 16);
+  limb(cx+shoulderW*0.6, shoulderY, cx+handW*0.6, handY, FH*0.11, bodyAlpha*0.3, 16);
+  limb(cx-hipW*0.7, hipY, cx-footW*0.8, feetY, FH*0.13, bodyAlpha*0.3, 16);
+  limb(cx+hipW*0.7, hipY, cx+footW*0.8, feetY, FH*0.13, bodyAlpha*0.3, 16);
+
+  // defined translucent body — torso, arms (relaxed, slightly bowed at the sides), legs
+  limb(cx, shoulderY, cx, hipY, shoulderW*1.15, bodyAlpha, 12);          // torso
+  limb(cx-shoulderW*0.6, shoulderY, cx-handW*0.6, handY, FH*0.05, bodyAlpha, 9);  // left arm
+  limb(cx+shoulderW*0.6, shoulderY, cx+handW*0.6, handY, FH*0.05, bodyAlpha, 9);  // right arm
+  limb(cx-hipW*0.7, hipY, cx-footW*0.8, feetY, FH*0.06, bodyAlpha, 9);   // left leg
+  limb(cx+hipW*0.7, hipY, cx+footW*0.8, feetY, FH*0.06, bodyAlpha, 9);   // right leg
+
+  // neck
+  limb(cx, headY+headR*0.8, cx, shoulderY, FH*0.035, bodyAlpha, 8);
+
+  // head: the brightest point on the figure, like a small second core
+  var hr = headR*headPulse;
+  var hHalo = ctx.createRadialGradient(cx,headY,0,cx,headY,hr*3.4);
+  hHalo.addColorStop(0, 'rgba(220,238,255,'+glowAlpha+')');
+  hHalo.addColorStop(0.35, 'rgba(140,200,255,'+(glowAlpha*0.32)+')');
+  hHalo.addColorStop(1, 'rgba(140,200,255,0)');
+  ctx.fillStyle = hHalo;
+  ctx.beginPath(); ctx.arc(cx,headY,hr*3.4,0,Math.PI*2); ctx.fill();
+
+  var hCore = ctx.createRadialGradient(cx,headY,0,cx,headY,hr);
+  hCore.addColorStop(0, 'rgba(255,255,255,'+Math.min(1,0.8+speakBoost*0.3)+')');
+  hCore.addColorStop(0.55, 'rgba(200,228,255,0.55)');
+  hCore.addColorStop(1, 'rgba(150,205,255,0)');
+  ctx.fillStyle = hCore;
+  ctx.beginPath(); ctx.arc(cx,headY,hr,0,Math.PI*2); ctx.fill();
 
   ctx.restore();
 }
