@@ -605,161 +605,31 @@ function rotX(p, a){
   var c = Math.cos(a), s = Math.sin(a);
   return { x: p.x, y: p.y*c - p.z*s, z: p.y*s + p.z*c };
 }
+function rotZ(p, a){
+  var c = Math.cos(a), s = Math.sin(a);
+  return { x: p.x*c - p.y*s, y: p.x*s + p.y*c, z: p.z };
+}
 
-/* ---- build a flat curtain/wall of LED tiles with a face texture mapped
-   across it (V.I.K.I.-style illuminated tile-screen), NOT a sculpted 3D
-   head: a portrait-oriented rectangle, no neck, no rounded skull. Facial
-   likeness comes entirely from per-tile brightness sampled off a small
-   offscreen face texture, never from geometric relief. ---- */
-
-var TEX_W = 176, TEX_H = 198;
-var faceTex = (function(){
-  var raw = document.createElement('canvas');
-  raw.width = TEX_W; raw.height = TEX_H;
-  var tx = raw.getContext('2d');
-  tx.fillStyle = '#000'; tx.fillRect(0,0,TEX_W,TEX_H);
-
-  function glow(cx, cy, rx, ry, a){
-    tx.save();
-    tx.translate(cx,cy); tx.scale(1, ry/rx);
-    var g = tx.createRadialGradient(0,0,0,0,0,rx);
-    g.addColorStop(0, 'rgba(255,255,255,'+a+')');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
-    tx.fillStyle = g; tx.beginPath(); tx.arc(0,0,rx,0,Math.PI*2); tx.fill();
-    tx.restore();
+/* ---- Fibonacci sphere point cloud: the glowing energy-core visual ---- */
+var N = 680;
+var points = (function(){
+  var pts = [];
+  var GA = Math.PI * (3 - Math.sqrt(5)); // golden angle
+  for(var i=0;i<N;i++){
+    var y = 1 - (i/(N-1))*2;
+    var r = Math.sqrt(Math.max(0,1 - y*y));
+    var theta = GA * i;
+    pts.push({
+      x: Math.cos(theta)*r,
+      y: y,
+      z: Math.sin(theta)*r,
+      tw: Math.random()*Math.PI*2, // per-point twinkle phase
+      ts: 0.6 + Math.random()*0.9  // twinkle speed
+    });
   }
-  function shadow(cx, cy, rx, ry, a){
-    tx.save();
-    tx.translate(cx,cy); tx.scale(1, ry/rx);
-    var g = tx.createRadialGradient(0,0,0,0,0,rx);
-    g.addColorStop(0, 'rgba(0,0,0,'+a+')');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    tx.fillStyle = g; tx.beginPath(); tx.arc(0,0,rx,0,Math.PI*2); tx.fill();
-    tx.restore();
-  }
-
-  // base skin visibility against the black background
-  glow(TEX_W*0.5, TEX_H*0.46, TEX_W*0.40, TEX_H*0.46, 0.62);
-
-  // broad volume (forehead / cheeks / chin), moderate
-  glow(TEX_W*0.5, TEX_H*0.24, TEX_W*0.22, TEX_H*0.15, 0.28);
-  glow(TEX_W*0.29, TEX_H*0.55, TEX_W*0.15, TEX_H*0.17, 0.24);
-  glow(TEX_W*0.71, TEX_H*0.55, TEX_W*0.15, TEX_H*0.17, 0.24);
-  glow(TEX_W*0.5, TEX_H*0.80, TEX_W*0.13, TEX_H*0.09, 0.22);
-
-  // temple / brow-bone shadow
-  shadow(TEX_W*0.22, TEX_H*0.32, TEX_W*0.11, TEX_H*0.15, 0.28);
-  shadow(TEX_W*0.78, TEX_H*0.32, TEX_W*0.11, TEX_H*0.15, 0.28);
-  shadow(TEX_W*0.365, TEX_H*0.355, TEX_W*0.09, TEX_H*0.018, 0.35);
-  shadow(TEX_W*0.635, TEX_H*0.355, TEX_W*0.09, TEX_H*0.018, 0.35);
-  glow(TEX_W*0.365, TEX_H*0.335, TEX_W*0.085, TEX_H*0.015, 0.32);
-  glow(TEX_W*0.635, TEX_H*0.335, TEX_W*0.085, TEX_H*0.015, 0.32);
-
-  // eye sockets — the single most important legibility cue
-  shadow(TEX_W*0.365, TEX_H*0.41, TEX_W*0.068, TEX_H*0.038, 0.72);
-  shadow(TEX_W*0.635, TEX_H*0.41, TEX_W*0.068, TEX_H*0.038, 0.72);
-  shadow(TEX_W*0.365, TEX_H*0.448, TEX_W*0.062, TEX_H*0.02, 0.3);
-  shadow(TEX_W*0.635, TEX_H*0.448, TEX_W*0.062, TEX_H*0.02, 0.3);
-  glow(TEX_W*0.365, TEX_H*0.425, TEX_W*0.016, TEX_H*0.01, 0.45);
-  glow(TEX_W*0.635, TEX_H*0.425, TEX_W*0.016, TEX_H*0.01, 0.45);
-
-  // nose — soft ridge + defined side shadows
-  glow(TEX_W*0.5, TEX_H*0.40, TEX_W*0.024, TEX_H*0.10, 0.45);
-  glow(TEX_W*0.5, TEX_H*0.50, TEX_W*0.028, TEX_H*0.02, 0.42);
-  shadow(TEX_W*0.435, TEX_H*0.465, TEX_W*0.026, TEX_H*0.085, 0.4);
-  shadow(TEX_W*0.565, TEX_H*0.465, TEX_W*0.026, TEX_H*0.085, 0.4);
-  shadow(TEX_W*0.468, TEX_H*0.512, TEX_W*0.011, TEX_H*0.009, 0.4);
-  shadow(TEX_W*0.532, TEX_H*0.512, TEX_W*0.011, TEX_H*0.009, 0.4);
-
-  // mouth — volume, not a flat bar
-  glow(TEX_W*0.5, TEX_H*0.57, TEX_W*0.045, TEX_H*0.016, 0.32);
-  glow(TEX_W*0.5, TEX_H*0.598, TEX_W*0.085, TEX_H*0.018, 0.26);
-  shadow(TEX_W*0.5, TEX_H*0.618, TEX_W*0.092, TEX_H*0.01, 0.5);
-  glow(TEX_W*0.5, TEX_H*0.64, TEX_W*0.09, TEX_H*0.018, 0.36);
-  shadow(TEX_W*0.5, TEX_H*0.662, TEX_W*0.10, TEX_H*0.016, 0.3);
-
-  // jaw / face edge — rounds off into the dark surround
-  shadow(TEX_W*0.5, TEX_H*0.89, TEX_W*0.28, TEX_H*0.12, 0.5);
-  shadow(TEX_W*0.08, TEX_H*0.5, TEX_W*0.16, TEX_H*0.48, 0.62);
-  shadow(TEX_W*0.92, TEX_H*0.5, TEX_W*0.16, TEX_H*0.48, 0.62);
-  shadow(TEX_W*0.5, TEX_H*0.02, TEX_W*0.56, TEX_H*0.08, 0.55);
-  shadow(TEX_W*0.5, TEX_H*0.99, TEX_W*0.56, TEX_H*0.08, 0.5);
-
-  // fine grain so the sampled brightness isn't perfectly smooth
-  for(var i=0;i<700;i++){
-    tx.fillStyle = 'rgba(255,255,255,'+(Math.random()*0.05)+')';
-    tx.fillRect(Math.random()*TEX_W, Math.random()*TEX_H, 1, 1);
-  }
-
-  // a light blur only — enough to feel photographic, not enough to melt
-  // the eyes/nose/mouth structure into a formless glow.
-  var soft = document.createElement('canvas');
-  soft.width = TEX_W; soft.height = TEX_H;
-  var sx = soft.getContext('2d');
-  sx.filter = 'blur(1.6px)';
-  sx.drawImage(raw, 0, 0);
-
-  return sx.getImageData(0,0,TEX_W,TEX_H).data;
+  return pts;
 })();
-function sampleFace(u, v){
-  var px = Math.min(TEX_W-1, Math.max(0, Math.round((u*0.5+0.5)*(TEX_W-1))));
-  var py = Math.min(TEX_H-1, Math.max(0, Math.round((v*0.5+0.5)*(TEX_H-1))));
-  var idx = (py*TEX_W + px) * 4;
-  return (0.299*faceTex[idx] + 0.587*faceTex[idx+1] + 0.114*faceTex[idx+2]) / 255;
-}
-function gauss2(dx, dy, sx, sy){
-  return Math.exp(-((dx*dx)/(2*sx*sx) + (dy*dy)/(2*sy*sy)));
-}
-// where warm skin-tone highlight is allowed to bloom in (face volume, not background/frame)
-function sampleSkinMask(u, v){
-  return gauss2(u, (v-0.02)*0.92, 0.62, 0.62);
-}
-function hash(n){ var x = Math.sin(n*127.1) * 43758.5453; return x - Math.floor(x); }
-
-var CLUSTER_SPAN = 4;
-var REGION_BANDS = 6;
-var clusterPhaseMap = {};
-function clusterPhase(cid){
-  if(!(cid in clusterPhaseMap)) clusterPhaseMap[cid] = Math.random()*Math.PI*2;
-  return clusterPhaseMap[cid];
-}
-
-// Rectangle proportions: roughly equal width/height (a touch taller — portrait).
-var RECT_W = 0.92, RECT_H = 1.0;
-var ROWS = 64;
-var ROW_PITCH = (RECT_H*2) / (ROWS-1);
-var TILE_SIZE = ROW_PITCH * 0.86;      // tiles nearly touch vertically within a column
-var COL_PITCH = TILE_SIZE * 1.28;      // wider gap between columns -> visible curtain strips
-var COLS = Math.max(2, Math.round((RECT_W*2) / COL_PITCH) + 1);
-
-var voxels = (function(){
-  var list = [];
-  for(var col=0; col<COLS; col++){
-    var u = COLS>1 ? (col/(COLS-1))*2 - 1 : 0;
-    // stable per-column stagger: uneven hanging strands, not a sculpted dome
-    var colZ = (hash(col*3.1) - 0.5) * 0.14;
-    var colYOff = (hash(col*7.7) - 0.5) * ROW_PITCH * 0.5;
-    var clusterCol = Math.floor(col/CLUSTER_SPAN);
-
-    for(var row=0; row<ROWS; row++){
-      var v = (row/(ROWS-1))*2 - 1;
-      var clusterId = Math.floor(row/CLUSTER_SPAN)*1000 + clusterCol;
-      var regionBand = Math.max(0, Math.min(REGION_BANDS-1, Math.floor(((v+1)/2)*REGION_BANDS)));
-
-      list.push({
-        u:u, v:v, colYOff:colYOff, z:colZ,
-        lum: sampleFace(u, v),
-        skin: sampleSkinMask(u, v),
-        clusterId: clusterId,
-        clusterPh: clusterPhase(clusterId),
-        regionBand: regionBand,
-        twPhase: Math.random()*Math.PI*2,
-        twSpeed: 0.4 + Math.random()*1.3
-      });
-    }
-  }
-  return list;
-})();
+var tiltX = 0.5;
 
 /* ---- pointer parallax (subtle) ---- */
 var mouseT = {x:0,y:0}, mouse = {x:0,y:0};
@@ -771,8 +641,9 @@ window.addEventListener('pointermove', function(e){
 var idleT = 0;
 var lastTime = performance.now();
 
-/* ---- ring / arc framing angles (reused around the head) ---- */
+/* ---- ring / arc / orbit framing angles ---- */
 var spin = 0;
+var orbitAngle = 0;
 var arcAngles = [0, 0.6, 1.9];
 var arcSpeeds = [0.00034, -0.00021, 0.00047];
 var rayAngle = 0;
@@ -783,19 +654,22 @@ function draw(now){
   idleT += dtMs/1000;
 
   var bands = getAudioBands(idleT, dtMs);
-  var breathe = Math.sin(idleT * 0.5) * 0.5 + 0.5;
-  var ampGlobal = speaking ? (0.22 + bands.amp*0.85) : (0.02 + breathe*0.05);
+  // pulse: gentle idle breathing, harder + faster when speaking, driven by
+  // the same Web Audio amplitude feed as the rest of the reactive UI.
+  var breathe = Math.sin(idleT * 0.62) * 0.5 + 0.5;
+  var pulse = speaking ? (1 + bands.amp*1.0) : (1 + breathe*0.11);
+  var speakBoost = speaking ? bands.amp : 0;
 
   mouse.x += (mouseT.x - mouse.x) * 0.03;
   mouse.y += (mouseT.y - mouse.y) * 0.03;
 
-  spin += dtMs * (0.00016 + (speaking ? bands.amp*0.00012 : 0));
+  spin += dtMs * (0.00016 + (speaking ? speakBoost*0.00012 : 0));
+  orbitAngle += dtMs * 0.00055;
   rayAngle += dtMs * 0.00009;
-  for(var a=0;a<3;a++) arcAngles[a] += dtMs * arcSpeeds[a] * (1 + (speaking ? bands.amp*0.6 : 0));
+  for(var a=0;a<3;a++) arcAngles[a] += dtMs * arcSpeeds[a] * (1 + (speaking ? speakBoost*0.6 : 0));
 
-  var cx = W/2, cy = H*0.46;
-  var worldScale = Math.min(W,H) * 0.155;
-  var R = worldScale * 1.05; // radius unit for the surrounding HUD framing
+  var cx = W/2, cy = H/2 + H*0.015;
+  var R = Math.min(W,H) * 0.145;
 
   /* background */
   var bg = ctx.createRadialGradient(cx, cy - H*0.05, 0, cx, cy, Math.max(W,H)*0.75);
@@ -806,27 +680,34 @@ function draw(now){
   ctx.fillStyle = bg;
   ctx.fillRect(0,0,W,H);
 
-  /* ambient breathing glow behind the head */
-  var glowR = worldScale * (1.9 + ampGlobal*0.9);
+  /* ambient glow */
+  var glowR = R * (2.6 + pulse*0.5);
   var amb = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
-  amb.addColorStop(0, 'rgba(120,175,255,'+(0.14 + ampGlobal*0.16)+')');
-  amb.addColorStop(0.4, 'rgba(80,140,230,0.06)');
+  amb.addColorStop(0, 'rgba(120,175,255,'+(0.16 + speakBoost*0.12)+')');
+  amb.addColorStop(0.4, 'rgba(80,140,230,0.07)');
   amb.addColorStop(1, 'rgba(10,20,30,0)');
   ctx.fillStyle = amb;
   ctx.beginPath(); ctx.arc(cx,cy,glowR,0,Math.PI*2); ctx.fill();
 
-  /* HUD framing */
-  drawTickRing(cx, cy, R*2.6, spin*0.15);
-  drawRays(cx, cy, R*1.5, R*2.42, rayAngle);
-  drawArc(cx, cy, R*1.75, arcAngles[0], [14,10], 0.28, 0.4);
-  drawArc(cx, cy, R*1.98, arcAngles[1], [3,9], 0.9, 0.2);
-  drawArc(cx, cy, R*2.2, arcAngles[2], [22,6], 0.55, 0.14);
+  /* outer tick ring */
+  drawTickRing(cx, cy, R*2.5, spin*0.15);
 
-  /* voxel head */
-  drawHead(cx, cy, worldScale, bands, ampGlobal);
+  /* faint radial rays */
+  drawRays(cx, cy, R*1.35, R*2.35, rayAngle);
 
-  /* scanlines drifting down across the head */
-  drawHeadScanlines(cx, cy, worldScale);
+  /* dashed HUD arcs */
+  drawArc(cx, cy, R*1.62, arcAngles[0], [14,10], 0.28, 0.42);
+  drawArc(cx, cy, R*1.86, arcAngles[1], [3,9], 0.9, 0.22);
+  drawArc(cx, cy, R*2.08, arcAngles[2], [22,6], 0.55, 0.16);
+
+  /* elliptical orbital ring + marker */
+  drawOrbit(cx, cy, R*1.42, R*0.42, -0.42, orbitAngle);
+
+  /* sphere point cloud */
+  drawSphere(cx, cy, R, pulse, speakBoost);
+
+  /* bright pulsing core */
+  drawCore(cx, cy, R, pulse, speakBoost);
 
   requestAnimationFrame(draw);
 }
@@ -878,139 +759,83 @@ function drawArc(cx, cy, R, rot, dash, sweep, alpha){
   ctx.restore();
 }
 
-var STEEL = {r:16,g:26,b:42};
-var SILVER = {r:230,g:240,b:251};
-var WARM = {r:255,g:214,b:172};
-var CELEBRATE_RGB = {r:255,g:210,b:92};
-function clamp255(v){ return v<0?0:(v>255?255:v); }
+function drawOrbit(cx, cy, rx, ry, rot, ang){
+  ctx.save();
+  ctx.translate(cx,cy); ctx.rotate(rot);
+  ctx.strokeStyle = 'rgba(130,190,255,0.28)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
+  ctx.stroke();
 
-var swayY = 0, swayX = 0;
-var headScreenBox = {top:0,bottom:0,left:0,right:0};
+  var mx = Math.cos(ang)*rx, my = Math.sin(ang)*ry;
+  var depth = Math.sin(ang); // -1 back .. 1 front
+  var scale = 0.7 + (depth*0.5+0.5)*0.7;
+  ctx.globalCompositeOperation = 'lighter';
+  var g = ctx.createRadialGradient(mx,my,0,mx,my,10*scale);
+  g.addColorStop(0,'rgba(230,242,255,0.95)');
+  g.addColorStop(0.4,'rgba(130,190,255,0.55)');
+  g.addColorStop(1,'rgba(130,190,255,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(mx,my,10*scale,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(235,245,255,0.95)';
+  ctx.beginPath(); ctx.arc(mx,my,2.2*scale,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
 
-function drawHead(cx, cy, worldScale, bands, ampGlobal){
-  var t = idleT;
-  // flat curtain of tiles: only a whisper of 3D (gentle sway + per-column
-  // stagger), never a sculpted rotation-revealing-volume like a bust.
-  var speakFactor = speaking ? (1 + bands.amp*0.2) : 1;
-  swayY = 0.045 * speakFactor * Math.sin(t * 0.22);
-  swayX = 0.05 + 0.02 * Math.sin(t * 0.17 + 1.3) + mouse.y*0.03;
-  var swayZ = mouse.x * 0.025;
+function drawSphere(cx, cy, R, pulse, speakBoost){
+  var focal = R*3.4;
+  var mx = mouse.y * 0.35; // vertical mouse -> extra tilt
+  var mz = mouse.x * 0.35;
 
-  var focal = worldScale * 6;
-  var renderSize = worldScale * TILE_SIZE;
-
-  var bassRegionPhase = [0,0.9,1.8,2.7,3.6,4.5];
-
-  var proj = new Array(voxels.length);
-  var i, vx;
-  for(i=0;i<voxels.length;i++){
-    vx = voxels[i];
-
-    var bassWave = Math.sin(t*0.8 + bassRegionPhase[vx.regionBand]) * bands.bass;
-    var trebleWave = Math.sin(t*(5 + bands.treble*6) + vx.clusterPh) * bands.treble;
-
-    var xw = vx.u * worldScale * RECT_W + trebleWave * worldScale * 0.02;
-    var yw = (vx.v * worldScale * RECT_H) + (vx.colYOff * worldScale) + bassWave * worldScale * 0.02;
-    var zw = (vx.z + bassWave*0.3) * worldScale;
-
-    var p = { x:xw, y:yw, z:zw };
-    p = rotY(p, swayZ*0.3);
-    p = rotX(p, swayX);
-    p = rotY(p, swayY);
-
-    var twinkle = 0.85 + 0.18*Math.sin(t*vx.twSpeed*2 + vx.twPhase);
-    var brightness = vx.lum * (0.78 + 0.22*twinkle)
-                    + bands.treble*0.22 + bands.bass*0.12 + ampGlobal*0.22;
-    brightness = Math.max(0, Math.min(1, brightness));
-
-    proj[i] = { x:p.x, y:p.y, z:p.z, b:brightness, k:vx.skin };
+  var proj = new Array(N);
+  for(var i=0;i<N;i++){
+    var p = points[i];
+    var q = rotZ(p, mz*0.2);
+    q = rotX(q, tiltX + mx);
+    q = rotY(q, spin);
+    proj[i] = q;
   }
   proj.sort(function(a,b){ return a.z - b.z; });
 
-  var minSX=Infinity, maxSX=-Infinity, minSY=Infinity, maxSY=-Infinity;
-
-  // extrusion direction for the cube's top/side faces (constant "light from
-  // upper-left" convention: top face lightest, front mid, side darkest).
   ctx.save();
-  for(i=0;i<proj.length;i++){
+  ctx.globalCompositeOperation = 'lighter';
+  for(i=0;i<N;i++){
     var d = proj[i];
-    var scale = focal / (focal - d.z);
-    var sx = cx + d.x*scale;
-    var sy = cy + d.y*scale;
-    if(sx<minSX)minSX=sx; if(sx>maxSX)maxSX=sx;
-    if(sy<minSY)minSY=sy; if(sy>maxSY)maxSY=sy;
-
-    // tiles stay small, uniform and square — brightness carries the face,
-    // not dramatic per-tile size swings.
-    var size = renderSize * scale * (0.9 + d.b*0.14) * (1 + ampGlobal*0.08);
-    var alpha = 0.82 + d.b*0.18;
-
-    var mixT = Math.min(1, d.b*1.05);
-    var r = STEEL.r + (SILVER.r-STEEL.r)*mixT;
-    var g = STEEL.g + (SILVER.g-STEEL.g)*mixT;
-    var b = STEEL.b + (SILVER.b-STEEL.b)*mixT;
-    // warm skin-tone bloom only where the face texture is both a skin
-    // region and lit — shadows/background stay on the cool blue palette.
-    var warmT = d.k * mixT * 0.55;
-    r = r + (WARM.r-r)*warmT;
-    g = g + (WARM.g-g)*warmT;
-    b = b + (WARM.b-b)*warmT;
-
-    var half = size/2;
-    // keep the extrusion inside this tile's own gap allowance so adjacent
-    // tiles' faces never bleed into each other (that's what was smearing
-    // the whole grid into a soft blob instead of crisp little cubes).
-    var depth = size*0.16;
-    var ex = depth*0.8, ey = -depth*0.5;
-    var tl_x=sx-half, tl_y=sy-half, tr_x=sx+half, tr_y=sy-half;
-    var br_x=sx+half, br_y=sy+half, bl_x=sx-half, bl_y=sy+half;
-
-    // side face (right) — darkest
-    ctx.fillStyle = 'rgba('+(clamp255(r*0.5)|0)+','+(clamp255(g*0.5)|0)+','+(clamp255(b*0.55)|0)+','+alpha+')';
+    var scale = focal / (focal - d.z*R);
+    var sx = cx + d.x*R*scale;
+    var sy = cy + d.y*R*scale*0.98;
+    var depthA = (d.z + 1)/2; // 0 back .. 1 front
+    var twinkle = 0.85 + 0.15*Math.sin(idleT*points[i].ts*2 + points[i].tw);
+    var alpha = (0.12 + depthA*0.62) * twinkle * (0.85 + speakBoost*0.3);
+    var size = (0.55 + depthA*1.15) * (pulse*0.9);
     ctx.beginPath();
-    ctx.moveTo(tr_x,tr_y); ctx.lineTo(br_x,br_y); ctx.lineTo(br_x+ex,br_y+ey); ctx.lineTo(tr_x+ex,tr_y+ey);
-    ctx.closePath(); ctx.fill();
-
-    // top face — lightest
-    ctx.fillStyle = 'rgba('+(clamp255(r*1.28)|0)+','+(clamp255(g*1.24)|0)+','+(clamp255(b*1.18)|0)+','+alpha+')';
-    ctx.beginPath();
-    ctx.moveTo(tl_x,tl_y); ctx.lineTo(tr_x,tr_y); ctx.lineTo(tr_x+ex,tr_y+ey); ctx.lineTo(tl_x+ex,tl_y+ey);
-    ctx.closePath(); ctx.fill();
-
-    // front face — mid-tone, carries the sampled face texture value
-    ctx.fillStyle = 'rgba('+(r|0)+','+(g|0)+','+(b|0)+','+alpha+')';
-    ctx.fillRect(tl_x, tl_y, size, size);
+    ctx.fillStyle = 'rgba(125,185,255,'+Math.min(1,alpha)+')';
+    ctx.arc(sx, sy, size, 0, Math.PI*2);
+    ctx.fill();
   }
   ctx.restore();
-
-  if(isFinite(minSX)){
-    var pad = renderSize*3;
-    headScreenBox = { left:minSX-pad, right:maxSX+pad, top:minSY-pad, bottom:maxSY+pad };
-  }
 }
 
-var scanOffset = 0;
-function drawHeadScanlines(cx, cy, worldScale){
-  scanOffset += 0.028 * (performance.now() - (drawHeadScanlines._last || performance.now()));
-  drawHeadScanlines._last = performance.now();
-
-  var box = headScreenBox;
-  if(!box || !isFinite(box.top)) return;
-  var spacing = 6;
-  var offset = scanOffset % spacing;
-
+function drawCore(cx, cy, R, pulse, speakBoost){
+  var coreR = R*0.34*pulse;
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(box.left, box.top, box.right-box.left, box.bottom-box.top);
-  ctx.clip();
-  ctx.strokeStyle = 'rgba(200,225,255,0.07)';
-  ctx.lineWidth = 1;
-  for(var y = box.top - spacing + offset; y < box.bottom + spacing; y += spacing){
-    ctx.beginPath();
-    ctx.moveTo(box.left, y);
-    ctx.lineTo(box.right, y);
-    ctx.stroke();
-  }
+  ctx.globalCompositeOperation = 'lighter';
+
+  var halo = ctx.createRadialGradient(cx,cy,0,cx,cy,coreR*3.2);
+  halo.addColorStop(0, 'rgba(210,232,255,'+(0.5+speakBoost*0.3)+')');
+  halo.addColorStop(0.25, 'rgba(130,190,255,0.28)');
+  halo.addColorStop(1, 'rgba(130,190,255,0)');
+  ctx.fillStyle = halo;
+  ctx.beginPath(); ctx.arc(cx,cy,coreR*3.2,0,Math.PI*2); ctx.fill();
+
+  var core = ctx.createRadialGradient(cx,cy,0,cx,cy,coreR);
+  core.addColorStop(0,'rgba(255,255,255,0.98)');
+  core.addColorStop(0.35,'rgba(205,232,255,0.9)');
+  core.addColorStop(1,'rgba(120,180,255,0)');
+  ctx.fillStyle = core;
+  ctx.beginPath(); ctx.arc(cx,cy,coreR,0,Math.PI*2); ctx.fill();
+
   ctx.restore();
 }
 
