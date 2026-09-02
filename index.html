@@ -835,14 +835,23 @@ function startListening(){
     }
   };
   recognition.onerror = function(e){
-    console.error('[VIKI] speech recognition error:', e && e.error);
+    var code = (e && e.error) || 'unknown';
+    console.error('[VIKI] speech recognition error:', code);
     setVoiceState('idle');
-    showToast('Voice input error — try again.', 4000);
+    // shown on-screen, not just console — a real console isn't always
+    // reachable (e.g. iOS Safari needs a Mac + cable to inspect)
+    showToast('Voice input error: ' + code + ' — try again.', 5000);
   };
   recognition.onend = function(){
     if(voiceState === 'listening') setVoiceState('idle');
   };
-  try{ recognition.start(); }catch(e){ console.error('[VIKI] speech recognition failed to start:', e); setVoiceState('idle'); }
+  try{
+    recognition.start();
+  }catch(e){
+    console.error('[VIKI] speech recognition failed to start:', e);
+    setVoiceState('idle');
+    showToast('Voice input failed to start: ' + ((e && e.message) || e) + '.', 5000);
+  }
 }
 
 if(!SpeechRecognitionCtor){
