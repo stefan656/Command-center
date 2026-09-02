@@ -7,6 +7,11 @@
 //
 // Required env vars (set in the Vercel project, never in frontend code):
 //   ANTHROPIC_API_KEY        - Claude API key
+// Optional env vars:
+//   ANTHROPIC_WORKSPACE_ID   - required only if your Anthropic API key is
+//                              "identity-linked" (belongs to a user in
+//                              multiple workspaces) — the API will 400 with
+//                              a message telling you this is needed if so.
 // Optional env vars (enable live Follow Up Boss lookups when set):
 //   ZAPIER_MCP_URL           - the Zapier MCP server URL for this account
 //   ZAPIER_MCP_TOKEN         - bearer token for that MCP server, if it requires one
@@ -64,7 +69,15 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const client = new Anthropic({ apiKey: anthropicKey });
+  const clientOptions = { apiKey: anthropicKey };
+  const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
+  if (workspaceId) {
+    // Some Anthropic Console API keys are "identity-linked" (tied to a user
+    // who belongs to multiple workspaces) and reject requests with a 400
+    // unless every request names which workspace it acts in.
+    clientOptions.defaultHeaders = { 'anthropic-workspace-id': workspaceId };
+  }
+  const client = new Anthropic(clientOptions);
 
   const zapierUrl = process.env.ZAPIER_MCP_URL;
   const zapierToken = process.env.ZAPIER_MCP_TOKEN;
