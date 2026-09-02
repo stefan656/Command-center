@@ -106,14 +106,33 @@ module.exports = async function handler(req, res) {
     const message = await client.beta.messages.create(params, { signal: controller.signal });
     clearTimeout(timeout);
 
+    const blockTypes = (message.content || []).map((b) => b.type);
+    const mcpBlocks = (message.content || []).filter((b) => String(b.type).includes('mcp'));
+    console.log('viki-respond: response block types:', blockTypes);
+    if (mcpServers.length) {
+      console.log('viki-respond: mcp_servers configured; allowlisted tools:', getAllowedTools());
+      console.log('viki-respond: mcp-related blocks in response:', mcpBlocks.length);
+      if (mcpBlocks.length) console.log('viki-respond: mcp block detail:', JSON.stringify(mcpBlocks));
+    }
+
     const answer = (message.content || [])
       .filter((block) => block.type === 'text')
       .map((block) => block.text)
       .join('\n')
       .trim();
 
+    // Visible on-screen (not just in logs) so this is diagnosable without
+    // needing Vercel log access: flags the exact failure mode where MCP was
+    // configured but Claude never had a usable tool to call — almost always
+    // means the ZAPIER_MCP_ALLOWED_TOOLS names don't match what your Zapier
+    // MCP server actually exposes.
+    let debugSuffix = '';
+    if (mcpServers.length && mcpBlocks.length === 0) {
+      debugSuffix = ' [debug: MCP configured but no tool was invoked — check that ZAPIER_MCP_ALLOWED_TOOLS matches the tool names your Zapier MCP server exposes]';
+    }
+
     return res.status(200).json({
-      answer: answer || "I looked into that but didn't come back with a clear answer. Could you try rephrasing?"
+      answer: (answer || "I looked into that but didn't come back with a clear answer. Could you try rephrasing?") + debugSuffix
     });
   } catch (err) {
     clearTimeout(timeout);
