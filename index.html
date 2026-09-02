@@ -850,15 +850,38 @@ if(SpeechRecognitionCtor){
   };
 }
 
-function startListening(){
-  if(!SpeechRecognitionCtor || !recognition) return;
-  setVoiceState('listening');
+function beginRecognition(){
   try{
     recognition.start();
   }catch(e){
     console.error('[VIKI] speech recognition failed to start:', e);
     setVoiceState('idle');
     showToast('Voice input failed to start: ' + ((e && e.message) || e) + '.', 5000);
+  }
+}
+
+function startListening(){
+  if(!SpeechRecognitionCtor || !recognition) return;
+  setVoiceState('listening');
+
+  /* On iOS/WebKit, SpeechRecognition's own implicit mic-permission request
+     appears to race with starting the recognition session and can trigger
+     a spurious "aborted" error. Explicitly requesting (and immediately
+     releasing) the mic via getUserMedia first settles that permission
+     ahead of time, so recognition.start() begins from a clean state. */
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function(stream){
+        stream.getTracks().forEach(function(t){ t.stop(); });
+        beginRecognition();
+      })
+      .catch(function(err){
+        console.error('[VIKI] microphone permission request failed:', err);
+        setVoiceState('idle');
+        showToast('Microphone access error: ' + ((err && err.name) || err) + '.', 5000);
+      });
+  } else {
+    beginRecognition();
   }
 }
 
