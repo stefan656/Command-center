@@ -323,6 +323,47 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .mic-btn[disabled]{opacity:.35;cursor:not-allowed}
 .mic-btn[disabled]:hover{transform:none;box-shadow:0 0 12px rgba(90,160,255,.25)}
 
+/* -- typed-question fallback: same visual language as the mic button,
+   for when voice input isn't available or working -- */
+.type-btn{
+  flex:none;position:relative;cursor:pointer;
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--blue-0);background:rgba(20,40,64,.55);
+  border:1px solid rgba(140,180,230,.4);
+  box-shadow:0 0 12px rgba(90,160,255,.25);
+  transition:transform .15s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
+}
+.type-btn:hover{transform:translateY(-1px);box-shadow:0 0 18px rgba(90,160,255,.4)}
+.type-btn:active{transform:translateY(0)}
+.type-btn.active{color:var(--navy-0);background:linear-gradient(160deg,var(--blue-1),var(--blue-2));box-shadow:0 0 18px rgba(90,160,255,.6)}
+
+.type-panel{
+  position:fixed;left:50%;bottom:96px;z-index:17;
+  transform:translateX(-50%);
+  display:flex;align-items:center;gap:10px;
+  width:min(480px,88vw);
+  background:linear-gradient(165deg,rgba(6,14,26,.95),rgba(2,6,12,.92));
+  border:1px solid var(--blue-2);border-radius:26px;
+  padding:8px 8px 8px 18px;
+  box-shadow:0 0 22px rgba(90,160,255,.3);
+}
+.type-panel[hidden]{display:none}
+.type-prompt{font-family:'Share Tech Mono',monospace;color:var(--blue-1);font-size:15px;text-shadow:var(--glow-soft)}
+.type-input{
+  flex:1;min-width:0;background:transparent;border:none;outline:none;
+  font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--blue-0);
+}
+.type-input::placeholder{color:var(--blue-3)}
+.type-send{
+  flex:none;cursor:pointer;border:none;border-radius:18px;
+  padding:9px 18px;font-family:'Orbitron',sans-serif;font-size:10.5px;letter-spacing:1.5px;font-weight:700;
+  color:var(--navy-0);background:linear-gradient(160deg,var(--blue-1),var(--blue-2));
+  transition:transform .15s ease, box-shadow .2s ease;
+}
+.type-send:hover{transform:translateY(-1px);box-shadow:0 0 14px rgba(90,160,255,.5)}
+.type-send:active{transform:translateY(0)}
+
 .ticker-wrap{flex:1;overflow:hidden;position:relative;height:20px;mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent)}
 .ticker{
   position:absolute;white-space:nowrap;display:flex;gap:0;
@@ -421,8 +462,20 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
       <path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z" fill="currentColor"/>
     </svg>
   </button>
+  <button class="type-btn" id="typeBtn" title="Type a question to V.I.K.I." aria-label="Type a question to V.I.K.I.">
+    <svg class="type-icon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+      <rect x="3.5" y="6" width="17" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M7 10h.01M10.5 10h.01M14 10h.01M17 10h.01M7 13.5h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </button>
   <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
   <button class="handle-btn" id="handleBtn">WHAT SHOULD I HANDLE FIRST</button>
+</div>
+
+<div class="type-panel" id="typePanel" hidden>
+  <span class="type-prompt">&gt;</span>
+  <input type="text" id="typeInput" class="type-input" placeholder="Ask V.I.K.I..." autocomplete="off" maxlength="400" />
+  <button class="type-send" id="typeSend">SEND</button>
 </div>
 
 <audio id="briefAudio" src="viki_brief.mp3" preload="auto" hidden></audio>
@@ -895,6 +948,44 @@ if(!SpeechRecognitionCtor){
     else stopVoiceInteraction();
   });
 }
+
+/* -- typed fallback: same askViki() pipeline as voice, so a failed/unavailable
+   mic never leaves BRIEF ME and HANDLE FIRST as the only ways to reach VIKI -- */
+var typeBtn = $('typeBtn');
+var typePanel = $('typePanel');
+var typeInput = $('typeInput');
+var typeSend = $('typeSend');
+
+function openTypePanel(){
+  typePanel.hidden = false;
+  typeBtn.classList.add('active');
+  typeInput.focus();
+}
+function closeTypePanel(){
+  typePanel.hidden = true;
+  typeBtn.classList.remove('active');
+}
+function submitTypedQuestion(){
+  var text = typeInput.value.trim();
+  if(!text) return;
+  if(voiceState !== 'idle'){
+    showToast("Still working on your last question — one moment.", 3000);
+    return;
+  }
+  typeInput.value = '';
+  closeTypePanel();
+  primeSpeechSynthesis();
+  askViki(text);
+}
+
+typeBtn.addEventListener('click', function(){
+  if(typePanel.hidden) openTypePanel(); else closeTypePanel();
+});
+typeSend.addEventListener('click', submitTypedQuestion);
+typeInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){ e.preventDefault(); submitTypedQuestion(); }
+  else if(e.key === 'Escape'){ closeTypePanel(); }
+});
 
 /* ================= CANVAS SCENE: V.I.K.I. VOXEL HEAD ================= */
 var canvas = $('scene');
