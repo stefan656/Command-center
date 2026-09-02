@@ -816,13 +816,16 @@ function askViki(question){
     });
 }
 
-function startListening(){
-  if(!SpeechRecognitionCtor) return;
+/* Built once and reused across activations rather than `new`-ing a fresh
+   SpeechRecognition per tap: Safari/iOS frequently fires a spurious
+   "aborted" error when a new instance is started before the previous
+   one has fully released the microphone/speech-engine resources — the
+   standard start()/stop() reuse pattern avoids that race entirely. */
+if(SpeechRecognitionCtor){
   recognition = new SpeechRecognitionCtor();
   recognition.lang = 'en-US';
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-  setVoiceState('listening');
 
   recognition.onresult = function(e){
     var transcript = e.results && e.results[0] && e.results[0][0] && e.results[0][0].transcript;
@@ -845,6 +848,11 @@ function startListening(){
   recognition.onend = function(){
     if(voiceState === 'listening') setVoiceState('idle');
   };
+}
+
+function startListening(){
+  if(!SpeechRecognitionCtor || !recognition) return;
+  setVoiceState('listening');
   try{
     recognition.start();
   }catch(e){
