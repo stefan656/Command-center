@@ -630,6 +630,21 @@ var synth = window.speechSynthesis;
 var voiceState = 'idle'; // idle | listening | thinking | speaking
 var recognition = null;
 var voiceAbortController = null;
+var synthPrimed = false;
+
+/* Safari/iOS silently drops speechSynthesis.speak() calls that happen async
+   (after a fetch) unless the engine was already "unlocked" by a speak() call
+   made synchronously inside a user-gesture handler earlier in the page's
+   life. Fire a silent one on the mic tap itself so the real one later works. */
+function primeSpeechSynthesis(){
+  if(synthPrimed || !synth) return;
+  synthPrimed = true;
+  try{
+    var warm = new SpeechSynthesisUtterance(' ');
+    warm.volume = 0;
+    synth.speak(warm);
+  }catch(e){}
+}
 
 function setVoiceState(next){
   voiceState = next;
@@ -679,12 +694,14 @@ function askViki(question){
       clearTimeout(timeoutId);
       var answer = (data && data.answer) || "I didn't come back with a usable answer that time.";
       appendLogLine('V.I.K.I. — ' + answer);
+      showToast(answer, Math.max(6000, Math.min(16000, answer.length * 90)));
       speakResponse(answer);
     })
     .catch(function(){
       clearTimeout(timeoutId);
       var msg = "I couldn't reach my systems just now. Please try again.";
       appendLogLine('V.I.K.I. — ' + msg);
+      showToast(msg, 6000);
       speakResponse(msg);
     });
 }
@@ -720,6 +737,7 @@ if(!SpeechRecognitionCtor){
   micBtn.title = 'Voice input is not supported in this browser';
 } else {
   micBtn.addEventListener('click', function(){
+    primeSpeechSynthesis();
     if(voiceState === 'idle') startListening();
     else stopVoiceInteraction();
   });
