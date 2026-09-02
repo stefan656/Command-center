@@ -105,7 +105,12 @@ module.exports = async function handler(req, res) {
         // tools named below are turned on. This is the enforcement point
         // for "read-only for now" — do not flip this to enabled-by-default.
         default_config: { enabled: false },
-        configs: getAllowedTools().map((name) => ({ name, enabled: true }))
+        // Keyed by tool name (an object, not an array) — confirmed against
+        // the API's own validation error when this was shaped as a list.
+        configs: getAllowedTools().reduce((acc, name) => {
+          acc[name] = { enabled: true };
+          return acc;
+        }, {})
       }
     ];
     betas.push('mcp-client-2025-11-20');
