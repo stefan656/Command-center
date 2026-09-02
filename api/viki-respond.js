@@ -127,7 +127,7 @@ module.exports = async function handler(req, res) {
     const blockTypes = (message.content || []).map((b) => b.type);
     const mcpBlocks = (message.content || []).filter((b) => String(b.type).includes('mcp'));
     console.log('viki-respond: response block types:', blockTypes);
-    if (mcpServers.length) {
+    if (zapierUrl) {
       console.log('viki-respond: mcp_servers configured; allowlisted tools:', getAllowedTools());
       console.log('viki-respond: mcp-related blocks in response:', mcpBlocks.length);
       if (mcpBlocks.length) console.log('viki-respond: mcp block detail:', JSON.stringify(mcpBlocks));
@@ -145,7 +145,7 @@ module.exports = async function handler(req, res) {
     // means the ZAPIER_MCP_ALLOWED_TOOLS names don't match what your Zapier
     // MCP server actually exposes.
     let debugSuffix = '';
-    if (mcpServers.length && mcpBlocks.length === 0) {
+    if (zapierUrl && mcpBlocks.length === 0) {
       debugSuffix = ' [debug: MCP configured but no tool was invoked — check that ZAPIER_MCP_ALLOWED_TOOLS matches the tool names your Zapier MCP server exposes]';
     }
 
