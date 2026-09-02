@@ -262,6 +262,27 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .brief-btn.speaking .btn-ring{opacity:1;animation:ringpulse 1.1s ease-out infinite}
 @keyframes ringpulse{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.3);opacity:0}}
 
+.mic-btn{
+  flex:none;position:relative;cursor:pointer;
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--blue-0);background:rgba(20,40,64,.55);
+  border:1px solid rgba(140,180,230,.4);
+  box-shadow:0 0 12px rgba(90,160,255,.25);
+  transition:transform .15s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
+}
+.mic-btn:hover{transform:translateY(-1px);box-shadow:0 0 18px rgba(90,160,255,.4)}
+.mic-btn:active{transform:translateY(0)}
+.mic-btn .mic-ring{
+  position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(140,180,230,.35);
+  opacity:0;pointer-events:none;
+}
+.mic-btn.listening{color:var(--navy-0);background:linear-gradient(160deg,var(--blue-1),var(--blue-2));box-shadow:0 0 18px rgba(90,160,255,.6)}
+.mic-btn.listening .mic-ring{opacity:1;animation:ringpulse 1.1s ease-out infinite}
+.mic-btn.busy{animation:briefpulse 1.1s ease-in-out infinite}
+.mic-btn[disabled]{opacity:.35;cursor:not-allowed}
+.mic-btn[disabled]:hover{transform:none;box-shadow:0 0 12px rgba(90,160,255,.25)}
+
 .ticker-wrap{flex:1;overflow:hidden;position:relative;height:20px;mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent)}
 .ticker{
   position:absolute;white-space:nowrap;display:flex;gap:0;
@@ -348,6 +369,13 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 
 <div class="bottom-bar">
   <button class="brief-btn" id="briefBtn"><span class="btn-ring"></span><span class="btn-label">BRIEF ME</span></button>
+  <button class="mic-btn" id="micBtn" title="Ask V.I.K.I." aria-label="Ask V.I.K.I. a question">
+    <span class="mic-ring"></span>
+    <svg class="mic-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3z" fill="currentColor"/>
+      <path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z" fill="currentColor"/>
+    </svg>
+  </button>
   <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
   <button class="handle-btn" id="handleBtn">WHAT SHOULD I HANDLE FIRST</button>
 </div>
@@ -434,21 +462,25 @@ if(DATA.closer) tickerParts.push(DATA.closer);
 var tickerText = tickerParts.join('   •   ');
 $('ticker').innerHTML = '<span>'+tickerText+'</span><span aria-hidden="true">'+tickerText+'</span>';
 
-/* activity log: reveal one line at a time, looping through content.log */
+/* activity log: reveal one line at a time; shared by the looping demo feed and voice Q&A */
+var logListEl = $('logList');
+function appendLogLine(text, celebrate){
+  var li = document.createElement('li');
+  li.className = 'log-line' + (celebrate ? ' celebrate' : '');
+  var time = new Date().toLocaleTimeString('en-US',{hour12:false});
+  li.innerHTML = '<span class="log-time">'+time+'</span><span class="log-text">'+(celebrate?'★ ':'')+text+'</span>';
+  logListEl.appendChild(li);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ li.classList.add('show'); }); });
+  while(logListEl.children.length > 7){ logListEl.removeChild(logListEl.firstChild); }
+  return li;
+}
 (function streamLog(){
   var lines = (DATA.content && DATA.content.log) || [];
   if(!lines.length) return;
-  var list = $('logList');
   var i = 0;
   function pushLine(){
     var entry = lines[i % lines.length];
-    var li = document.createElement('li');
-    li.className = 'log-line' + (entry.celebrate ? ' celebrate' : '');
-    var time = new Date().toLocaleTimeString('en-US',{hour12:false});
-    li.innerHTML = '<span class="log-time">'+time+'</span><span class="log-text">'+(entry.celebrate?'★ ':'')+entry.text+'</span>';
-    list.appendChild(li);
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ li.classList.add('show'); }); });
-    while(list.children.length > 7){ list.removeChild(list.firstChild); }
+    appendLogLine(entry.text, entry.celebrate);
     i++;
     setTimeout(pushLine, 2400 + Math.random()*1600);
   }
@@ -477,6 +509,13 @@ var speaking = false;
 var speakEndTimer = null;
 var usedRealAudio = false;
 
+/* speaking is shared by two independent sources — BRIEF ME playback and the
+   voice Q&A flow below — so each source flag ORs into the effective state
+   instead of one clobbering the other if they ever overlap. */
+var briefSpeaking = false;
+var voiceSpeaking = false;
+function recomputeSpeaking(){ speaking = briefSpeaking || voiceSpeaking; }
+
 /* -- Web Audio graph: analyses the actual playing audio in real time -- */
 var audioCtx = null, analyser = null, freqData = null, audioGraphReady = false;
 function ensureAudioGraph(){
@@ -500,7 +539,8 @@ function ensureAudioGraph(){
 }
 
 function setSpeaking(v){
-  speaking = v;
+  briefSpeaking = v;
+  recomputeSpeaking();
   briefBtn.classList.toggle('speaking', v);
   briefBtn.querySelector('.btn-label').textContent = v ? 'SPEAKING' : 'BRIEF ME';
 }
@@ -577,6 +617,112 @@ function getAudioBands(t, dtMs){
   var bass = (0.35 + 0.5*Math.abs(Math.sin(t*1.3))) * synthAmpCur;
   var treble = (0.3 + 0.6*Math.abs(Math.sin(t*4.7+0.6))*Math.abs(Math.sin(t*1.9))) * synthAmpCur;
   return { bass: bass, treble: treble, amp: synthAmpCur };
+}
+
+/* ================= VOICE INTERACTION: mic -> /api/viki-respond -> TTS =================
+   Read-only voice Q&A layer. Reuses the existing speaking flag/animation state
+   (via voiceSpeaking -> recomputeSpeaking) so the sphere pulses through both
+   "thinking" (waiting on the backend) and "speaking" (TTS playback), exactly
+   like it already does for BRIEF ME — no sphere/HUD code below this is touched. */
+var micBtn = $('micBtn');
+var SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+var synth = window.speechSynthesis;
+var voiceState = 'idle'; // idle | listening | thinking | speaking
+var recognition = null;
+var voiceAbortController = null;
+
+function setVoiceState(next){
+  voiceState = next;
+  micBtn.classList.toggle('listening', next === 'listening');
+  micBtn.classList.toggle('busy', next === 'thinking' || next === 'speaking');
+}
+
+function stopVoiceInteraction(){
+  if(recognition){ try{ recognition.abort(); }catch(e){} }
+  if(voiceAbortController){ voiceAbortController.abort(); voiceAbortController = null; }
+  if(synth){ try{ synth.cancel(); }catch(e){} }
+  voiceSpeaking = false;
+  recomputeSpeaking();
+  setVoiceState('idle');
+}
+
+function speakResponse(text){
+  setVoiceState('speaking');
+  if(!synth){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); return; }
+  usedRealAudio = false; // TTS has no <audio> element to analyse — drive the sphere synthetically
+  voiceSpeaking = true;
+  recomputeSpeaking();
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.onend = function(){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); };
+  utter.onerror = function(){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); };
+  synth.cancel();
+  synth.speak(utter);
+}
+
+function askViki(question){
+  appendLogLine('YOU — ' + question);
+  setVoiceState('thinking');
+  usedRealAudio = false; // synthetic envelope drives the "thinking" pulse too
+  voiceSpeaking = true;
+  recomputeSpeaking();
+
+  voiceAbortController = new AbortController();
+  var timeoutId = setTimeout(function(){ voiceAbortController.abort(); }, 30000);
+
+  fetch('/api/viki-respond', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question: question }),
+    signal: voiceAbortController.signal
+  }).then(function(r){ return r.json(); })
+    .then(function(data){
+      clearTimeout(timeoutId);
+      var answer = (data && data.answer) || "I didn't come back with a usable answer that time.";
+      appendLogLine('V.I.K.I. — ' + answer);
+      speakResponse(answer);
+    })
+    .catch(function(){
+      clearTimeout(timeoutId);
+      var msg = "I couldn't reach my systems just now. Please try again.";
+      appendLogLine('V.I.K.I. — ' + msg);
+      speakResponse(msg);
+    });
+}
+
+function startListening(){
+  if(!SpeechRecognitionCtor) return;
+  recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  setVoiceState('listening');
+
+  recognition.onresult = function(e){
+    var transcript = e.results && e.results[0] && e.results[0][0] && e.results[0][0].transcript;
+    if(transcript && transcript.trim()){
+      askViki(transcript.trim());
+    } else {
+      setVoiceState('idle');
+    }
+  };
+  recognition.onerror = function(){
+    setVoiceState('idle');
+    showToast('Voice input error — try again.', 4000);
+  };
+  recognition.onend = function(){
+    if(voiceState === 'listening') setVoiceState('idle');
+  };
+  try{ recognition.start(); }catch(e){ setVoiceState('idle'); }
+}
+
+if(!SpeechRecognitionCtor){
+  micBtn.disabled = true;
+  micBtn.title = 'Voice input is not supported in this browser';
+} else {
+  micBtn.addEventListener('click', function(){
+    if(voiceState === 'idle') startListening();
+    else stopVoiceInteraction();
+  });
 }
 
 /* ================= CANVAS SCENE: V.I.K.I. VOXEL HEAD ================= */

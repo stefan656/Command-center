@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/viki-respond.js": {
+      "maxDuration": 30
+    }
+  }
+}

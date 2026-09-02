@@ -1,0 +1,9 @@
+{
+  "name": "command-center",
+  "version": "1.0.0",
+  "private": true,
+  "description": "V.I.K.I. command center dashboard + voice interaction backend",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0"
+  }
+}
