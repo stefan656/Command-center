@@ -804,7 +804,12 @@ function askViki(question){
     .catch(function(err){
       clearTimeout(timeoutId);
       console.error('[VIKI] backend request failed:', err);
-      var msg = "I couldn't reach my systems just now. Please try again.";
+      var detail = err && err.name === 'AbortError'
+        ? 'request timed out after 30s'
+        : ((err && err.name) || 'Error') + ': ' + ((err && err.message) || String(err));
+      // shown directly on-screen (not just console) since a real JS console
+      // isn't always reachable — e.g. iOS Safari needs a Mac + cable to inspect
+      var msg = "I couldn't reach my systems just now. (" + detail + ")";
       appendLogLine('V.I.K.I. — ' + msg);
       typeIntoTerminal(msg);
       speakResponse(msg);
