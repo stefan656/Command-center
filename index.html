@@ -816,6 +816,8 @@ function speakResponse(text){
   });
 }
 
+var THINKING_CUE_DELAY_MS = 6000;
+
 function askViki(question){
   console.log('[VIKI] sending question to backend:', question);
   appendLogLine('YOU — ' + question);
@@ -826,6 +828,16 @@ function askViki(question){
 
   voiceAbortController = new AbortController();
   var timeoutId = setTimeout(function(){ voiceAbortController.abort(); }, 30000);
+
+  // Real lookups round-trip through Claude -> Zapier -> Follow Up Boss and
+  // can genuinely take several seconds; past a threshold, say so instead of
+  // leaving only the ambient sphere pulse with no explicit acknowledgment.
+  // Uses speakText() directly (not speakResponse()) so it doesn't touch
+  // voiceState — we're still in 'thinking', not transitioning to 'speaking'.
+  var thinkingCueTimer = setTimeout(function(){
+    typeIntoTerminal('Still checking my systems…');
+    speakText('Still checking.', {});
+  }, THINKING_CUE_DELAY_MS);
 
   fetch('/api/viki-respond', {
     method: 'POST',
@@ -843,6 +855,7 @@ function askViki(question){
     })
     .then(function(result){
       clearTimeout(timeoutId);
+      clearTimeout(thinkingCueTimer);
       console.log('[VIKI] backend response received — status:', result.status, 'body:', result.data);
       if(!result.ok){
         console.error('[VIKI] backend returned a non-OK status:', result.status);
@@ -856,6 +869,7 @@ function askViki(question){
     })
     .catch(function(err){
       clearTimeout(timeoutId);
+      clearTimeout(thinkingCueTimer);
       console.error('[VIKI] backend request failed:', err);
       var detail = err && err.name === 'AbortError'
         ? 'request timed out after 30s'
