@@ -542,9 +542,19 @@ function showToast(text, ms){
   toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, ms || 6000);
 }
 
+var handleSpeaking = false;
+
 $('handleBtn').addEventListener('click', function(){
   var top = (DATA.priorities||[])[0];
-  if(top){ showToast('▲ HANDLE FIRST — '+top.label, 7000); }
+  var text = top
+    ? ('Top priority right now: ' + top.label + '. Tagged ' + top.tag + ', ' + top.urgency + ' urgency.')
+    : "You're all caught up — nothing urgent in the priority queue right now.";
+  typeIntoTerminal(text);
+  handleSpeaking = true;
+  recomputeSpeaking();
+  speakText(text, {
+    onEnd: function(){ handleSpeaking = false; recomputeSpeaking(); }
+  });
 });
 
 /* ================= BRIEF ME + WEB AUDIO ANALYSIS ================= */
@@ -554,12 +564,12 @@ var speaking = false;
 var speakEndTimer = null;
 var usedRealAudio = false;
 
-/* speaking is shared by two independent sources — BRIEF ME playback and the
-   voice Q&A flow below — so each source flag ORs into the effective state
-   instead of one clobbering the other if they ever overlap. */
+/* speaking is shared by three independent sources — BRIEF ME, WHAT SHOULD I
+   HANDLE FIRST, and the voice Q&A flow below — so each source flag ORs into
+   the effective state instead of one clobbering another if they overlap. */
 var briefSpeaking = false;
 var voiceSpeaking = false;
-function recomputeSpeaking(){ speaking = briefSpeaking || voiceSpeaking; }
+function recomputeSpeaking(){ speaking = briefSpeaking || voiceSpeaking || handleSpeaking; }
 
 /* -- Web Audio graph: analyses the actual playing audio in real time -- */
 var audioCtx = null, analyser = null, freqData = null, audioGraphReady = false;
@@ -590,39 +600,28 @@ function setSpeaking(v){
   briefBtn.querySelector('.btn-label').textContent = v ? 'SPEAKING' : 'BRIEF ME';
 }
 
+function buildBriefText(){
+  var parts = [];
+  if(DATA.greeting) parts.push(DATA.greeting);
+  if(DATA.headline) parts.push(DATA.headline + '.');
+  var top = (DATA.priorities||[])[0];
+  if(top) parts.push('Top priority: ' + top.label + '.');
+  if(DATA.closer) parts.push(DATA.closer);
+  return parts.join(' ');
+}
+
 briefBtn.addEventListener('click', function(){
-  if(speaking){
-    try{ audioEl.pause(); audioEl.currentTime = 0; }catch(e){}
-    clearTimeout(speakEndTimer);
-    usedRealAudio = false;
+  if(briefSpeaking){
+    try{ synth.cancel(); }catch(e){}
     setSpeaking(false);
     return;
   }
+  var text = buildBriefText();
   setSpeaking(true);
-  showToast(DATA.closer || '', 6500);
-  usedRealAudio = false;
-
-  ensureAudioGraph();
-  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume().catch(function(){}); }
-  try{ audioEl.currentTime = 0; }catch(e){}
-
-  function fallback(){
-    if(usedRealAudio) return;
-    var duration = 9000 + Math.random()*3200;
-    clearTimeout(speakEndTimer);
-    speakEndTimer = setTimeout(function(){ setSpeaking(false); }, duration);
-  }
-
-  var p = audioEl.play();
-  if(p && typeof p.then === 'function'){
-    p.then(function(){ usedRealAudio = audioGraphReady; if(!usedRealAudio) fallback(); }).catch(fallback);
-  } else {
-    fallback();
-  }
-  audioEl.onended = function(){ setSpeaking(false); };
-  audioEl.onerror = fallback;
-  // if playback never actually starts producing audio, don't leave the head silent forever
-  setTimeout(function(){ if(speaking && !usedRealAudio && audioEl.paused) fallback(); }, 600);
+  typeIntoTerminal(text);
+  speakText(text, {
+    onEnd: function(){ setSpeaking(false); }
+  });
 });
 
 /* -- synthetic speech-envelope fallback (keeps BRIEF ME demonstrable offline) -- */
@@ -734,25 +733,34 @@ function stopVoiceInteraction(){
   setVoiceState('idle');
 }
 
-function speakResponse(text){
-  setVoiceState('speaking');
+/* Low-level TTS: shared by the mic Q&A flow, BRIEF ME, and WHAT SHOULD I
+   HANDLE FIRST, so every VIKI-initiated utterance goes through one place. */
+function speakText(text, callbacks){
+  callbacks = callbacks || {};
+  usedRealAudio = false; // TTS has no <audio> element to analyse — drive the sphere synthetically
   if(!synth){
     console.error('[VIKI] speechSynthesis is not available in this browser — cannot speak the response');
-    voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle');
+    if(callbacks.onEnd) callbacks.onEnd();
     return;
   }
-  usedRealAudio = false; // TTS has no <audio> element to analyse — drive the sphere synthetically
-  voiceSpeaking = true;
-  recomputeSpeaking();
   var utter = new SpeechSynthesisUtterance(text);
-  utter.onstart = function(){ console.log('[VIKI] speechSynthesis started speaking'); };
-  utter.onend = function(){ console.log('[VIKI] speechSynthesis finished'); voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); };
+  utter.onstart = function(){ console.log('[VIKI] speechSynthesis started speaking'); if(callbacks.onStart) callbacks.onStart(); };
+  utter.onend = function(){ console.log('[VIKI] speechSynthesis finished'); if(callbacks.onEnd) callbacks.onEnd(); };
   utter.onerror = function(e){
     console.error('[VIKI] speechSynthesis failed to fire:', e && e.error);
-    voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle');
+    if(callbacks.onEnd) callbacks.onEnd();
   };
   synth.cancel();
   synth.speak(utter);
+}
+
+function speakResponse(text){
+  setVoiceState('speaking');
+  voiceSpeaking = true;
+  recomputeSpeaking();
+  speakText(text, {
+    onEnd: function(){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); }
+  });
 }
 
 function askViki(question){
