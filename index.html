@@ -231,6 +231,46 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ---------- V.I.K.I. response terminal ---------- */
+.vk-terminal{
+  position:fixed;top:140px;left:50%;z-index:16;pointer-events:none;
+  width:min(560px,52vw);
+  transform:translateX(-50%) translateY(-10px);
+  background:linear-gradient(165deg,rgba(6,14,26,.94),rgba(2,6,12,.9));
+  border:1px solid var(--blue-2);border-radius:5px;
+  box-shadow:0 0 22px rgba(90,160,255,.3), inset 0 0 44px rgba(0,0,0,.55);
+  padding:13px 18px 15px;
+  opacity:0;transition:opacity .45s ease, transform .45s ease;
+  overflow:hidden;
+}
+.vk-terminal.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.vk-terminal::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom, rgba(180,215,255,.05) 0px, rgba(180,215,255,.05) 1px, transparent 1px, transparent 3px);
+}
+.vk-terminal-bar{
+  font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:2.5px;font-weight:700;
+  color:var(--blue-2);text-transform:uppercase;margin-bottom:9px;
+  display:flex;align-items:center;gap:6px;
+}
+.vk-terminal-bar::before{content:"";width:5px;height:5px;background:var(--blue-1);box-shadow:var(--glow);border-radius:1px}
+.vk-terminal-body{
+  font-family:'Share Tech Mono',monospace;font-size:14px;line-height:1.55;
+  color:var(--blue-0);text-shadow:0 0 8px rgba(90,160,255,.4);
+  min-height:1.55em;white-space:pre-wrap;word-break:break-word;
+}
+.vk-cursor{display:inline-block;width:8px;color:var(--blue-1);text-shadow:var(--glow);animation:vk-blink .9s steps(1) infinite}
+.vk-cursor.hidden{visibility:hidden;animation:none}
+@keyframes vk-blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+@media (max-width:760px){
+  /* the mobile layout stacks HUD panels tightly with no open top-center gap
+     wide enough for a centered box, so on narrow screens the terminal drops
+     into the one genuinely free column (left of hud-stats, below hud-top-left)
+     instead of overlapping either panel */
+  .vk-terminal{width:min(225px,58vw);left:24px;top:135px;transform:translateY(-10px)}
+  .vk-terminal.show{transform:translateY(0)}
+}
+
 /* ---------- Bottom bar ---------- */
 .bottom-bar{
   position:fixed;left:0;right:0;bottom:0;height:78px;z-index:11;
@@ -366,6 +406,11 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="vk-terminal" id="vkTerminal" aria-live="polite">
+  <div class="vk-terminal-bar">V.I.K.I. — RESPONSE</div>
+  <div class="vk-terminal-body"><span id="vkTerminalText"></span><span class="vk-cursor" id="vkCursor">▌</span></div>
+</div>
 
 <div class="bottom-bar">
   <button class="brief-btn" id="briefBtn"><span class="btn-ring"></span><span class="btn-label">BRIEF ME</span></button>
@@ -652,6 +697,34 @@ function setVoiceState(next){
   micBtn.classList.toggle('busy', next === 'thinking' || next === 'speaking');
 }
 
+/* -- retro terminal response box: typewriter reveal, then fades after a pause -- */
+var vkTerminal = $('vkTerminal');
+var vkTerminalText = $('vkTerminalText');
+var vkCursor = $('vkCursor');
+var vkTypeTimer = null;
+var vkHideTimer = null;
+var VK_TYPE_SPEED_MS = 26;
+var VK_HOLD_MS = 6000;
+
+function typeIntoTerminal(text){
+  clearTimeout(vkTypeTimer);
+  clearTimeout(vkHideTimer);
+  vkTerminalText.textContent = '';
+  vkCursor.classList.remove('hidden');
+  vkTerminal.classList.add('show');
+  var i = 0;
+  function step(){
+    if(i < text.length){
+      vkTerminalText.textContent += text.charAt(i);
+      i++;
+      vkTypeTimer = setTimeout(step, VK_TYPE_SPEED_MS);
+    } else {
+      vkHideTimer = setTimeout(function(){ vkTerminal.classList.remove('show'); }, VK_HOLD_MS);
+    }
+  }
+  step();
+}
+
 function stopVoiceInteraction(){
   if(recognition){ try{ recognition.abort(); }catch(e){} }
   if(voiceAbortController){ voiceAbortController.abort(); voiceAbortController = null; }
@@ -663,18 +736,27 @@ function stopVoiceInteraction(){
 
 function speakResponse(text){
   setVoiceState('speaking');
-  if(!synth){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); return; }
+  if(!synth){
+    console.error('[VIKI] speechSynthesis is not available in this browser — cannot speak the response');
+    voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle');
+    return;
+  }
   usedRealAudio = false; // TTS has no <audio> element to analyse — drive the sphere synthetically
   voiceSpeaking = true;
   recomputeSpeaking();
   var utter = new SpeechSynthesisUtterance(text);
-  utter.onend = function(){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); };
-  utter.onerror = function(){ voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); };
+  utter.onstart = function(){ console.log('[VIKI] speechSynthesis started speaking'); };
+  utter.onend = function(){ console.log('[VIKI] speechSynthesis finished'); voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle'); };
+  utter.onerror = function(e){
+    console.error('[VIKI] speechSynthesis failed to fire:', e && e.error);
+    voiceSpeaking = false; recomputeSpeaking(); setVoiceState('idle');
+  };
   synth.cancel();
   synth.speak(utter);
 }
 
 function askViki(question){
+  console.log('[VIKI] sending question to backend:', question);
   appendLogLine('YOU — ' + question);
   setVoiceState('thinking');
   usedRealAudio = false; // synthetic envelope drives the "thinking" pulse too
@@ -689,19 +771,34 @@ function askViki(question){
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question: question }),
     signal: voiceAbortController.signal
-  }).then(function(r){ return r.json(); })
-    .then(function(data){
+  }).then(function(r){
+      var status = r.status, ok = r.ok;
+      return r.json()
+        .catch(function(parseErr){
+          console.error('[VIKI] backend response was not valid JSON:', status, parseErr);
+          return null;
+        })
+        .then(function(data){ return { ok: ok, status: status, data: data }; });
+    })
+    .then(function(result){
       clearTimeout(timeoutId);
-      var answer = (data && data.answer) || "I didn't come back with a usable answer that time.";
+      console.log('[VIKI] backend response received — status:', result.status, 'body:', result.data);
+      if(!result.ok){
+        console.error('[VIKI] backend returned a non-OK status:', result.status);
+      } else if(result.data && result.data.error){
+        console.warn('[VIKI] backend reported an internal error:', result.data.error);
+      }
+      var answer = (result.data && result.data.answer) || "I didn't come back with a usable answer that time.";
       appendLogLine('V.I.K.I. — ' + answer);
-      showToast(answer, Math.max(6000, Math.min(16000, answer.length * 90)));
+      typeIntoTerminal(answer);
       speakResponse(answer);
     })
-    .catch(function(){
+    .catch(function(err){
       clearTimeout(timeoutId);
+      console.error('[VIKI] backend request failed:', err);
       var msg = "I couldn't reach my systems just now. Please try again.";
       appendLogLine('V.I.K.I. — ' + msg);
-      showToast(msg, 6000);
+      typeIntoTerminal(msg);
       speakResponse(msg);
     });
 }
@@ -716,20 +813,23 @@ function startListening(){
 
   recognition.onresult = function(e){
     var transcript = e.results && e.results[0] && e.results[0][0] && e.results[0][0].transcript;
+    console.log('[VIKI] speech recognition transcript:', transcript);
     if(transcript && transcript.trim()){
       askViki(transcript.trim());
     } else {
+      console.warn('[VIKI] speech recognition returned no usable transcript');
       setVoiceState('idle');
     }
   };
-  recognition.onerror = function(){
+  recognition.onerror = function(e){
+    console.error('[VIKI] speech recognition error:', e && e.error);
     setVoiceState('idle');
     showToast('Voice input error — try again.', 4000);
   };
   recognition.onend = function(){
     if(voiceState === 'listening') setVoiceState('idle');
   };
-  try{ recognition.start(); }catch(e){ setVoiceState('idle'); }
+  try{ recognition.start(); }catch(e){ console.error('[VIKI] speech recognition failed to start:', e); setVoiceState('idle'); }
 }
 
 if(!SpeechRecognitionCtor){
