@@ -15,9 +15,9 @@
 // New env var for this endpoint:
 //   NOTION_API_KEY           - Notion internal integration token (ntn_...). The
 //                              integration must be explicitly shared with the
-//                              RE Ops Micro Tracker and BD Tracker pages (and,
-//                              once created, the FUB Daily Stats page) in
-//                              Notion itself — a token alone grants no access.
+//                              RE Ops Micro Tracker, BD Tracker, and FUB Daily
+//                              Stats pages in Notion itself — a token alone
+//                              grants no access to any of them.
 //
 // Every section is independent and best-effort: if Follow Up Boss, Notion ops
 // trackers, or the Notion daily-stats database fail or are unavailable, that
@@ -32,6 +32,7 @@ const NOTION_VERSION = '2025-09-03';
 
 const RE_OPS_DATA_SOURCE_ID = '9b37c9e1-339a-48e6-9844-4ccc186c3213';
 const BD_TRACKER_DATA_SOURCE_ID = '544a2381-5586-42ca-b446-7c83ea838e1d';
+const DAILY_STATS_DATA_SOURCE_ID = 'dd3031d0-52c0-45cc-8425-b22ca2e19d44';
 
 // Every FUB stage name in this account, bucketed into the six tiers the
 // dashboard shows. Matched by exact name against live GET /v1/stages output
@@ -317,44 +318,17 @@ async function fetchOpsPanel() {
   }
 }
 
-// "FUB Daily Stats" doesn't exist yet as of this build. This looks it up by
-// title via Notion search rather than a hardcoded ID (there is none yet) —
-// once created, this starts working with no code change needed. Any failure
-// here (not found, no rows, bad schema) degrades to available:false rather
-// than failing the request, per spec.
+// "FUB Daily Stats" exists (DAILY_STATS_DATA_SOURCE_ID above) but starts
+// empty until something writes a daily row into it. Any failure here (no
+// rows yet, bad schema, request error) degrades to available:false rather
+// than failing the request, per spec — so an empty table today reads as
+// "pending", not broken.
 async function fetchDailyStats() {
   const notionKey = process.env.NOTION_API_KEY;
   if (!notionKey) return { ok: false, available: false, error: 'server_not_configured' };
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-    let searchJson;
-    try {
-      const searchRes = await fetch('https://api.notion.com/v1/search', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${notionKey}`,
-          'Notion-Version': NOTION_VERSION,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query: 'FUB Daily Stats', filter: { value: 'database', property: 'object' } }),
-        signal: controller.signal
-      });
-      if (!searchRes.ok) throw new Error(`notion_search_http_${searchRes.status}`);
-      searchJson = await searchRes.json();
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    const match = (searchJson.results || []).find((r) =>
-      notionPlainText(r.title).toLowerCase().includes('fub daily stats'));
-    const dataSourceId = match?.data_sources?.[0]?.id;
-    if (!dataSourceId) {
-      return { ok: true, available: false, error: null, calls: null, texts: null, conversations: null, confirmedSellers: null, newLeads: null, lastUpdated: null };
-    }
-
-    const rows = await notionQuery(dataSourceId, {
+    const rows = await notionQuery(DAILY_STATS_DATA_SOURCE_ID, {
       page_size: 1,
       sorts: [{ property: 'Date', direction: 'descending' }]
     });
@@ -365,6 +339,10 @@ async function fetchDailyStats() {
 
     const props = row.properties || {};
     const num = (key) => (typeof props[key]?.number === 'number' ? props[key].number : null);
+    // "Last Updated" is a real date property on this database (set by
+    // whatever writes the daily row), not Notion's own edit timestamp —
+    // fall back to last_edited_time only if that property is ever left blank.
+    const lastUpdated = props['Last Updated']?.date?.start || row.last_edited_time || null;
     return {
       ok: true,
       available: true,
@@ -374,7 +352,7 @@ async function fetchDailyStats() {
       conversations: num('Conversations'),
       confirmedSellers: num('Confirmed Sellers'),
       newLeads: num('New Leads'),
-      lastUpdated: row.last_edited_time || null
+      lastUpdated
     };
   } catch (err) {
     console.error('viki-dashboard: FUB Daily Stats lookup failed', err.message);
