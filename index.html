@@ -189,8 +189,16 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 
 /* ---------- Bottom headline / metrics / payment chip ---------- */
 .hud-headline{
-  left:50%;bottom:118px;transform:translateX(-50%);
-  width:min(980px,88vw);text-align:center;pointer-events:none;
+  /* Bound to the actual gap between the side panels — not a fixed vw guess —
+     so this can never drift into hud-priorities/hud-stats/hud-sponsors
+     regardless of viewport size or orientation. Mirrors the same
+     24px-gap + min(340px,30vw)-panel-width math those panels use, so the
+     safe zone always matches their real edges. */
+  left:calc(24px + min(340px,30vw) + 24px);
+  right:calc(24px + min(340px,30vw) + 24px);
+  bottom:118px;
+  max-width:980px;margin:0 auto;
+  text-align:center;pointer-events:none;
 }
 .headline-text{
   font-family:'Orbitron',sans-serif;font-size:clamp(12px,1.5vw,16px);letter-spacing:3px;
@@ -396,7 +404,11 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   .hud-stats{top:150px}
   .brand h1{font-size:18px;letter-spacing:4px}
   .handle-btn{display:none}
-  .hud-headline{bottom:100px}
+  /* No side panels compete for this vertical band on mobile (hud-priorities/
+     hud-sponsors hidden, hud-stats moved up to top:150px), so the panel-gap
+     formula isn't needed here — revert to simple edge padding matching the
+     dashboard's original ~88vw mobile width. */
+  .hud-headline{left:6vw;right:6vw;bottom:100px;max-width:none}
 }
 </style>
 </head>
