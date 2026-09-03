@@ -30,13 +30,13 @@ window.VIKI_DATA = {
       { stage: "Offer Submitted",       value: 5,   pct: 1.5  },
       { stage: "Accepted",              value: 1,   pct: 0.3  }
     ],
+    // The five business-metric tiles that used to live here (Pipeline
+    // Commission, Offer Accept Rate, Active Deals, Club Partners, Tasks
+    // Open) were replaced by the live "FUB Daily Stats" tiles — see
+    // dailyStatTiles in index.html. Deal Closed This Week is the only
+    // hand-curated tile left in the row.
     metrics: [
-      { value: "$12.4K", label: "Pipeline Commission" },
-      { value: "18%",    label: "Offer Accept Rate"   },
-      { value: "7",      label: "Active Deals"        },
-      { value: "3",      label: "Club Partners"       },
-      { value: "29",     label: "Tasks Open"          },
-      { value: "1",      label: "Deal Closed This Week", celebrate: true }
+      { value: "1", label: "Deal Closed This Week", celebrate: true }
     ],
     log: [
       { text: "Skip trace batch complete — 96 owners resolved" },

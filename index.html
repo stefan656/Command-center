@@ -218,13 +218,8 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .metric-label.celebrate{color:var(--celebrate-soft);opacity:.85}
 
 .daily-stats-asof{
-  pointer-events:auto;
-  margin:14px auto 0;max-width:min(560px,90%);
-  padding:6px 16px;border-radius:16px;
-  border:1px solid rgba(140,180,230,.3);
-  background:linear-gradient(160deg,rgba(18,32,52,.4),rgba(6,10,20,.3));
-  text-align:center;font-size:10px;letter-spacing:.5px;
-  color:var(--blue-2);text-transform:uppercase;
+  margin-top:8px;text-align:center;font-size:9.5px;letter-spacing:1px;
+  color:var(--blue-3);text-transform:uppercase;opacity:.75;
 }
 .daily-stats-asof[hidden]{display:none}
 
@@ -687,47 +682,53 @@ $('sponsorList').innerHTML = (DATA.sponsors||[]).map(function(s){
 }).join('');
 
 $('headlineText').textContent = DATA.headline || "";
-var baseMetrics = (DATA.content && DATA.content.metrics) || [];
+// Deal Closed This Week is the only hand-curated tile left in the row (see
+// viki_data.js) — the other five slots are the live "FUB Daily Stats" tiles
+// below, starting as placeholders until that data loads. This intentionally
+// keeps the row at the same 6-tile size as the original working layout: an
+// earlier attempt that ADDED 5 tiles alongside the old 6 grew the headline
+// column tall enough to collide with neighboring panels on narrow
+// breakpoints (verified by screenshot); replacing tiles 1:1 avoids that.
+var dealMetric = (DATA.content && DATA.content.metrics) || [];
+var DAILY_STAT_LABELS = ['Calls', 'Texts', 'Conversations', 'Confirmed Sellers', 'New Leads'];
+var dailyStatTiles = DAILY_STAT_LABELS.map(function(label){ return { value: '—', label: label }; });
+
 function renderMetrics(){
-  $('metrics').innerHTML = baseMetrics.map(function(m){
+  $('metrics').innerHTML = dailyStatTiles.concat(dealMetric).map(function(m){
     var cls = m.celebrate ? ' celebrate' : '';
     return '<div class="metric"><div class="metric-value'+cls+'">'+m.value+'</div><div class="metric-label'+cls+'">'+m.label+'</div></div>';
   }).join('');
 }
 renderMetrics();
 
-function setTasksOpenMetric(count){
-  var tile = baseMetrics.filter(function(m){ return m.label === 'Tasks Open'; })[0];
-  if(tile) tile.value = String(count);
-  renderMetrics();
-}
-
-// Rendered as one compact chip (same visual weight as .payment-chip, not
-// full metric tiles) deliberately: five more full-size tiles wrapping
-// inside the already width-constrained headline column pushed its total
-// height enough to collide with neighboring panels on narrower breakpoints
-// (verified by screenshot) — a single bounded-height line carries the same
-// information without growing the column's height at all.
 function renderDailyStats(stats){
   var asOfEl = $('dailyStatsAsOf');
-  if(!stats || !stats.available){
-    asOfEl.hidden = true;
-    asOfEl.innerHTML = '';
-    return;
-  }
-  var parts = [
-    stats.calls + ' calls', stats.texts + ' texts', stats.conversations + ' conversations',
-    stats.confirmedSellers + ' confirmed sellers', stats.newLeads + ' new leads'
-  ].join(' · ');
-  var asOf = '';
-  if(stats.lastUpdated){
+  var available = stats && stats.available;
+  var values = {
+    Calls: available ? stats.calls : null,
+    Texts: available ? stats.texts : null,
+    Conversations: available ? stats.conversations : null,
+    'Confirmed Sellers': available ? stats.confirmedSellers : null,
+    'New Leads': available ? stats.newLeads : null
+  };
+  dailyStatTiles.forEach(function(tile){
+    var v = values[tile.label];
+    tile.value = (v === null || v === undefined) ? '—' : String(v);
+  });
+  renderMetrics();
+
+  if(available && stats.lastUpdated){
     var d = new Date(stats.lastUpdated);
-    asOf = ' — as of ' + d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    asOfEl.textContent = 'As of ' + d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  } else {
+    // Last daily report hasn't landed yet — say so rather than leaving an
+    // unexplained dash under the placeholders (still content, not blank).
+    asOfEl.textContent = 'Daily stats pending — no report received yet';
   }
-  asOfEl.textContent = parts + asOf;
   asOfEl.hidden = false;
   enforceHeadlineClearance(asOfEl);
 }
+renderDailyStats(null); // placeholder state until the live fetch resolves
 
 if(DATA.paymentDue){
   $('paymentChip').innerHTML =
@@ -1234,8 +1235,6 @@ async function loadLiveDashboard(){
     }
 
     if(data.fub && data.fub.ok){
-      var tc = data.fub.taskCounts;
-      setTasksOpenMetric(tc.overdue + tc.dueToday + tc.upNext);
       renderLeadTiers(data.fub.leadTiers);
     }
 
