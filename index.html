@@ -175,6 +175,10 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   transition:transform 1.4s cubic-bezier(.2,.8,.2,1);
 }
 
+.lead-tiers{margin-top:14px;padding-top:12px;border-top:1px solid rgba(140,180,230,.18)}
+.lead-tiers[hidden]{display:none}
+.lead-tiers .bar-label{color:var(--blue-2)}
+
 .hud-sponsors{top:560px;right:24px;width:min(340px,30vw)}
 .sponsor-list{list-style:none;display:flex;flex-direction:column;gap:10px}
 .sponsor-item{font-size:11px}
@@ -212,6 +216,17 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .metric-value.celebrate{color:var(--celebrate);text-shadow:0 0 8px rgba(255,210,92,.85),0 0 24px rgba(255,210,92,.4)}
 .metric-label{font-size:9.5px;letter-spacing:1.5px;color:var(--blue-3);text-transform:uppercase;margin-top:6px}
 .metric-label.celebrate{color:var(--celebrate-soft);opacity:.85}
+
+.daily-stats-asof{
+  pointer-events:auto;
+  margin:14px auto 0;max-width:min(560px,90%);
+  padding:6px 16px;border-radius:16px;
+  border:1px solid rgba(140,180,230,.3);
+  background:linear-gradient(160deg,rgba(18,32,52,.4),rgba(6,10,20,.3));
+  text-align:center;font-size:10px;letter-spacing:.5px;
+  color:var(--blue-2);text-transform:uppercase;
+}
+.daily-stats-asof[hidden]{display:none}
 
 .payment-chip{
   pointer-events:auto;
@@ -346,6 +361,27 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .type-btn:active{transform:translateY(0)}
 .type-btn.active{color:var(--navy-0);background:linear-gradient(160deg,var(--blue-1),var(--blue-2));box-shadow:0 0 18px rgba(90,160,255,.6)}
 
+/* -- manual refresh for live dashboard data -- */
+.refresh-btn{
+  flex:none;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  color:var(--blue-2);background:rgba(20,40,64,.4);
+  border:1px solid rgba(140,180,230,.3);border-radius:16px;
+  padding:6px 12px 6px 10px;
+  font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:1.5px;font-weight:700;
+  transition:transform .15s ease, box-shadow .3s ease, color .3s ease;
+}
+.refresh-btn:hover{transform:translateY(-1px);color:var(--blue-0);box-shadow:0 0 12px rgba(90,160,255,.3)}
+.refresh-btn:active{transform:translateY(0)}
+.refresh-icon{flex:none;transition:transform .5s ease}
+.refresh-btn.syncing .refresh-icon{animation:refresh-spin 1s linear infinite}
+.refresh-btn.syncing{color:var(--blue-0)}
+@keyframes refresh-spin{to{transform:rotate(360deg)}}
+@media (max-width:760px){
+  .refresh-btn .refresh-label{display:none}
+  .refresh-btn{padding:8px}
+}
+
 .type-panel{
   position:fixed;left:50%;bottom:96px;z-index:17;
   transform:translateX(-50%);
@@ -445,6 +481,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 <div class="hud hud-stats panel">
   <div class="panel-title">LEAD FUNNEL</div>
   <div class="bars" id="bars"></div>
+  <div class="bars lead-tiers" id="leadTiers" hidden></div>
 </div>
 
 <div class="hud hud-sponsors panel">
@@ -455,6 +492,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 <div class="hud hud-headline">
   <div class="headline-text" id="headlineText"></div>
   <div class="metrics" id="metrics"></div>
+  <div class="daily-stats-asof" id="dailyStatsAsOf" hidden></div>
   <div class="payment-chip" id="paymentChip"></div>
 </div>
 
@@ -481,6 +519,13 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
     </svg>
   </button>
   <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+  <button class="refresh-btn" id="refreshBtn" title="Refresh live data" aria-label="Refresh live data">
+    <svg class="refresh-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+      <path d="M4 12a8 8 0 0 1 13.66-5.66M20 12a8 8 0 0 1-13.66 5.66" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M17 3v4h-4M7 21v-4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="refresh-label" id="refreshLabel">SYNC</span>
+  </button>
   <button class="handle-btn" id="handleBtn">WHAT SHOULD I HANDLE FIRST</button>
 </div>
 
@@ -514,9 +559,12 @@ function tickClock(){
 tickClock();
 setInterval(tickClock,1000);
 
-$('connectors').innerHTML = (DATA.connectors||[]).map(function(c){
-  return '<li class="conn '+(c.status==='online'?'online':'offline')+'"><span class="dot"></span>'+c.name+'</li>';
-}).join('');
+function renderConnectors(list){
+  $('connectors').innerHTML = (list||[]).map(function(c){
+    return '<li class="conn '+(c.status==='online'?'online':'offline')+'"><span class="dot"></span>'+c.name+'</li>';
+  }).join('');
+}
+renderConnectors(DATA.connectors);
 
 var funnel = (DATA.content && DATA.content.funnel) || [];
 $('bars').innerHTML = funnel.map(function(f){
@@ -534,9 +582,103 @@ requestAnimationFrame(function(){
   });
 });
 
-$('priorityList').innerHTML = (DATA.priorities||[]).map(function(p){
-  return '<li class="priority-item urgency-'+slug(p.urgency)+'"><span class="pdot"></span><span class="tag">'+p.tag+'</span><span class="ptext">'+p.label+'</span></li>';
-}).join('');
+function renderPriorities(list){
+  $('priorityList').innerHTML = (list||[]).map(function(p){
+    return '<li class="priority-item urgency-'+slug(p.urgency)+'"><span class="pdot"></span><span class="tag">'+p.tag+'</span><span class="ptext">'+p.label+'</span></li>';
+  }).join('');
+}
+renderPriorities(DATA.priorities);
+
+// hud-sponsors is CSS-anchored at a fixed top:560px, sized on the
+// assumption that hud-stats only ever holds the 6 static funnel rows.
+// Lead tiers can push hud-stats taller than that budget, so — same fix as
+// the sphere's computeSphereCenter() — measure the real rendered bottom of
+// hud-stats and push hud-sponsors down to clear it, instead of guessing a
+// fixed pixel value that only holds for one specific content length.
+// Pushing it down can in turn run it into the bottom bar, so it also gets a
+// hard max-height + internal scroll against that boundary — a safety net
+// that holds regardless of exactly how tall either panel's content gets.
+function repositionSponsorsPanel(){
+  var sponsorsEl = document.querySelector('.hud-sponsors');
+  var statsEl = document.querySelector('.hud-stats');
+  if(!sponsorsEl || !statsEl) return;
+  sponsorsEl.style.display = ''; // clear any prior JS-driven hide before re-measuring
+  if(getComputedStyle(sponsorsEl).display === 'none'){ sponsorsEl.style.top = ''; sponsorsEl.style.maxHeight = ''; return; }
+  var neededTop = Math.round(statsEl.getBoundingClientRect().bottom + 16);
+  var top = Math.max(560, neededTop);
+  var bottomBarTop = window.innerHeight - 78;
+  var available = bottomBarTop - top - 16;
+  // Same threshold logic the CSS already applies by width (hiding this panel
+  // entirely below 1150px rather than cramming it in) — extended to height:
+  // below ~100px there's no legible room left for even one partner card, so
+  // hide rather than show a panel that's clipped to near-nothing or forced
+  // to overflow into the bottom bar.
+  if(available < 100){
+    sponsorsEl.style.display = 'none';
+    return;
+  }
+  sponsorsEl.style.top = top + 'px';
+  sponsorsEl.style.maxHeight = available + 'px';
+  sponsorsEl.style.overflowY = 'auto';
+}
+window.addEventListener('resize', repositionSponsorsPanel);
+
+// Only the three temperature tiers (Hot/Warm/Cold) render here — the most
+// actionable "where does the pipeline stand right now" read at a glance.
+// Active/Pending/Closed are still returned in the API payload (real,
+// usable data) but adding all 6 as full bar-rows doesn't fit the panel's
+// vertical budget without pushing Partner Status off-screen (verified by
+// screenshot), and Hot/Warm/Cold is the more useful subset for this spot.
+var LEAD_TIER_DISPLAY = ['Hot', 'Warm', 'Cold'];
+function renderLeadTiers(tiers){
+  var el = $('leadTiers');
+  var shown = (tiers || []).filter(function(t){ return LEAD_TIER_DISPLAY.indexOf(t.tier) !== -1; });
+  if(!shown.length){ el.hidden = true; el.innerHTML = ''; }
+  else {
+    var max = Math.max.apply(null, shown.map(function(t){ return t.count; }).concat([1]));
+    el.innerHTML = shown.map(function(t){
+      var pct = Math.round((t.count / max) * 100);
+      return '<div class="bar-row"><div class="bar-label"><span>'+t.tier+'</span><span class="bar-value">'+t.count+'</span></div>'+
+             '<div class="bar-track"><div class="bar-fill" style="transform:scaleX(1);width:'+pct+'%"></div></div></div>';
+    }).join('');
+    el.hidden = false;
+  }
+  repositionSponsorsPanel();
+  if(typeof resize === 'function') resize(); // let the sphere reclaim/avoid the new hud-stats height too
+
+  enforceHeadlineClearance(el);
+}
+
+// On narrow layouts hud-stats sits directly above hud-headline in the page's
+// vertical stack (rather than beside it, where the two don't share any
+// horizontal space at all), so anything that grows either one — lead tiers
+// making hud-stats taller, or the daily-stats chip making hud-headline
+// taller — can push them into each other. Caught the same way as the
+// sphere/sponsors collisions above: measure the real result and back off
+// the element just added if it actually caused an overlap. Checked as a
+// real rectangle intersection (both axes), not just vertical — a
+// vertical-only check false-positived on wide desktop, where hud-stats
+// (right-aligned) and hud-headline (centered, narrower) never overlap
+// horizontally regardless of how tall hud-stats gets.
+function headlineStatsCollide(){
+  var headlineEl = document.querySelector('.hud-headline');
+  var statsEl = document.querySelector('.hud-stats');
+  if(!headlineEl || !statsEl) return false;
+  var hRect = headlineEl.getBoundingClientRect();
+  var sRect = statsEl.getBoundingClientRect();
+  var verticallyOverlaps = hRect.top > 0 && sRect.bottom > hRect.top - 8;
+  var horizontallyOverlaps = sRect.left < hRect.right && sRect.right > hRect.left;
+  return verticallyOverlaps && horizontallyOverlaps;
+}
+function enforceHeadlineClearance(growEl){
+  if(growEl.hidden) return;
+  if(headlineStatsCollide()){
+    growEl.hidden = true;
+    growEl.innerHTML = '';
+    repositionSponsorsPanel();
+    if(typeof resize === 'function') resize();
+  }
+}
 
 $('sponsorList').innerHTML = (DATA.sponsors||[]).map(function(s){
   return '<li class="sponsor-item"><div class="sponsor-top"><span class="sname">'+s.name+'</span>'+
@@ -545,11 +687,47 @@ $('sponsorList').innerHTML = (DATA.sponsors||[]).map(function(s){
 }).join('');
 
 $('headlineText').textContent = DATA.headline || "";
-var metrics = (DATA.content && DATA.content.metrics) || [];
-$('metrics').innerHTML = metrics.map(function(m){
-  var cls = m.celebrate ? ' celebrate' : '';
-  return '<div class="metric"><div class="metric-value'+cls+'">'+m.value+'</div><div class="metric-label'+cls+'">'+m.label+'</div></div>';
-}).join('');
+var baseMetrics = (DATA.content && DATA.content.metrics) || [];
+function renderMetrics(){
+  $('metrics').innerHTML = baseMetrics.map(function(m){
+    var cls = m.celebrate ? ' celebrate' : '';
+    return '<div class="metric"><div class="metric-value'+cls+'">'+m.value+'</div><div class="metric-label'+cls+'">'+m.label+'</div></div>';
+  }).join('');
+}
+renderMetrics();
+
+function setTasksOpenMetric(count){
+  var tile = baseMetrics.filter(function(m){ return m.label === 'Tasks Open'; })[0];
+  if(tile) tile.value = String(count);
+  renderMetrics();
+}
+
+// Rendered as one compact chip (same visual weight as .payment-chip, not
+// full metric tiles) deliberately: five more full-size tiles wrapping
+// inside the already width-constrained headline column pushed its total
+// height enough to collide with neighboring panels on narrower breakpoints
+// (verified by screenshot) — a single bounded-height line carries the same
+// information without growing the column's height at all.
+function renderDailyStats(stats){
+  var asOfEl = $('dailyStatsAsOf');
+  if(!stats || !stats.available){
+    asOfEl.hidden = true;
+    asOfEl.innerHTML = '';
+    return;
+  }
+  var parts = [
+    stats.calls + ' calls', stats.texts + ' texts', stats.conversations + ' conversations',
+    stats.confirmedSellers + ' confirmed sellers', stats.newLeads + ' new leads'
+  ].join(' · ');
+  var asOf = '';
+  if(stats.lastUpdated){
+    var d = new Date(stats.lastUpdated);
+    asOf = ' — as of ' + d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+  asOfEl.textContent = parts + asOf;
+  asOfEl.hidden = false;
+  enforceHeadlineClearance(asOfEl);
+}
 
 if(DATA.paymentDue){
   $('paymentChip').innerHTML =
@@ -1012,6 +1190,72 @@ typeInput.addEventListener('keydown', function(e){
   if(e.key === 'Enter'){ e.preventDefault(); submitTypedQuestion(); }
   else if(e.key === 'Escape'){ closeTypePanel(); }
 });
+
+/* ================= LIVE DASHBOARD DATA ================= */
+// Fetches /api/viki-dashboard for the fields that have a real live source
+// (Priority Queue, Tasks Open, Lead Funnel tiers, Daily Stats row) and
+// overlays them onto the static content already rendered from viki_data.js.
+// Every source is independent — a Follow Up Boss or Notion failure only
+// dims that one connector dot and leaves everything else (including the
+// static fallback content) exactly as it was, never a blank/broken panel.
+var refreshBtn = $('refreshBtn');
+var liveDashboardLoading = false;
+
+function setSyncing(on){
+  refreshBtn.classList.toggle('syncing', on);
+  refreshBtn.disabled = on;
+  $('refreshLabel').textContent = on ? 'SYNCING' : 'SYNC';
+}
+
+async function loadLiveDashboard(){
+  if(liveDashboardLoading) return;
+  liveDashboardLoading = true;
+  setSyncing(true);
+
+  var controller = new AbortController();
+  var timeoutId = setTimeout(function(){ controller.abort(); }, 30000);
+
+  try {
+    var res = await fetch('/api/viki-dashboard', { signal: controller.signal });
+    var data = await res.json().catch(function(){ return null; });
+    if(!data){ throw new Error('bad_json'); }
+
+    var connectorOverrides = (DATA.connectors||[]).map(function(c){
+      var status = c.status;
+      if(c.name === 'Follow Up Boss') status = data.fub && data.fub.ok ? 'online' : 'offline';
+      if(c.name === 'Notion') status = data.ops && data.ops.ok ? 'online' : 'offline';
+      return { name: c.name, status: status };
+    });
+    renderConnectors(connectorOverrides);
+
+    if(data.ops && data.ops.ok && data.ops.items && data.ops.items.length){
+      var live = data.ops.items.filter(function(i){ return i.bucket === 'Overdue' || i.bucket === 'Due Today'; });
+      renderPriorities((live.length ? live : data.ops.items).slice(0, 8));
+    }
+
+    if(data.fub && data.fub.ok){
+      var tc = data.fub.taskCounts;
+      setTasksOpenMetric(tc.overdue + tc.dueToday + tc.upNext);
+      renderLeadTiers(data.fub.leadTiers);
+    }
+
+    renderDailyStats(data.dailyStats);
+
+    console.log('[VIKI] dashboard refreshed', data);
+  } catch(err){
+    console.error('[VIKI] dashboard live refresh failed:', err.name, err.message);
+    // Leave every panel exactly as it was (static content) — a failed
+    // refresh is silent on-screen by design, same as a stale-but-correct
+    // dashboard, rather than replacing good content with an error state.
+  } finally {
+    clearTimeout(timeoutId);
+    setSyncing(false);
+    liveDashboardLoading = false;
+  }
+}
+
+refreshBtn.addEventListener('click', loadLiveDashboard);
+loadLiveDashboard();
 
 /* ================= CANVAS SCENE: V.I.K.I. VOXEL HEAD ================= */
 var canvas = $('scene');
