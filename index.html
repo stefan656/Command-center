@@ -1018,6 +1018,78 @@ var canvas = $('scene');
 var ctx = canvas.getContext('2d');
 var W = 0, H = 0, DPR = 1;
 
+// Vertical center of the sphere/orbit/arcs, as the midpoint of the actual
+// clear band between the top panels and the bottom banner — measured from
+// the real DOM rather than a fixed fraction of viewport height, so it holds
+// across orientations instead of drifting into either at short/wide aspect
+// ratios. Recomputed on resize/orientation change, same cadence as W/H.
+var sphereCy = 0;
+function computeSphereCenter(){
+  // Same R the draw loop uses. The faint outer tick ring/rays (out to R*2.5)
+  // read as fine near panel edges — visualR (the bright core + point cloud,
+  // the part that actually reads as "solid" against text) is what has to
+  // stay clear.
+  var R = Math.min(W,H) * 0.145;
+  var visualR = R * 1.3;
+  var margin = 14;
+  var cx = W / 2;
+  var left = cx - visualR, right = cx + visualR;
+
+  function overlapsX(r){ return r.width > 0 || r.height > 0 ? (r.right > left && r.left < right) : false; }
+  function bottomOf(selector){
+    var out = 0;
+    document.querySelectorAll(selector).forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if(overlapsX(r)) out = Math.max(out, r.bottom);
+    });
+    return out;
+  }
+
+  // Two tiers of "must clear" panels:
+  //  - hard: the title box and clock/connector box named explicitly in the
+  //    repositioning request — never allowed to be violated.
+  //  - soft: everything else that can occupy this column (e.g. the Lead
+  //    Funnel panel, which jumps from top:300px to top:150px on narrow
+  //    phones and becomes tall enough to sit where the sphere does) —
+  //    cleared when there's room, but not at the cost of colliding with the
+  //    hard panels or the headline below, since on some phone-sized
+  //    viewports the gap between them is too short for the sphere to clear
+  //    both a tall side panel and the headline at once.
+  var hardBottom = Math.max(24, bottomOf('.hud-top-left, .hud-top-right'));
+  var softBottom = Math.max(hardBottom, bottomOf('.hud-log, .hud-stats, .hud-priorities, .hud-sponsors'));
+
+  // The headline block is anchored to the bottom of the viewport and can
+  // grow tall enough (wrapped text + metrics + payment chip) to render with
+  // a negative top on short landscape viewports — i.e. it has already
+  // scrolled off the top edge. A negative/above-panels top there isn't a
+  // real constraint to honor, so only trust it when it actually sits below
+  // the hard top-panel band.
+  var headlineEl = document.querySelector('.hud-headline');
+  var headlineTop = H;
+  if(headlineEl){
+    var hRect = headlineEl.getBoundingClientRect();
+    if(hRect.height > 0 && hRect.top > hardBottom) headlineTop = hRect.top;
+  }
+  var maxCy = headlineTop - margin - visualR;
+
+  var hardMinCy = hardBottom + margin + visualR;
+  var softMinCy = softBottom + margin + visualR;
+  // Prefer clearing every panel (hard + soft) and the headline. If that
+  // genuinely doesn't fit in this viewport, drop the soft panels first —
+  // the headline is the one the sphere was originally reported overlapping,
+  // so it outranks a side panel. Only if even the hard panels can't fit
+  // against the headline is there no overlap-free position left at this
+  // exact size/viewport — split the unavoidable encroachment evenly
+  // between the two, rather than fully committing to overlapping either.
+  if(softMinCy <= maxCy){
+    sphereCy = Math.max(Math.min((softMinCy + maxCy) / 2, H * 0.48), softMinCy);
+  } else if(hardMinCy <= maxCy){
+    sphereCy = Math.max(Math.min((hardMinCy + maxCy) / 2, H * 0.48), hardMinCy);
+  } else {
+    sphereCy = (hardMinCy + maxCy) / 2;
+  }
+}
+
 function resize(){
   DPR = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
   W = window.innerWidth; H = window.innerHeight;
@@ -1026,6 +1098,7 @@ function resize(){
   canvas.style.width = W + 'px';
   canvas.style.height = H + 'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
+  computeSphereCenter();
 }
 window.addEventListener('resize', resize);
 resize();
@@ -1145,7 +1218,11 @@ function draw(now){
   rayAngle += dtMs * 0.00009;
   for(var a=0;a<3;a++) arcAngles[a] += dtMs * arcSpeeds[a] * (1 + (speaking ? speakBoost*0.6 : 0));
 
-  var cx = W/2, cy = H/2 + H*0.015;
+  // sphereCy is measured from the real gap between the top panels and the
+  // bottom banner (see computeSphereCenter/resize) rather than a fixed
+  // fraction of H, so it holds across portrait/landscape without drifting
+  // into either.
+  var cx = W/2, cy = sphereCy;
   var R = Math.min(W,H) * 0.145;
 
   /* background */
