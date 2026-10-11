@@ -614,6 +614,17 @@ section{
 }
 @media (min-width:880px){ .cal{ grid-template-columns:repeat(3,1fr); } }
 
+/* Down to a single gathering, the three-column grid above would leave two
+   empty cells beside it. Center one card at a readable width instead. */
+.cal-single{
+  grid-template-columns:none;
+  justify-content:center;
+}
+.cal-single .cal-card{
+  width:100%;
+  max-width:360px;
+}
+
 .cal-card{ display:flex; flex-direction:column; gap:.9rem; }
 .cal-card p{ margin:0; max-width:none; }
 
@@ -854,8 +865,8 @@ footer{
       <h1 class="hero-title reveal" style="--d:180ms">Family Reunion Weekend</h1>
 
       <p class="hero-sub reveal" style="--d:250ms">
-        Two days of fellowship, praise, and food from around the world.
-        September 19 and 20 in Pembroke Pines.
+        An afternoon of food, games, and fellowship on the grounds.
+        October 17 in Pembroke Pines.
       </p>
 
       <div class="hero-cta reveal" style="--d:320ms">
@@ -880,35 +891,17 @@ footer{
     <div class="wrap">
       <h2 class="reveal">The weekend</h2>
       <p class="lede reveal" style="--d:60ms; margin-top:1rem">
-        Three gatherings across two days. Come for one, come for all of them.
+        One afternoon together on the grounds.
       </p>
 
-      <div class="cal">
+      <div class="cal cal-single">
         <article class="card cal-card reveal" data-tilt style="--d:0ms">
           <p class="cal-day">Saturday</p>
-          <p class="cal-date gold">19 <small>Sept</small></p>
+          <p class="cal-date gold">17 <small>Oct</small></p>
           <div class="cal-rule"></div>
           <h3>Family Picnic</h3>
           <p class="cal-time">12:00 PM to 6:00 PM</p>
           <p class="cal-note">An afternoon on the grounds with food, games, and room for the children to run.</p>
-        </article>
-
-        <article class="card cal-card reveal" data-tilt style="--d:80ms">
-          <p class="cal-day">Sunday</p>
-          <p class="cal-date gold">20 <small>Sept</small></p>
-          <div class="cal-rule"></div>
-          <h3>Festive Service</h3>
-          <p class="cal-time">9:30 AM</p>
-          <p class="cal-note">Our anniversary celebration of the Eucharist, with the choir and the whole parish family together.</p>
-        </article>
-
-        <article class="card cal-card reveal" data-tilt style="--d:160ms">
-          <p class="cal-day">Sunday</p>
-          <p class="cal-date gold">20 <small>Sept</small></p>
-          <div class="cal-rule"></div>
-          <h3>Fellowship Around the World in 26 Bites</h3>
-          <p class="cal-time">11:30 AM</p>
-          <p class="cal-note">Twenty six dishes from the countries our parish calls home, served right after the service.</p>
         </article>
       </div>
 
