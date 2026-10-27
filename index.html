@@ -92,25 +92,11 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .subtitle{margin-top:8px;font-size:13px;letter-spacing:1px;color:var(--blue-2);opacity:.9}
 .datestamp{margin-top:5px;font-size:10.5px;letter-spacing:1.5px;color:var(--blue-3);text-transform:uppercase}
 
-.status-block{text-align:right;max-width:min(460px,52vw)}
 .clock{
   font-family:'Orbitron',sans-serif;font-size:clamp(22px,2.6vw,32px);font-weight:700;
   letter-spacing:3px;color:var(--blue-0);text-shadow:var(--glow);
 }
 .clock-date{font-size:10.5px;letter-spacing:2px;color:var(--blue-3);text-transform:uppercase;margin-top:2px}
-.connectors{
-  list-style:none;margin-top:12px;
-  display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 14px;
-}
-.conn{
-  display:flex;align-items:center;gap:6px;
-  font-size:10.5px;letter-spacing:1px;color:var(--blue-2);text-transform:uppercase;white-space:nowrap;
-}
-.conn .dot{width:6px;height:6px;border-radius:50%;flex:none}
-.conn.online .dot{background:var(--blue-1);box-shadow:0 0 6px var(--blue-1),0 0 14px rgba(79,166,255,.7)}
-.conn.offline .dot{background:var(--blue-3);box-shadow:0 0 5px var(--blue-3);animation:blink 1.1s steps(1) infinite}
-.conn.offline{color:rgba(140,170,210,.55)}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.15}}
 
 .hero-bottom{
   position:absolute;left:0;right:0;bottom:0;z-index:2;
@@ -208,54 +194,10 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .mini.win .v{color:var(--celebrate);text-shadow:0 0 8px rgba(255,210,92,.8),0 0 22px rgba(255,210,92,.35)}
 
 /* -- two-column work panels -- */
-.work-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
 
-.task-counts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.tc{
-  flex:1 1 0;min-width:72px;padding:8px 10px;border:1px solid rgba(140,180,230,.2);border-radius:2px;
-  background:rgba(10,20,34,.4);
-}
-.tc .v{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:var(--blue-0)}
-.tc .l{font-size:9px;letter-spacing:1px;color:var(--blue-3);text-transform:uppercase;margin-top:3px}
-.tc.hot .v{color:#ffb3b9}
 
-.priority-list{list-style:none;display:flex;flex-direction:column;gap:9px}
-.priority-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.4}
-.priority-item .tag{
-  flex:none;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:2px;
-  border:1px solid rgba(140,180,230,.4);color:var(--blue-1);opacity:.85;white-space:nowrap;margin-top:1px;
-}
-.priority-item.urgency-high .tag{border-color:rgba(255,95,109,.55);color:#ff9aa3}
-.priority-item .ptext{color:var(--blue-0);opacity:.9}
-.priority-item .pdot{width:5px;height:5px;border-radius:50%;background:var(--blue-2);margin-top:6px;flex:none}
-.priority-item.urgency-high .pdot{background:var(--red);box-shadow:0 0 6px var(--red)}
-.priority-item.urgency-medium .pdot{background:var(--blue-1);box-shadow:0 0 6px var(--blue-1)}
-.empty-note{font-size:11.5px;color:var(--blue-3);line-height:1.5}
 
-.bars{display:flex;flex-direction:column;gap:12px}
-.bar-label{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.5px;color:var(--blue-2);margin-bottom:5px;text-transform:uppercase}
-.bar-value{color:var(--blue-0);font-weight:700}
-.bar-track{height:5px;background:rgba(140,180,230,.08);border-radius:3px;overflow:hidden;position:relative}
-.bar-fill{
-  height:100%;border-radius:3px;width:0;
-  background:linear-gradient(90deg,var(--blue-3),var(--blue-1));
-  box-shadow:0 0 8px rgba(90,160,255,.7);
-  transition:width 1.2s cubic-bezier(.2,.8,.2,1);
-}
-.bar-row.t-hot .bar-fill{background:linear-gradient(90deg,#7a2a33,var(--red));box-shadow:0 0 8px rgba(255,95,109,.6)}
-.tier-foot{margin-top:14px;padding-top:10px;border-top:1px solid rgba(140,180,230,.14);font-size:10.5px;letter-spacing:1px;color:var(--blue-2);text-transform:uppercase}
-.tier-foot b{color:var(--blue-0);font-weight:700}
 
-.sponsor-list{list-style:none;display:flex;flex-direction:column;gap:12px}
-.sponsor-item{font-size:11.5px}
-.sponsor-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.sname{color:var(--blue-0);letter-spacing:.5px}
-.sstatus{font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid;white-space:nowrap}
-.status-verbaldeal{color:var(--blue-2);border-color:rgba(111,147,194,.5)}
-.status-pending{color:var(--blue-2);border-color:rgba(111,147,194,.5)}
-.status-waiting{color:var(--blue-1);border-color:rgba(140,180,230,.4)}
-.sstatus.celebrate{color:var(--celebrate);border-color:rgba(255,210,92,.6);box-shadow:0 0 10px rgba(255,210,92,.3);text-shadow:0 0 6px rgba(255,210,92,.4)}
-.sdetail{color:var(--blue-3);font-size:10.5px;margin-top:3px;opacity:.85}
 
 .log-list{list-style:none;display:flex;flex-direction:column;gap:8px}
 .log-line{
@@ -270,6 +212,60 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .log-text{color:var(--blue-1);opacity:.92}
 .log-line.celebrate .log-text{color:var(--celebrate);opacity:1;text-shadow:0 0 8px rgba(255,210,92,.4)}
 
+/* -- data-source status (hero, top-right) -- */
+.source{
+  margin-top:12px;display:inline-flex;align-items:center;gap:8px;
+  font-size:10.5px;letter-spacing:1.5px;color:var(--blue-2);text-transform:uppercase;
+  padding:5px 12px;border:1px solid rgba(140,180,230,.22);border-radius:14px;
+  background:rgba(8,16,28,.5);
+}
+.source .dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--blue-3)}
+.source.online .dot{background:var(--blue-1);box-shadow:0 0 6px var(--blue-1),0 0 14px rgba(79,166,255,.7)}
+.source.syncing .dot{background:var(--blue-2);animation:blink 1.1s steps(1) infinite}
+.source.offline{border-color:rgba(255,95,109,.4);color:#ffb3b9}
+.source.offline .dot{background:var(--red);box-shadow:0 0 6px var(--red)}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.2}}
+
+/* -- change vs previous brief, under KPI / trend values -- */
+.delta{margin-top:8px;font-size:10px;letter-spacing:1px;color:var(--blue-3);text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.delta .ar{font-size:9px;color:var(--blue-2)}
+.delta.worse .ar{color:var(--red)}
+.delta.better .ar{color:var(--blue-1)}
+
+/* -- trends: one sparkline card per metric -- */
+.trend-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.trend{padding:16px 16px 12px}
+.trend-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.trend-name{font-size:10px;letter-spacing:1.5px;color:var(--blue-2);text-transform:uppercase}
+.trend-val{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:700;color:var(--blue-0);text-shadow:0 0 10px rgba(130,190,255,.45)}
+.trend .delta{margin-top:2px}
+.spark{position:relative;height:72px;margin-top:10px;touch-action:pan-y}
+.spark svg{display:block;width:100%;height:100%;overflow:visible}
+.spark .ln{fill:none;stroke:var(--blue-1);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(79,166,255,.55))}
+.spark .ar-fill{fill:url(#sparkFill)}
+.spark .base{stroke:rgba(140,180,230,.14);stroke-width:1}
+.spark .end{fill:var(--blue-0);stroke:var(--navy-0);stroke-width:2}
+.spark .hx{stroke:rgba(200,225,255,.45);stroke-width:1;stroke-dasharray:2 3}
+.spark .hp{fill:var(--blue-0);stroke:var(--navy-0);stroke-width:2}
+.spark-tip{
+  position:absolute;top:-6px;transform:translate(-50%,-100%);pointer-events:none;white-space:nowrap;
+  background:rgba(4,10,20,.95);border:1px solid rgba(140,180,230,.35);border-radius:3px;
+  padding:4px 8px;font-size:10.5px;color:var(--blue-0);opacity:0;transition:opacity .15s ease;z-index:3;
+}
+.spark-tip span{color:var(--blue-3)}
+.spark-tip.show{opacity:1}
+.spark-axis{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;letter-spacing:1px;color:var(--blue-3);text-transform:uppercase}
+.trend-empty{font-size:11px;color:var(--blue-3);padding:26px 0}
+
+/* -- brief notes + log -- */
+.duo{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
+.brief-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.bchip{font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:2px;border:1px solid rgba(140,180,230,.35);color:var(--blue-2)}
+.bchip.warn{border-color:rgba(255,95,109,.5);color:#ffb3b9}
+.bchip.dry{border-color:rgba(255,210,92,.45);color:var(--celebrate-soft)}
+.brief-notes{font-size:12px;line-height:1.6;color:var(--blue-1);white-space:pre-wrap}
+.empty-note{font-size:11.5px;color:var(--blue-3);line-height:1.5}
+
 /* -- recent briefs history -- */
 .hist-wrap{overflow-x:auto}
 .hist{border-collapse:collapse;width:100%;font-size:11.5px;font-variant-numeric:tabular-nums}
@@ -281,17 +277,6 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .hist tr:first-child td{color:var(--blue-0)}
 .hist tbody tr:first-child td{text-shadow:0 0 8px rgba(130,190,255,.5)}
 
-.payment-chip{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:7px 16px;border-radius:20px;margin-top:16px;
-  border:1px solid rgba(140,180,230,.45);
-  background:linear-gradient(160deg,rgba(18,32,52,.55),rgba(6,10,20,.4));
-  box-shadow:0 0 16px rgba(90,160,255,.15), inset 0 0 10px rgba(90,160,255,.07);
-  font-size:11px;letter-spacing:.5px;color:var(--blue-2);
-}
-.chip-dot{width:7px;height:7px;border-radius:50%;background:var(--blue-1);box-shadow:0 0 8px var(--blue-1);animation:blink 1.6s steps(1) infinite}
-.chip-amount{color:var(--blue-0);font-weight:700}
-.chip-date{color:var(--blue-3)}
 
 .page-foot{text-align:center;font-size:9.5px;letter-spacing:2px;color:var(--blue-3);text-transform:uppercase;padding:6px 0 0;opacity:.7}
 
@@ -480,20 +465,21 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 /* ---------- Responsive ---------- */
 @media (max-width:900px){
   .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .work-grid{grid-template-columns:1fr}
+  .trend-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .duo{grid-template-columns:1fr}
 }
 @media (max-width:760px){
   .hero{height:clamp(520px,88vh,760px)}
   .hero-top{padding:16px}
   .status-block{max-width:50vw}
-  .connectors{gap:4px 10px}
-  .conn{font-size:9px;letter-spacing:.5px}
+  .source{font-size:9px}
   .subtitle{font-size:11.5px}
   .brand h1{font-size:20px;letter-spacing:4px}
   .clock{font-size:20px;letter-spacing:2px}
   .hero-bottom{padding:40px 16px 18px}
   .kpi{padding:16px 14px 14px}
   .stat-groups{grid-template-columns:1fr}
+  .kpi .v{font-size:34px}
   .handle-btn{display:none}
   .bottom-bar{gap:12px;padding:0 14px}
   .brief-btn{padding:12px 18px;font-size:11px;letter-spacing:2px}
@@ -507,6 +493,11 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4fa6ff" stop-opacity=".28"/><stop offset="1" stop-color="#4fa6ff" stop-opacity="0"/>
+  </linearGradient></defs>
+</svg>
 <div class="page-glow"></div>
 <div class="scan-sweep"></div>
 <div class="scanlines"></div>
@@ -524,7 +515,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
     <div class="status-block">
       <div class="clock" id="clock">00:00:00</div>
       <div class="clock-date" id="clockDate"></div>
-      <ul class="connectors" id="connectors"></ul>
+      <div class="source syncing" id="sourceStatus"><span class="dot"></span><span id="sourceText">Notion · Morning brief</span></div>
     </div>
   </div>
 
@@ -547,13 +538,19 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
       <span class="section-note" id="todayNote"></span>
     </div>
     <div class="kpi-row" id="kpiToday"></div>
-    <div class="payment-chip" id="paymentChip"></div>
+  </section>
+
+  <section aria-labelledby="h-trends">
+    <div class="section-head">
+      <h2 id="h-trends">TRENDS</h2>
+      <span class="section-note" id="trendsNote">Recent morning brief runs</span>
+    </div>
+    <div class="trend-grid" id="trendGrid"></div>
   </section>
 
   <section aria-labelledby="h-numbers">
     <div class="section-head">
       <h2 id="h-numbers">THE NUMBERS</h2>
-      <span class="section-note" id="numbersNote"></span>
     </div>
     <div class="stat-groups">
       <div class="panel"><div class="panel-title">YESTERDAY'S ACTIVITY</div><div class="mini-grid" id="grpActivity"></div></div>
@@ -563,42 +560,27 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
     </div>
   </section>
 
-  <section aria-labelledby="h-work">
-    <div class="section-head">
-      <h2 id="h-work">WORK QUEUE</h2>
-      <span class="section-note">Live from Follow Up Boss + Notion</span>
+  <section class="duo">
+    <div class="panel">
+      <div class="panel-title">BRIEF NOTES</div>
+      <div class="brief-chips" id="briefChips"></div>
+      <p class="brief-notes" id="briefNotes">Waiting on the latest morning brief…</p>
     </div>
-    <div class="work-grid">
-      <div class="panel">
-        <div class="panel-title">PRIORITY QUEUE <span class="pt-sub" id="pqSub"></span></div>
-        <div class="task-counts" id="taskCounts"></div>
-        <ul class="priority-list" id="priorityList"></ul>
-      </div>
-      <div class="panel">
-        <div class="panel-title">LEAD TIERS <span class="pt-sub">FUB STAGES</span></div>
-        <div class="bars" id="leadTiers"></div>
-        <div class="tier-foot" id="tierFoot"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">PARTNER STATUS</div>
-        <ul class="sponsor-list" id="sponsorList"></ul>
-      </div>
-      <div class="panel">
-        <div class="panel-title">ACTIVITY STREAM</div>
-        <ul class="log-list" id="logList"></ul>
-      </div>
+    <div class="panel">
+      <div class="panel-title">V.I.K.I. LOG</div>
+      <ul class="log-list" id="logList"></ul>
     </div>
   </section>
 
   <section aria-labelledby="h-hist">
     <div class="section-head">
       <h2 id="h-hist">RECENT BRIEFS</h2>
-      <span class="section-note">Last 7 morning brief runs</span>
+      <span class="section-note">Last 7 runs</span>
     </div>
     <div class="panel hist-wrap"><table class="hist" id="hist"></table></div>
   </section>
 
-  <div class="page-foot">V.I.K.I. · Command Center</div>
+  <div class="page-foot">V.I.K.I. · Command Center · Source: Notion · Morning Brief Reports</div>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -649,28 +631,31 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 var DATA = window.VIKI_DATA || {};
 
 function $(id){ return document.getElementById(id); }
-function slug(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,""); }
 
 /* ================= DATA BINDING ================= */
-// Static, hand-curated content (connectors list, partner status, payment
-// reminder, closer) comes from viki_data.js. Everything numeric comes from
+// Every number comes from the "Morning Brief Reports" Notion database via
 // /api/viki-dashboard (see LIVE DASHBOARD DATA below) and shows "—" until
-// that loads — no invented placeholder numbers.
+// that loads. viki_data.js only supplies the spoken closer.
 
-var LIVE = { brief: null, history: [], fub: null, ops: null };
+var LIVE = { brief: null, history: [] };
 
 function esc(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
     return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
   });
 }
-function fmtNum(v){ return (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toLocaleString('en-US'); }
-function fmtMoney(v){ return (v === null || v === undefined || isNaN(v)) ? '—' : '$' + Math.round(v).toLocaleString('en-US'); }
+function isNum(v){ return v !== null && v !== undefined && !isNaN(v); }
+function fmtNum(v){ return isNum(v) ? Number(v).toLocaleString('en-US') : '—'; }
+function fmtMoney(v){ return isNum(v) ? '$' + Math.round(v).toLocaleString('en-US') : '—'; }
 function fmtWhen(iso){
   if(!iso) return '';
   var d = new Date(iso);
   if(isNaN(d)) return '';
   return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+function fmtDay(iso){
+  var d = new Date(iso);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 
 function greetingText(){
@@ -678,8 +663,7 @@ function greetingText(){
   var part = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
   return 'Good ' + part + ', Stefan.';
 }
-DATA.greeting = greetingText();
-$('subtitle').textContent = DATA.greeting;
+$('subtitle').textContent = greetingText();
 
 function tickClock(){
   var now = new Date();
@@ -689,35 +673,48 @@ function tickClock(){
 tickClock();
 setInterval(tickClock,1000);
 
-function renderConnectors(list){
-  $('connectors').innerHTML = (list||[]).map(function(c){
-    return '<li class="conn '+(c.status==='online'?'online':'offline')+'"><span class="dot"></span>'+esc(c.name)+'</li>';
-  }).join('');
+function setSource(state, text){
+  $('sourceStatus').className = 'source ' + state;
+  $('sourceText').textContent = text;
 }
-renderConnectors(DATA.connectors);
+
+/* ---- change vs the previous brief ----
+   lowerIsBetter marks metrics where a rise is bad news (overdue, bounces). */
+function deltaHtml(cur, prev, lowerIsBetter){
+  if(!isNum(cur) || !isNum(prev)) return '<div class="delta">&nbsp;</div>';
+  var d = Math.round((cur - prev) * 10) / 10;
+  if(d === 0) return '<div class="delta"><span class="ar">●</span>No change</div>';
+  var up = d > 0;
+  var cls = (up === !!lowerIsBetter) ? 'worse' : 'better';
+  return '<div class="delta '+cls+'"><span class="ar">'+(up ? '▲' : '▼')+'</span>'+
+    fmtNum(Math.abs(d))+' vs last brief</div>';
+}
 
 /* ---- stat tiles ---- */
 // opts.money: format as dollars. opts.hot: highlight when > 0 (needs
 // attention). opts.win: celebrate accent when > 0 (reserved for wins).
-function tileHtml(cls, value, label, opts){
+function tileHtml(cls, value, label, opts, extra){
   opts = opts || {};
-  var n = (value === null || value === undefined) ? null : Number(value);
+  var n = isNum(value) ? Number(value) : null;
   var state = '';
   if(n !== null && n > 0){
     if(opts.hot) state = ' hot';
     else if(opts.win) state = ' win';
   }
   var shown = opts.money ? fmtMoney(n) : fmtNum(n);
-  return '<div class="'+cls+state+'"><div class="v">'+shown+'</div><div class="l">'+esc(label)+'</div></div>';
+  return '<div class="'+cls+state+'"><div class="v">'+shown+'</div><div class="l">'+esc(label)+'</div>'+(extra||'')+'</div>';
 }
 
-function renderBriefTiles(b){
-  b = b || {};
+function renderBriefTiles(b, prev){
+  b = b || {}; prev = prev || {};
+  function kpi(key, label, opts, lowerIsBetter){
+    return tileHtml('panel kpi', b[key], label, opts, deltaHtml(b[key], prev[key], lowerIsBetter));
+  }
   $('kpiToday').innerHTML = [
-    tileHtml('panel kpi', b.tasksDueToday, 'Tasks due today', {hot:true}),
-    tileHtml('panel kpi', b.tasksOverdue, 'Tasks overdue', {hot:true}),
-    tileHtml('panel kpi', b.appointmentsToday, 'Appointments today'),
-    tileHtml('panel kpi', b.newLeads24h, 'New leads · 24h')
+    kpi('tasksDueToday', 'Tasks due today', {hot:true}, true),
+    kpi('tasksOverdue', 'Tasks overdue', {hot:true}, true),
+    kpi('appointmentsToday', 'Appointments today'),
+    kpi('newLeads24h', 'New leads · 24h')
   ].join('');
 
   $('grpActivity').innerHTML = [
@@ -760,7 +757,6 @@ function renderBriefHeader(b){
     $('briefStamp').textContent = '';
     $('modeBadge').hidden = true;
     $('todayNote').textContent = '';
-    $('numbersNote').textContent = '';
     return;
   }
   $('headlineText').textContent = b.focusToday || 'Nothing flagged — see the numbers below.';
@@ -769,15 +765,100 @@ function renderBriefHeader(b){
   $('modeBadge').hidden = b.mode !== 'DRY_RUN';
   $('datestamp').textContent = when ? 'Brief generated · ' + when : 'Brief generated';
   $('todayNote').textContent = when ? 'As of ' + when : '';
-  var note = b.sectionsFailed
-    ? b.sectionsFailed + ' section(s) failed to pull — those show “—”, not zero'
-    : (b.notes || '');
-  $('numbersNote').textContent = note;
 }
+
+function renderBriefNotes(b){
+  if(!b){ $('briefChips').innerHTML = ''; return; }
+  var chips = [];
+  if(b.mode) chips.push('<span class="bchip'+(b.mode === 'DRY_RUN' ? ' dry' : '')+'">'+esc(b.mode.replace('_',' '))+'</span>');
+  if(b.sectionsFailed) chips.push('<span class="bchip warn">✕ '+fmtNum(b.sectionsFailed)+' section'+(b.sectionsFailed === 1 ? '' : 's')+' failed</span>');
+  if(b.sectionsPartial) chips.push('<span class="bchip warn">◐ '+fmtNum(b.sectionsPartial)+' partial</span>');
+  if(!b.sectionsFailed && !b.sectionsPartial) chips.push('<span class="bchip">✓ All sections pulled</span>');
+  $('briefChips').innerHTML = chips.join('');
+  $('briefNotes').textContent = b.notes || 'No notes on this run.';
+}
+
+/* ---- trends: sparkline per metric, oldest → newest ---- */
+var TRENDS = [
+  { key:'callsYesterday',      name:'Calls',          lowerIsBetter:false },
+  { key:'textsSentYesterday',  name:'Texts sent',     lowerIsBetter:false },
+  { key:'tasksOverdue',        name:'Tasks overdue',  lowerIsBetter:true  },
+  { key:'aiCalls7d',           name:'AI calls · 7d',  lowerIsBetter:false }
+];
+
+function renderTrends(history){
+  var rows = (history || []).slice().reverse(); // chronological
+  $('trendGrid').innerHTML = TRENDS.map(function(t, i){
+    var pts = rows.filter(function(r){ return isNum(r[t.key]); });
+    var last = pts[pts.length-1], prev = pts[pts.length-2];
+    return '<div class="panel trend">'+
+      '<div class="trend-head"><span class="trend-name">'+esc(t.name)+'</span>'+
+      '<span class="trend-val">'+(last ? fmtNum(last[t.key]) : '—')+'</span></div>'+
+      deltaHtml(last && last[t.key], prev && prev[t.key], t.lowerIsBetter)+
+      (pts.length >= 2
+        ? '<div class="spark" data-i="'+i+'"></div><div class="spark-axis"><span>'+esc(fmtDay(pts[0].runTime))+'</span><span>'+esc(fmtDay(last.runTime))+'</span></div>'
+        : '<div class="trend-empty">Trend appears after two briefs.</div>')+
+    '</div>';
+  }).join('');
+  $('trendsNote').textContent = rows.length ? 'Last ' + rows.length + ' morning brief runs' : 'Recent morning brief runs';
+  drawSparks();
+}
+
+function drawSparks(){
+  var rows = (LIVE.history || []).slice().reverse();
+  document.querySelectorAll('.spark').forEach(function(el){
+    var t = TRENDS[+el.dataset.i];
+    var pts = rows.filter(function(r){ return isNum(r[t.key]); });
+    var w = el.clientWidth, h = el.clientHeight, pad = 6;
+    if(!w || pts.length < 2) return;
+    var vals = pts.map(function(r){ return Number(r[t.key]); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if(hi === lo){ hi += 1; lo -= 1; }
+    function x(i){ return pad + i * (w - pad*2) / (pts.length - 1); }
+    function y(v){ return pad + (h - pad*2) * (1 - (v - lo) / (hi - lo)); }
+    var line = vals.map(function(v,i){ return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join('');
+    var area = line + 'L' + x(vals.length-1).toFixed(1) + ',' + h + 'L' + x(0).toFixed(1) + ',' + h + 'Z';
+    var li = vals.length - 1;
+    el.innerHTML =
+      '<svg viewBox="0 0 '+w+' '+h+'" aria-hidden="true">'+
+        '<line class="base" x1="0" x2="'+w+'" y1="'+(h-0.5)+'" y2="'+(h-0.5)+'"/>'+
+        '<path class="ar-fill" d="'+area+'"/><path class="ln" d="'+line+'"/>'+
+        '<line class="hx" y1="0" y2="'+h+'" x1="0" x2="0" visibility="hidden"/>'+
+        '<circle class="end" r="4" cx="'+x(li)+'" cy="'+y(vals[li])+'"/>'+
+        '<circle class="hp" r="4" cx="0" cy="0" visibility="hidden"/>'+
+      '</svg><div class="spark-tip"></div>';
+    el.setAttribute('role','img');
+    el.setAttribute('aria-label', t.name + ' over the last ' + vals.length + ' briefs: ' + vals.join(', '));
+    var hx = el.querySelector('.hx'), hp = el.querySelector('.hp'), tip = el.querySelector('.spark-tip');
+    function show(e){
+      var r = el.getBoundingClientRect();
+      var i = Math.round((e.clientX - r.left - pad) / ((w - pad*2) / (pts.length - 1)));
+      i = Math.max(0, Math.min(pts.length - 1, i));
+      hx.setAttribute('x1', x(i)); hx.setAttribute('x2', x(i));
+      hp.setAttribute('cx', x(i)); hp.setAttribute('cy', y(vals[i]));
+      tip.innerHTML = '<b>'+fmtNum(vals[i])+'</b> <span>· '+esc(fmtWhen(pts[i].runTime))+'</span>';
+      tip.style.left = Math.max(60, Math.min(w - 60, x(i))) + 'px';
+      tip.classList.add('show');
+      hx.setAttribute('visibility','visible'); hp.setAttribute('visibility','visible');
+    }
+    function hide(){
+      tip.classList.remove('show');
+      hx.setAttribute('visibility','hidden'); hp.setAttribute('visibility','hidden');
+    }
+    el.onpointermove = show; el.onpointerdown = show; el.onpointerleave = hide;
+  });
+}
+var sparkResizeTimer = null;
+window.addEventListener('resize', function(){
+  clearTimeout(sparkResizeTimer);
+  sparkResizeTimer = setTimeout(drawSparks, 150);
+});
+renderTrends(null);
 
 function renderHistory(rows){
   var el = $('hist');
-  if(!rows || !rows.length){
+  rows = (rows || []).slice(0, 7);
+  if(!rows.length){
     el.innerHTML = '<tbody><tr><td class="empty-note" style="text-align:left">No briefs recorded yet.</td></tr></tbody>';
     return;
   }
@@ -798,89 +879,26 @@ function renderHistory(rows){
 }
 renderHistory(null);
 
-/* ---- work queue ---- */
-function renderPriorities(list){
-  var el = $('priorityList');
-  if(!list || !list.length){
-    el.innerHTML = '<li class="empty-note">Nothing overdue or due today in the Notion trackers.</li>';
-    return;
-  }
-  el.innerHTML = list.map(function(p){
-    var when = p.bucket ? ' <span style="color:var(--blue-3)">· '+esc(p.bucket)+'</span>' : '';
-    return '<li class="priority-item urgency-'+slug(p.urgency)+'"><span class="pdot"></span><span class="tag">'+esc(p.tag)+'</span><span class="ptext">'+esc(p.label)+when+'</span></li>';
-  }).join('');
-}
-$('priorityList').innerHTML = '<li class="empty-note">Loading…</li>';
-
-function renderTaskCounts(tc){
-  tc = tc || {};
-  function c(v, label, hot){
-    var n = (v === null || v === undefined) ? null : v;
-    return '<div class="tc'+(hot && n > 0 ? ' hot' : '')+'"><div class="v">'+fmtNum(n)+'</div><div class="l">'+label+'</div></div>';
-  }
-  $('taskCounts').innerHTML =
-    c(tc.overdue, 'Overdue', true) + c(tc.dueToday, 'Due today', true) +
-    c(tc.upNext, 'Up next') + c(tc.finished, 'Done today');
-}
-renderTaskCounts(null);
-$('pqSub').textContent = 'FUB OPEN TASKS';
-
-var TIER_HOT = { Hot: true };
-function renderLeadTiers(tiers, newLeadsToday){
-  var el = $('leadTiers');
-  if(!tiers || !tiers.length){
-    el.innerHTML = '<div class="empty-note">Lead tiers load from Follow Up Boss…</div>';
-    $('tierFoot').innerHTML = '';
-    return;
-  }
-  var max = Math.max.apply(null, tiers.map(function(t){ return t.count; }).concat([1]));
-  el.innerHTML = tiers.map(function(t){
-    var pct = Math.round((t.count / max) * 100);
-    return '<div class="bar-row'+(TIER_HOT[t.tier] ? ' t-hot' : '')+'"><div class="bar-label"><span>'+esc(t.tier)+'</span><span class="bar-value">'+fmtNum(t.count)+'</span></div>'+
-           '<div class="bar-track"><div class="bar-fill" data-pct="'+pct+'"></div></div></div>';
-  }).join('');
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){
-    el.querySelectorAll('.bar-fill').forEach(function(f){ f.style.width = f.dataset.pct + '%'; });
-  }); });
-  $('tierFoot').innerHTML = 'New leads today: <b>'+fmtNum(newLeadsToday)+'</b>';
-}
-renderLeadTiers(null);
-
-$('sponsorList').innerHTML = (DATA.sponsors||[]).map(function(s){
-  return '<li class="sponsor-item"><div class="sponsor-top"><span class="sname">'+esc(s.name)+'</span>'+
-         '<span class="sstatus status-'+slug(s.status)+(s.celebrate?' celebrate':'')+'">'+esc(s.status)+'</span></div>'+
-         '<div class="sdetail">'+esc(s.detail)+'</div></li>';
-}).join('');
-
-if(DATA.paymentDue){
-  $('paymentChip').innerHTML =
-    '<span class="chip-dot"></span><span class="chip-label">'+esc(DATA.paymentDue.label)+'</span>'+
-    '<span class="chip-amount">'+esc(DATA.paymentDue.amount)+'</span>'+
-    '<span class="chip-date">Due '+esc(DATA.paymentDue.date)+'</span>';
-} else {
-  $('paymentChip').style.display = 'none';
-}
-
-/* ticker: focus line + partner status + priorities + closer, looped twice for seamless scroll */
+/* ticker: focus line + key numbers + closer, looped twice for seamless scroll */
+DATA.headline = '';
 function renderTicker(){
-  var parts = [];
-  if(DATA.headline) parts.push(esc(DATA.headline));
-  (DATA.sponsors||[]).forEach(function(s){
-    var t = esc(s.name.toUpperCase()+': '+s.status);
-    parts.push(s.celebrate ? '<span class="celebrate-tick">★ '+t+'</span>' : t);
-  });
-  (DATA.priorities||[]).forEach(function(p){ parts.push(esc(p.label)); });
+  var b = LIVE.brief, parts = [];
+  if(b){
+    if(b.focusToday) parts.push(esc(b.focusToday));
+    if(isNum(b.callsYesterday)) parts.push(fmtNum(b.callsYesterday) + ' CALLS YESTERDAY');
+    if(isNum(b.openDeals)) parts.push(fmtNum(b.openDeals) + ' OPEN DEALS');
+    if(isNum(b.commissionClosed30d) && b.commissionClosed30d > 0)
+      parts.push('<span class="celebrate-tick">★ ' + fmtMoney(b.commissionClosed30d) + ' COMMISSION CLOSED · 30D</span>');
+  } else {
+    parts.push('SYNCING THE LATEST MORNING BRIEF');
+  }
   if(DATA.closer) parts.push(esc(DATA.closer));
   var text = parts.join('   •   ');
   $('ticker').innerHTML = '<span>'+text+'</span><span aria-hidden="true">'+text+'</span>';
 }
-// Until live data arrives there's no real focus line or priority list to
-// scroll — start with just the curated partner status + closer.
-DATA.headline = '';
-DATA.priorities = [];
 renderTicker();
 
-/* activity stream: real events only — sync results and voice Q&A */
+/* V.I.K.I. log: real events only — sync results and voice Q&A */
 var logListEl = $('logList');
 function appendLogLine(text, celebrate, warn){
   var li = document.createElement('li');
@@ -889,10 +907,10 @@ function appendLogLine(text, celebrate, warn){
   li.innerHTML = '<span class="log-time">'+time+'</span><span class="log-text">'+(celebrate?'★ ':'')+esc(text)+'</span>';
   logListEl.insertBefore(li, logListEl.firstChild);
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ li.classList.add('show'); }); });
-  while(logListEl.children.length > 8){ logListEl.removeChild(logListEl.lastChild); }
+  while(logListEl.children.length > 6){ logListEl.removeChild(logListEl.lastChild); }
   return li;
 }
-appendLogLine('V.I.K.I. online — syncing live data');
+appendLogLine('V.I.K.I. online — syncing the morning brief');
 
 /* ================= TOAST ================= */
 var toastEl = $('toast');
@@ -907,10 +925,18 @@ function showToast(text, ms){
 var handleSpeaking = false;
 
 $('handleBtn').addEventListener('click', function(){
-  var top = (DATA.priorities||[])[0];
-  var text = top
-    ? ('Top priority right now: ' + top.label + '.' + (top.tag ? ' Tagged ' + top.tag + (top.urgency ? ', ' + top.urgency + ' urgency.' : '.') : ''))
-    : "You're all caught up — nothing urgent in the priority queue right now.";
+  var b = LIVE.brief;
+  var text;
+  if(!b){
+    text = "I don't have this morning's brief yet — try SYNC.";
+  } else if(b.focusToday){
+    text = 'Start here: ' + String(b.focusToday).replace(/[.\s]+$/,'') + '.';
+    if(b.tasksOverdue) text += ' You also have ' + fmtNum(b.tasksOverdue) + ' overdue tasks to clear.';
+  } else if(b.tasksOverdue){
+    text = 'Start with your ' + fmtNum(b.tasksOverdue) + ' overdue tasks.';
+  } else {
+    text = "You're all caught up — nothing urgent in this morning's brief.";
+  }
   typeIntoTerminal(text);
   handleSpeaking = true;
   recomputeSpeaking();
@@ -977,8 +1003,6 @@ function buildBriefText(){
   } else {
     parts.push("I don't have this morning's brief yet.");
   }
-  var top = (DATA.priorities||[])[0];
-  if(top) parts.push('Top priority: ' + top.label + '.');
   if(DATA.closer) parts.push(DATA.closer);
   return parts.join(' ');
 }
@@ -1323,9 +1347,7 @@ typeInput.addEventListener('keydown', function(e){
 
 /* ================= LIVE DASHBOARD DATA ================= */
 // Fetches /api/viki-dashboard: the latest Morning Brief Reports rows from
-// Notion (KPIs, numbers, history), live FUB task counts + lead tiers, and the
-// Notion ops trackers (priority queue). Every source is independent — one
-// failing only dims its connector dot and leaves its panel showing "—".
+// Notion. A failed sync keeps whatever was last rendered and says why.
 var refreshBtn = $('refreshBtn');
 var liveDashboardLoading = false;
 
@@ -1341,70 +1363,43 @@ async function loadLiveDashboard(){
   setSyncing(true);
 
   var controller = new AbortController();
-  var timeoutId = setTimeout(function(){ controller.abort(); }, 65000);
+  var timeoutId = setTimeout(function(){ controller.abort(); }, 30000);
 
   try {
     var res = await fetch('/api/viki-dashboard', { signal: controller.signal });
     var data = await res.json().catch(function(){ return null; });
     if(!data){ throw new Error('bad_json'); }
 
-    var fubOk = !!(data.fub && data.fub.ok);
-    var notionOk = !!((data.ops && data.ops.ok) || (data.brief && data.brief.ok));
-    renderConnectors((DATA.connectors||[]).map(function(c){
-      var status = c.status;
-      if(c.name === 'Follow Up Boss') status = fubOk ? 'online' : 'offline';
-      if(c.name === 'Notion') status = notionOk ? 'online' : 'offline';
-      return { name: c.name, status: status };
-    }));
-
-    var briefNote = 'Morning brief unavailable';
-    if(data.brief && data.brief.available && data.brief.latest){
-      LIVE.brief = data.brief.latest;
-      LIVE.history = data.brief.history || [];
-      renderBriefTiles(LIVE.brief);
+    var brief = data.brief || {};
+    if(brief.available && brief.latest){
+      LIVE.brief = brief.latest;
+      LIVE.history = brief.history || [];
+      renderBriefTiles(LIVE.brief, LIVE.history[1]);
       renderBriefHeader(LIVE.brief);
+      renderBriefNotes(LIVE.brief);
+      renderTrends(LIVE.history);
       renderHistory(LIVE.history);
       DATA.headline = LIVE.brief.focusToday || '';
-      briefNote = 'Morning brief ' + fmtWhen(LIVE.brief.runTime);
-    } else if(!LIVE.brief){
-      renderBriefHeader(null);
-      $('headlineText').textContent = 'Morning brief unavailable — share “Morning Brief Reports” with the Notion integration.';
-      appendLogLine('Morning brief not reachable' + (data.brief && data.brief.error ? ' (' + data.brief.error + ')' : ''), false, true);
-    }
-
-    if(data.ops && data.ops.ok){
-      LIVE.ops = data.ops;
-      var items = data.ops.items || [];
-      var urgent = items.filter(function(i){ return i.bucket === 'Overdue' || i.bucket === 'Due Today'; });
-      DATA.priorities = (urgent.length ? urgent : items).slice(0, 8);
-      renderPriorities(DATA.priorities);
-    } else if(!LIVE.ops){
-      $('priorityList').innerHTML = '<li class="empty-note">Notion ops trackers unavailable.</li>';
-    }
-
-    if(fubOk){
-      LIVE.fub = data.fub;
-      renderTaskCounts(data.fub.taskCounts);
-      renderLeadTiers(data.fub.leadTiers, data.fub.newLeadsToday);
-    } else if(!LIVE.fub){
-      // Fall back to the morning brief's task counts so the queue isn't blank.
-      if(LIVE.brief){
-        renderTaskCounts({ overdue: LIVE.brief.tasksOverdue, dueToday: LIVE.brief.tasksDueToday });
-        $('pqSub').textContent = 'FROM MORNING BRIEF';
+      setSource('online', 'Notion · synced ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}));
+      appendLogLine('Synced — morning brief ' + fmtWhen(LIVE.brief.runTime));
+    } else {
+      var why = brief.error ? ' (' + brief.error + ')' : '';
+      setSource(LIVE.brief ? 'online' : 'offline', 'Notion · ' + (brief.ok ? 'no briefs yet' : 'unreachable'));
+      if(!LIVE.brief){
+        renderBriefHeader(null);
+        $('headlineText').textContent = brief.ok
+          ? 'No morning briefs recorded yet.'
+          : 'Morning brief unavailable — check the Notion connection.';
       }
-      $('leadTiers').innerHTML = '<div class="empty-note">Follow Up Boss unavailable right now.</div>';
+      appendLogLine('Morning brief not reachable' + why, false, true);
     }
-
     renderTicker();
-    function why(src){ return src && src.error ? ' (' + src.error + ')' : ''; }
-    appendLogLine('Synced — FUB ' + (fubOk ? '✓' : '✗' + why(data.fub)) +
-      ' · Notion ops ' + (data.ops && data.ops.ok ? '✓' : '✗' + why(data.ops)) +
-      ' · ' + briefNote, false, !(fubOk && data.ops && data.ops.ok));
     console.log('[VIKI] dashboard refreshed', data);
   } catch(err){
     console.error('[VIKI] dashboard live refresh failed:', err.name, err.message);
-    // Keep whatever was last rendered; just note the failure in the stream.
-    appendLogLine('Live sync failed — showing last known data', false, true);
+    // Keep whatever was last rendered; just note the failure.
+    if(!LIVE.brief) setSource('offline', 'Notion · sync failed');
+    appendLogLine('Sync failed — showing last known data', false, true);
   } finally {
     clearTimeout(timeoutId);
     setSyncing(false);

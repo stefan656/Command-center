@@ -2,9 +2,6 @@
   "functions": {
     "api/viki-respond.js": {
       "maxDuration": 30
-    },
-    "api/viki-dashboard.js": {
-      "maxDuration": 60
     }
   }
 }
