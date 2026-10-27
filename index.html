@@ -1341,7 +1341,7 @@ async function loadLiveDashboard(){
   setSyncing(true);
 
   var controller = new AbortController();
-  var timeoutId = setTimeout(function(){ controller.abort(); }, 30000);
+  var timeoutId = setTimeout(function(){ controller.abort(); }, 65000);
 
   try {
     var res = await fetch('/api/viki-dashboard', { signal: controller.signal });
@@ -1387,11 +1387,19 @@ async function loadLiveDashboard(){
       renderTaskCounts(data.fub.taskCounts);
       renderLeadTiers(data.fub.leadTiers, data.fub.newLeadsToday);
     } else if(!LIVE.fub){
+      // Fall back to the morning brief's task counts so the queue isn't blank.
+      if(LIVE.brief){
+        renderTaskCounts({ overdue: LIVE.brief.tasksOverdue, dueToday: LIVE.brief.tasksDueToday });
+        $('pqSub').textContent = 'FROM MORNING BRIEF';
+      }
       $('leadTiers').innerHTML = '<div class="empty-note">Follow Up Boss unavailable right now.</div>';
     }
 
     renderTicker();
-    appendLogLine('Synced — FUB ' + (fubOk ? '✓' : '✗') + ' · Notion ' + (notionOk ? '✓' : '✗') + ' · ' + briefNote, false, !(fubOk && notionOk));
+    function why(src){ return src && src.error ? ' (' + src.error + ')' : ''; }
+    appendLogLine('Synced — FUB ' + (fubOk ? '✓' : '✗' + why(data.fub)) +
+      ' · Notion ops ' + (data.ops && data.ops.ok ? '✓' : '✗' + why(data.ops)) +
+      ' · ' + briefNote, false, !(fubOk && data.ops && data.ops.ok));
     console.log('[VIKI] dashboard refreshed', data);
   } catch(err){
     console.error('[VIKI] dashboard live refresh failed:', err.name, err.message);

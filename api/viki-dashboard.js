@@ -27,7 +27,7 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
 const MODEL = 'claude-opus-5';
-const REQUEST_TIMEOUT_MS = 28000;
+const REQUEST_TIMEOUT_MS = 50000;
 const NOTION_VERSION = '2025-09-03';
 
 const RE_OPS_DATA_SOURCE_ID = '9b37c9e1-339a-48e6-9844-4ccc186c3213';
@@ -151,7 +151,8 @@ async function fetchFubData() {
     message = await client.beta.messages.create(params, { signal: controller.signal });
   } catch (err) {
     console.error('viki-dashboard: FUB fetch failed', err?.status, err?.message || err);
-    return { ok: false, error: 'upstream_failure' };
+    if (controller.signal.aborted) return { ok: false, error: 'timeout' };
+    return { ok: false, error: err?.status ? 'anthropic_http_' + err.status : 'upstream_failure' };
   } finally {
     clearTimeout(timeout);
   }
@@ -192,7 +193,7 @@ async function fetchFubData() {
   if (!stagesBody || !openTasksBody || !doneTasksBody || !newLeadsBody) {
     console.error('viki-dashboard: one or more FUB calls did not return a parseable body',
       { stages: !!stagesBody, openTasks: !!openTasksBody, doneTasks: !!doneTasksBody, newLeads: !!newLeadsBody });
-    return { ok: false, error: 'incomplete_data' };
+    return { ok: false, error: 'incomplete_data (' + resultBlocks.length + ' of ' + calls.length + ' calls returned, stop=' + message.stop_reason + ')' };
   }
 
   // Lead tiers, from /v1/stages' live peopleCount per stage.
@@ -265,6 +266,18 @@ async function notionQuery(dataSourceId, body) {
   }
 }
 
+// Short, user-readable reason for a failed Notion call, shown in the
+// dashboard's Activity Stream.
+function notionErrorCode(err) {
+  const msg = err?.message || '';
+  if (msg === 'notion_not_configured') return 'server_not_configured';
+  if (err?.name === 'AbortError') return 'timeout';
+  if (msg.startsWith('notion_http_404')) return 'not_shared_with_integration';
+  if (msg.startsWith('notion_http_401')) return 'bad_token';
+  const m = msg.match(/^notion_http_(\d+)/);
+  return m ? 'notion_http_' + m[1] : 'upstream_failure';
+}
+
 function notionPlainText(richTextArray) {
   return (richTextArray || []).map((t) => t.plain_text || '').join('').trim();
 }
@@ -314,7 +327,7 @@ async function fetchOpsPanel() {
     return { ok: true, error: null, items };
   } catch (err) {
     console.error('viki-dashboard: Notion ops trackers failed', err.message);
-    return { ok: false, error: err.message === 'notion_not_configured' ? 'server_not_configured' : 'upstream_failure', items: [] };
+    return { ok: false, error: notionErrorCode(err), items: [] };
   }
 }
 
@@ -380,7 +393,7 @@ async function fetchMorningBrief() {
     return { ok: true, available: true, error: null, latest: history[0], history };
   } catch (err) {
     console.error('viki-dashboard: Morning Brief lookup failed', err.message);
-    return { ok: false, available: false, error: 'upstream_failure', latest: null, history: [] };
+    return { ok: false, available: false, error: notionErrorCode(err), latest: null, history: [] };
   }
 }
 
