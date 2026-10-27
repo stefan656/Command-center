@@ -2,7 +2,7 @@
 // Vercel serverless function: read-only live-data feed for the V.I.K.I. dashboard.
 //
 // Returns a JSON object the frontend overlays onto the static content already
-// loaded from viki_data.js (greeting, sponsors, activity log, etc. stay
+// loaded from viki_data.js (connectors, sponsors, payment reminder stay
 // hand-curated there — this endpoint only covers the fields below, which are
 // genuinely computable from live sources).
 //
@@ -15,9 +15,9 @@
 // New env var for this endpoint:
 //   NOTION_API_KEY           - Notion internal integration token (ntn_...). The
 //                              integration must be explicitly shared with the
-//                              RE Ops Micro Tracker, BD Tracker, and FUB Daily
-//                              Stats pages in Notion itself — a token alone
-//                              grants no access to any of them.
+//                              RE Ops Micro Tracker, BD Tracker, and Morning
+//                              Brief Reports pages in Notion itself — a token
+//                              alone grants no access to any of them.
 //
 // Every section is independent and best-effort: if Follow Up Boss, Notion ops
 // trackers, or the Notion daily-stats database fail or are unavailable, that
@@ -32,7 +32,7 @@ const NOTION_VERSION = '2025-09-03';
 
 const RE_OPS_DATA_SOURCE_ID = '9b37c9e1-339a-48e6-9844-4ccc186c3213';
 const BD_TRACKER_DATA_SOURCE_ID = '544a2381-5586-42ca-b446-7c83ea838e1d';
-const DAILY_STATS_DATA_SOURCE_ID = 'dd3031d0-52c0-45cc-8425-b22ca2e19d44';
+const MORNING_BRIEF_DATA_SOURCE_ID = '171cf501-39d5-4809-a129-7243c93bc45e';
 
 // Every FUB stage name in this account, bucketed into the six tiers the
 // dashboard shows. Matched by exact name against live GET /v1/stages output
@@ -318,45 +318,69 @@ async function fetchOpsPanel() {
   }
 }
 
-// "FUB Daily Stats" exists (DAILY_STATS_DATA_SOURCE_ID above) but starts
-// empty until something writes a daily row into it. Any failure here (no
-// rows yet, bad schema, request error) degrades to available:false rather
-// than failing the request, per spec — so an empty table today reads as
-// "pending", not broken.
-async function fetchDailyStats() {
-  const notionKey = process.env.NOTION_API_KEY;
-  if (!notionKey) return { ok: false, available: false, error: 'server_not_configured' };
+// Notion number property name -> key in the API response. Every field the
+// Morning Brief skill writes per run.
+const BRIEF_NUMBER_FIELDS = {
+  'Tasks due today': 'tasksDueToday',
+  'Tasks overdue': 'tasksOverdue',
+  'Appointments today': 'appointmentsToday',
+  'New leads 24h': 'newLeads24h',
+  'New leads 7d': 'newLeads7d',
+  'New leads 30d': 'newLeads30d',
+  'Calls yesterday': 'callsYesterday',
+  'Outbound calls 7d avg': 'outboundCalls7dAvg',
+  'Texts sent yesterday': 'textsSentYesterday',
+  'Texts received yesterday': 'textsReceivedYesterday',
+  'Emails delivered': 'emailsDelivered',
+  'Emails failed': 'emailsFailed',
+  'Open deals': 'openDeals',
+  'Expected commission': 'expectedCommission',
+  'Closed deals 30d': 'closedDeals30d',
+  'Commission closed 30d': 'commissionClosed30d',
+  'AI calls 7d': 'aiCalls7d',
+  'AI calls reached': 'aiCallsReached',
+  'Sellers interested 7d': 'sellersInterested7d',
+  'Opt-outs 7d': 'optOuts7d',
+  'Zero-list total': 'zeroListTotal',
+  'Cash-offer list total': 'cashOfferListTotal',
+  'Active drip plans': 'activeDripPlans',
+  'People in drips': 'peopleInDrips',
+  'Sections failed': 'sectionsFailed',
+  'Sections partial': 'sectionsPartial'
+};
+
+function briefRowToJson(row) {
+  const props = row.properties || {};
+  const out = {
+    runTime: props['Run time']?.date?.start || row.created_time || null,
+    mode: props.Mode?.select?.name || null,
+    focusToday: notionPlainText(props['Focus today']?.rich_text) || null,
+    notes: notionPlainText(props.Notes?.rich_text) || null
+  };
+  for (const [prop, key] of Object.entries(BRIEF_NUMBER_FIELDS)) {
+    out[key] = typeof props[prop]?.number === 'number' ? props[prop].number : null;
+  }
+  return out;
+}
+
+// "Morning Brief Reports" is written by the SMRE Morning Brief skill, one row
+// per run. Returns the newest run plus a short history for the trend table.
+// No rows / any failure degrades to available:false rather than failing the
+// whole request, so the dashboard shows placeholders instead of breaking.
+async function fetchMorningBrief() {
+  if (!process.env.NOTION_API_KEY) return { ok: false, available: false, error: 'server_not_configured', latest: null, history: [] };
 
   try {
-    const rows = await notionQuery(DAILY_STATS_DATA_SOURCE_ID, {
-      page_size: 1,
-      sorts: [{ property: 'Date', direction: 'descending' }]
+    const rows = await notionQuery(MORNING_BRIEF_DATA_SOURCE_ID, {
+      page_size: 7,
+      sorts: [{ property: 'Run time', direction: 'descending' }]
     });
-    const row = rows.results?.[0];
-    if (!row) {
-      return { ok: true, available: false, error: null, calls: null, texts: null, conversations: null, confirmedSellers: null, newLeads: null, lastUpdated: null };
-    }
-
-    const props = row.properties || {};
-    const num = (key) => (typeof props[key]?.number === 'number' ? props[key].number : null);
-    // "Last Updated" is a real date property on this database (set by
-    // whatever writes the daily row), not Notion's own edit timestamp —
-    // fall back to last_edited_time only if that property is ever left blank.
-    const lastUpdated = props['Last Updated']?.date?.start || row.last_edited_time || null;
-    return {
-      ok: true,
-      available: true,
-      error: null,
-      calls: num('Calls'),
-      texts: num('Texts'),
-      conversations: num('Conversations'),
-      confirmedSellers: num('Confirmed Sellers'),
-      newLeads: num('New Leads'),
-      lastUpdated
-    };
+    const history = (rows.results || []).map(briefRowToJson);
+    if (!history.length) return { ok: true, available: false, error: null, latest: null, history: [] };
+    return { ok: true, available: true, error: null, latest: history[0], history };
   } catch (err) {
-    console.error('viki-dashboard: FUB Daily Stats lookup failed', err.message);
-    return { ok: false, available: false, error: 'upstream_failure', calls: null, texts: null, conversations: null, confirmedSellers: null, newLeads: null, lastUpdated: null };
+    console.error('viki-dashboard: Morning Brief lookup failed', err.message);
+    return { ok: false, available: false, error: 'upstream_failure', latest: null, history: [] };
   }
 }
 
@@ -366,16 +390,16 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed. Use GET.' });
   }
 
-  const [fub, ops, dailyStats] = await Promise.all([
+  const [fub, ops, brief] = await Promise.all([
     fetchFubData().catch((err) => { console.error('viki-dashboard: fub threw', err); return { ok: false, error: 'unexpected_error' }; }),
     fetchOpsPanel(),
-    fetchDailyStats()
+    fetchMorningBrief()
   ]);
 
   return res.status(200).json({
     generatedAt: new Date().toISOString(),
     fub,
     ops,
-    dailyStats
+    brief
   });
 };
