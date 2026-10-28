@@ -257,6 +257,27 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
 .spark-axis{display:flex;justify-content:space-between;margin-top:6px;font-size:9px;letter-spacing:1px;color:var(--blue-3);text-transform:uppercase}
 .trend-empty{font-size:11px;color:var(--blue-3);padding:26px 0}
 
+/* -- text delivery: rate vs 95% target, failed counts, trend -- */
+.deliv{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1.3fr);gap:24px;align-items:center;padding:22px 22px 18px}
+.deliv.below{border-color:rgba(255,95,109,.45);box-shadow:0 0 22px rgba(255,95,109,.12), inset 0 0 30px rgba(255,95,109,.05)}
+.dv-rate .v{font-family:'Orbitron',sans-serif;font-size:clamp(40px,4.6vw,60px);font-weight:800;line-height:1;color:var(--blue-0);text-shadow:var(--glow);font-variant-numeric:tabular-nums}
+.deliv.below .dv-rate .v{color:#ffb3b9;text-shadow:0 0 10px rgba(255,95,109,.6),0 0 26px rgba(255,95,109,.25)}
+.dv-rate .l{font-size:10px;letter-spacing:1.5px;color:var(--blue-2);text-transform:uppercase;margin-top:10px}
+.dv-status{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:2px;border:1px solid rgba(140,180,230,.35);color:var(--blue-1)}
+.deliv.below .dv-status{border-color:rgba(255,95,109,.5);color:#ffb3b9}
+.meter{position:relative;height:6px;margin-top:16px;background:rgba(140,180,230,.1);border-radius:3px}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--blue-dim),var(--blue-1));box-shadow:0 0 8px rgba(79,166,255,.5);width:0;transition:width 1s ease}
+.deliv.below .meter .fill{background:linear-gradient(90deg,#7a2a33,var(--red));box-shadow:0 0 8px rgba(255,95,109,.55)}
+.meter .tgt{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--blue-0);box-shadow:0 0 6px rgba(200,225,255,.8)}
+.meter-scale{position:relative;height:14px;margin-top:6px;font-size:9px;letter-spacing:1px;color:var(--blue-3)}
+.meter-scale span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.dv-counts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+.dv-spark .trend-name{display:block;margin-bottom:2px}
+.spark .tl{stroke:rgba(200,225,255,.55);stroke-width:1;stroke-dasharray:4 4}
+.spark .tl-l{fill:var(--blue-2);font-size:9px;letter-spacing:1px;font-family:'Share Tech Mono',monospace}
+.dv-wait{grid-column:1/-1;font-size:12px;line-height:1.6;color:var(--blue-2)}
+.dv-wait b{color:var(--blue-0);font-weight:400}
+
 /* -- brief notes + log -- */
 .duo{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
 .brief-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
@@ -467,6 +488,8 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .trend-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .duo{grid-template-columns:1fr}
+  .deliv{grid-template-columns:1fr 1fr}
+  .dv-spark{grid-column:1/-1}
 }
 @media (max-width:760px){
   .hero{height:clamp(520px,88vh,760px)}
@@ -480,6 +503,7 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
   .kpi{padding:16px 14px 14px}
   .stat-groups{grid-template-columns:1fr}
   .kpi .v{font-size:34px}
+  .deliv{grid-template-columns:1fr;gap:20px}
   .handle-btn{display:none}
   .bottom-bar{gap:12px;padding:0 14px}
   .brief-btn{padding:12px 18px;font-size:11px;letter-spacing:2px}
@@ -538,6 +562,14 @@ h1,h2,.mono-head{font-family:'Orbitron',sans-serif}
       <span class="section-note" id="todayNote"></span>
     </div>
     <div class="kpi-row" id="kpiToday"></div>
+  </section>
+
+  <section aria-labelledby="h-texts">
+    <div class="section-head">
+      <h2 id="h-texts">TEXT DELIVERY</h2>
+      <span class="section-note">Follow Up Boss · target 95%+</span>
+    </div>
+    <div class="panel deliv" id="deliv"></div>
   </section>
 
   <section aria-labelledby="h-trends">
@@ -680,14 +712,14 @@ function setSource(state, text){
 
 /* ---- change vs the previous brief ----
    lowerIsBetter marks metrics where a rise is bad news (overdue, bounces). */
-function deltaHtml(cur, prev, lowerIsBetter){
+function deltaHtml(cur, prev, lowerIsBetter, unit){
   if(!isNum(cur) || !isNum(prev)) return '<div class="delta">&nbsp;</div>';
   var d = Math.round((cur - prev) * 10) / 10;
   if(d === 0) return '<div class="delta"><span class="ar">●</span>No change</div>';
   var up = d > 0;
   var cls = (up === !!lowerIsBetter) ? 'worse' : 'better';
   return '<div class="delta '+cls+'"><span class="ar">'+(up ? '▲' : '▼')+'</span>'+
-    fmtNum(Math.abs(d))+' vs last brief</div>';
+    fmtNum(Math.abs(d))+(unit || '')+' vs last brief</div>';
 }
 
 /* ---- stat tiles ---- */
@@ -778,57 +810,125 @@ function renderBriefNotes(b){
   $('briefNotes').textContent = b.notes || 'No notes on this run.';
 }
 
-/* ---- trends: sparkline per metric, oldest → newest ---- */
-var TRENDS = [
-  { key:'callsYesterday',      name:'Calls',          lowerIsBetter:false },
-  { key:'textsSentYesterday',  name:'Texts sent',     lowerIsBetter:false },
-  { key:'tasksOverdue',        name:'Tasks overdue',  lowerIsBetter:true  },
-  { key:'aiCalls7d',           name:'AI calls · 7d',  lowerIsBetter:false }
-];
+/* ---- sparkline series: get() pulls the value from a brief row ---- */
+var DELIVERY_TARGET = 95;
+function deliveryRate(r){
+  if(!r || !isNum(r.textsSent7d) || !isNum(r.textsFailed7d) || r.textsSent7d <= 0) return null;
+  return Math.round((r.textsSent7d - r.textsFailed7d) / r.textsSent7d * 1000) / 10;
+}
+function fmtPct(v){ return isNum(v) ? (Math.round(v * 10) / 10) + '%' : '—'; }
+
+var SERIES = {
+  calls:   { name:'Calls',         get:function(r){ return r.callsYesterday; } },
+  texts:   { name:'Texts sent',    get:function(r){ return r.textsSentYesterday; } },
+  overdue: { name:'Tasks overdue', get:function(r){ return r.tasksOverdue; }, lowerIsBetter:true },
+  ai:      { name:'AI calls · 7d', get:function(r){ return r.aiCalls7d; } },
+  deliv:   { name:'Delivery rate', get:deliveryRate, fmt:fmtPct, target:DELIVERY_TARGET }
+};
+var TRENDS = ['calls', 'texts', 'overdue', 'ai'];
+
+function seriesPoints(id){
+  var s = SERIES[id];
+  return (LIVE.history || []).slice().reverse() // chronological
+    .filter(function(r){ return isNum(s.get(r)); });
+}
+function sparkHtml(id, pts){
+  return pts.length >= 2
+    ? '<div class="spark" data-s="'+id+'"></div><div class="spark-axis"><span>'+esc(fmtDay(pts[0].runTime))+'</span><span>'+esc(fmtDay(pts[pts.length-1].runTime))+'</span></div>'
+    : '<div class="trend-empty">Trend appears after two briefs.</div>';
+}
 
 function renderTrends(history){
-  var rows = (history || []).slice().reverse(); // chronological
-  $('trendGrid').innerHTML = TRENDS.map(function(t, i){
-    var pts = rows.filter(function(r){ return isNum(r[t.key]); });
+  $('trendGrid').innerHTML = TRENDS.map(function(id){
+    var s = SERIES[id], pts = seriesPoints(id);
     var last = pts[pts.length-1], prev = pts[pts.length-2];
     return '<div class="panel trend">'+
-      '<div class="trend-head"><span class="trend-name">'+esc(t.name)+'</span>'+
-      '<span class="trend-val">'+(last ? fmtNum(last[t.key]) : '—')+'</span></div>'+
-      deltaHtml(last && last[t.key], prev && prev[t.key], t.lowerIsBetter)+
-      (pts.length >= 2
-        ? '<div class="spark" data-i="'+i+'"></div><div class="spark-axis"><span>'+esc(fmtDay(pts[0].runTime))+'</span><span>'+esc(fmtDay(last.runTime))+'</span></div>'
-        : '<div class="trend-empty">Trend appears after two briefs.</div>')+
+      '<div class="trend-head"><span class="trend-name">'+esc(s.name)+'</span>'+
+      '<span class="trend-val">'+(last ? fmtNum(s.get(last)) : '—')+'</span></div>'+
+      deltaHtml(last && s.get(last), prev && s.get(prev), s.lowerIsBetter)+
+      sparkHtml(id, pts)+
     '</div>';
   }).join('');
-  $('trendsNote').textContent = rows.length ? 'Last ' + rows.length + ' morning brief runs' : 'Recent morning brief runs';
+  var n = (history || []).length;
+  $('trendsNote').textContent = n ? 'Last ' + n + ' morning brief runs' : 'Recent morning brief runs';
+  drawSparks();
+}
+
+/* ---- text delivery panel ---- */
+function renderDelivery(b){
+  var el = $('deliv');
+  b = b || {};
+  var rate = deliveryRate(b);
+  var tracked = rate !== null || isNum(b.textsFailedYesterday);
+  if(!tracked){
+    el.className = 'panel deliv';
+    el.innerHTML = '<div class="dv-wait">'+(LIVE.brief
+      ? 'Not tracked yet. The morning brief doesn\'t record failed texts so far — once the agent fills in <b>Texts failed yesterday</b>, <b>Texts sent 7d</b> and <b>Texts failed 7d</b> in Morning Brief Reports, the delivery rate shows here.'
+      : 'Waiting on the latest morning brief…')+'</div>';
+    return;
+  }
+  var below = rate !== null && rate < DELIVERY_TARGET;
+  el.className = 'panel deliv' + (below ? ' below' : '');
+  var pts = seriesPoints('deliv');
+  var prev = pts.length >= 2 ? deliveryRate(pts[pts.length-2]) : null;
+  var status = rate === null ? '' :
+    '<div class="dv-status">'+(below
+      ? '✕ ' + fmtPct(DELIVERY_TARGET - rate).replace('%','') + ' pts below target'
+      : '✓ On target')+'</div>';
+  // meter spans 50–100% so the gap to 95 is readable
+  function pos(v){ return Math.max(0, Math.min(100, (v - 50) * 2)); }
+  el.innerHTML =
+    '<div class="dv-rate"><div class="v">'+fmtPct(rate)+'</div>'+
+      '<div class="l">Delivered · last 7 days</div>'+status+
+      (rate === null ? '' :
+        '<div class="meter" role="img" aria-label="'+fmtPct(rate)+' delivered against a '+DELIVERY_TARGET+'% target">'+
+          '<div class="fill" data-w="'+pos(rate)+'"></div><div class="tgt" style="left:calc('+pos(DELIVERY_TARGET)+'% - 1px)"></div></div>'+
+        '<div class="meter-scale"><span style="left:0;transform:none">50%</span><span style="left:'+pos(DELIVERY_TARGET)+'%">TARGET '+DELIVERY_TARGET+'%</span></div>')+
+      deltaHtml(rate, prev, false, ' pts')+
+    '</div>'+
+    '<div class="dv-counts">'+
+      tileHtml('mini', b.textsFailedYesterday, 'Failed yesterday', {hot:true})+
+      tileHtml('mini', b.textsSentYesterday, 'Sent yesterday')+
+      tileHtml('mini', b.textsFailed7d, 'Failed · 7 days', {hot:true})+
+      tileHtml('mini', b.textsSent7d, 'Sent · 7 days')+
+    '</div>'+
+    '<div class="dv-spark"><span class="trend-name">Delivery rate by run</span>'+sparkHtml('deliv', pts)+'</div>';
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    var f = el.querySelector('.meter .fill'); if(f) f.style.width = f.dataset.w + '%';
+  }); });
   drawSparks();
 }
 
 function drawSparks(){
-  var rows = (LIVE.history || []).slice().reverse();
   document.querySelectorAll('.spark').forEach(function(el){
-    var t = TRENDS[+el.dataset.i];
-    var pts = rows.filter(function(r){ return isNum(r[t.key]); });
+    var s = SERIES[el.dataset.s];
+    var pts = seriesPoints(el.dataset.s);
+    var fmt = s.fmt || fmtNum;
     var w = el.clientWidth, h = el.clientHeight, pad = 6;
     if(!w || pts.length < 2) return;
-    var vals = pts.map(function(r){ return Number(r[t.key]); });
+    var vals = pts.map(function(r){ return Number(s.get(r)); });
     var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if(isNum(s.target)){ lo = Math.min(lo, s.target); hi = Math.max(hi, s.target); }
     if(hi === lo){ hi += 1; lo -= 1; }
     function x(i){ return pad + i * (w - pad*2) / (pts.length - 1); }
     function y(v){ return pad + (h - pad*2) * (1 - (v - lo) / (hi - lo)); }
     var line = vals.map(function(v,i){ return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join('');
     var area = line + 'L' + x(vals.length-1).toFixed(1) + ',' + h + 'L' + x(0).toFixed(1) + ',' + h + 'Z';
     var li = vals.length - 1;
+    var target = isNum(s.target)
+      ? '<line class="tl" x1="0" x2="'+w+'" y1="'+y(s.target)+'" y2="'+y(s.target)+'"/>'+
+        '<text class="tl-l" x="'+(w-2)+'" y="'+(y(s.target)-4)+'" text-anchor="end">'+s.target+'% TARGET</text>'
+      : '';
     el.innerHTML =
       '<svg viewBox="0 0 '+w+' '+h+'" aria-hidden="true">'+
-        '<line class="base" x1="0" x2="'+w+'" y1="'+(h-0.5)+'" y2="'+(h-0.5)+'"/>'+
+        '<line class="base" x1="0" x2="'+w+'" y1="'+(h-0.5)+'" y2="'+(h-0.5)+'"/>'+target+
         '<path class="ar-fill" d="'+area+'"/><path class="ln" d="'+line+'"/>'+
         '<line class="hx" y1="0" y2="'+h+'" x1="0" x2="0" visibility="hidden"/>'+
         '<circle class="end" r="4" cx="'+x(li)+'" cy="'+y(vals[li])+'"/>'+
         '<circle class="hp" r="4" cx="0" cy="0" visibility="hidden"/>'+
       '</svg><div class="spark-tip"></div>';
     el.setAttribute('role','img');
-    el.setAttribute('aria-label', t.name + ' over the last ' + vals.length + ' briefs: ' + vals.join(', '));
+    el.setAttribute('aria-label', s.name + ' over the last ' + vals.length + ' briefs: ' + vals.map(fmt).join(', '));
     var hx = el.querySelector('.hx'), hp = el.querySelector('.hp'), tip = el.querySelector('.spark-tip');
     function show(e){
       var r = el.getBoundingClientRect();
@@ -836,7 +936,7 @@ function drawSparks(){
       i = Math.max(0, Math.min(pts.length - 1, i));
       hx.setAttribute('x1', x(i)); hx.setAttribute('x2', x(i));
       hp.setAttribute('cx', x(i)); hp.setAttribute('cy', y(vals[i]));
-      tip.innerHTML = '<b>'+fmtNum(vals[i])+'</b> <span>· '+esc(fmtWhen(pts[i].runTime))+'</span>';
+      tip.innerHTML = '<b>'+fmt(vals[i])+'</b> <span>· '+esc(fmtWhen(pts[i].runTime))+'</span>';
       tip.style.left = Math.max(60, Math.min(w - 60, x(i))) + 'px';
       tip.classList.add('show');
       hx.setAttribute('visibility','visible'); hp.setAttribute('visibility','visible');
@@ -854,6 +954,7 @@ window.addEventListener('resize', function(){
   sparkResizeTimer = setTimeout(drawSparks, 150);
 });
 renderTrends(null);
+renderDelivery(null);
 
 function renderHistory(rows){
   var el = $('hist');
@@ -862,7 +963,7 @@ function renderHistory(rows){
     el.innerHTML = '<tbody><tr><td class="empty-note" style="text-align:left">No briefs recorded yet.</td></tr></tbody>';
     return;
   }
-  var head = '<thead><tr><th>Run</th><th>Calls</th><th>Texts out</th><th>New leads 24h</th><th>Due</th><th>Overdue</th><th>AI calls 7d</th><th>Interested</th></tr></thead>';
+  var head = '<thead><tr><th>Run</th><th>Calls</th><th>Texts out</th><th>New leads 24h</th><th>Due</th><th>Overdue</th><th>Delivery 7d</th><th>AI calls 7d</th><th>Interested</th></tr></thead>';
   var body = rows.map(function(r){
     return '<tr>'+
       '<td>'+esc(fmtWhen(r.runTime))+(r.mode === 'DRY_RUN' ? ' <span style="color:var(--blue-3)">· dry</span>' : '')+'</td>'+
@@ -871,6 +972,7 @@ function renderHistory(rows){
       '<td>'+fmtNum(r.newLeads24h)+'</td>'+
       '<td>'+fmtNum(r.tasksDueToday)+'</td>'+
       '<td'+(r.tasksOverdue > 0 ? ' class="hot"' : '')+'>'+fmtNum(r.tasksOverdue)+'</td>'+
+      '<td'+(deliveryRate(r) !== null && deliveryRate(r) < DELIVERY_TARGET ? ' class="hot"' : '')+'>'+fmtPct(deliveryRate(r))+'</td>'+
       '<td>'+fmtNum(r.aiCalls7d)+'</td>'+
       '<td>'+fmtNum(r.sellersInterested7d)+'</td>'+
     '</tr>';
@@ -887,6 +989,8 @@ function renderTicker(){
     if(b.focusToday) parts.push(esc(b.focusToday));
     if(isNum(b.callsYesterday)) parts.push(fmtNum(b.callsYesterday) + ' CALLS YESTERDAY');
     if(isNum(b.openDeals)) parts.push(fmtNum(b.openDeals) + ' OPEN DEALS');
+    var dr = deliveryRate(b);
+    if(dr !== null) parts.push('TEXT DELIVERY ' + fmtPct(dr) + (dr < DELIVERY_TARGET ? ' — BELOW ' + DELIVERY_TARGET + '% TARGET' : ''));
     if(isNum(b.commissionClosed30d) && b.commissionClosed30d > 0)
       parts.push('<span class="celebrate-tick">★ ' + fmtMoney(b.commissionClosed30d) + ' COMMISSION CLOSED · 30D</span>');
   } else {
@@ -1000,6 +1104,11 @@ function buildBriefText(){
     if(b.tasksOverdue) facts.push(fmtNum(b.tasksOverdue) + ' overdue');
     if(b.openDeals != null) facts.push(fmtNum(b.openDeals) + ' open deals');
     if(facts.length) parts.push('You have ' + facts.join(', ') + '.');
+    var dr = deliveryRate(b);
+    if(dr !== null && dr < DELIVERY_TARGET){
+      parts.push('Heads up: text delivery is ' + fmtPct(dr).replace('%',' percent') + ' over the last 7 days, below your ' + DELIVERY_TARGET + ' percent target' +
+        (b.textsFailedYesterday ? ', with ' + fmtNum(b.textsFailedYesterday) + ' failed texts yesterday.' : '.'));
+    }
   } else {
     parts.push("I don't have this morning's brief yet.");
   }
@@ -1378,6 +1487,7 @@ async function loadLiveDashboard(){
       renderBriefHeader(LIVE.brief);
       renderBriefNotes(LIVE.brief);
       renderTrends(LIVE.history);
+      renderDelivery(LIVE.brief);
       renderHistory(LIVE.history);
       DATA.headline = LIVE.brief.focusToday || '';
       setSource('online', 'Notion · synced ' + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}));
